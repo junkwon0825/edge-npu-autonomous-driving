@@ -1,7 +1,7 @@
 {
   "project": "NPU Auto Driving Project 2",
   "branch": "feature/npu-pipeline",
-  "updated": "2026-11-22T12:11:04+0900",
+  "updated": "2026-11-22T12:35:09+0900",
   "tasks": {
     "A0": {
       "title": "Environment audit",
@@ -100,9 +100,9 @@
       "artifacts": [
         "reports/evidence/npu_compile.json"
       ],
-      "next": "poll status_compile.json",
+      "next": "",
       "note": "AOT compile 1901.9 s, furiosa-torch 2026.4.0",
-      "last_checkpoint": "2026-11-22T12:03:39+0900"
+      "last_checkpoint": "2026-11-22T12:35:09+0900"
     },
     "N3": {
       "title": "NPU runtime inference + numerical check vs CPU",
@@ -129,12 +129,15 @@
       "deps": [
         "N2"
       ],
-      "status": "RUNNING",
+      "status": "PARTIAL",
       "acceptance": "supported precision path executed or blocker documented",
-      "artifacts": [],
-      "next": "",
-      "note": "no INT8/vision quantization API in furiosa-torch 2026.4.0; running BF16 compile experiment",
-      "last_checkpoint": "2026-11-22T12:11:04+0900"
+      "artifacts": [
+        "reports/evidence/npu_bench_bf16.json",
+        "reports/evidence/gpu_vs_npu_bf16.json"
+      ],
+      "next": "INT8 needs an officially documented SDK path",
+      "note": "INT8 BLOCKED: no vision quantization API in furiosa-torch 2026.4.0; BF16 compiled 1169.6 s, compute 2.000 ms, recall vs GPU 0.972",
+      "last_checkpoint": "2026-11-22T12:35:09+0900"
     },
     "P1": {
       "title": "GPU vs NPU benchmark + detection agreement",
@@ -193,10 +196,15 @@
         "P1",
         "F1"
       ],
-      "status": "TODO",
+      "status": "PASS",
       "acceptance": "README, reports, KO/EN summary with status labels",
-      "artifacts": [],
-      "next": ""
+      "artifacts": [
+        "README.md",
+        "docs/portfolio_summary.md",
+        "reports/final_report.md"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-22T12:35:09+0900"
     }
   }
 }

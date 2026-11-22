@@ -20,6 +20,7 @@
   before/after evidence. **TESTED** (simulation; NPU latency injected, not NPU-in-the-loop)
 - Independent read-only review by a second coding agent (Kiro) via my multi-agent orchestrator; 1 of 5
   findings accepted, 4 rejected with evidence.
+- BF16 variant also compiled and run on RNGD: 2.00 ms compute, recall vs GPU 0.972 (vs 0.988 for FP32). **TESTED**
 
 Not done / limitations: INT8 quantization (no vision quantization API in the installed SDK — see
 `reports/npu_compilation.md`), ground-truth mAP, NPU-in-the-loop control, power measurement,
@@ -45,6 +46,7 @@ compiled-GPU (TensorRT) comparison. No real-vehicle validation.
   NPU-in-the-loop 아님)
 - 자체 멀티 에이전트 오케스트레이터로 두 번째 코딩 에이전트(Kiro)의 읽기 전용 독립 리뷰 수행,
   5건 중 1건 채택·4건은 근거와 함께 기각.
+- BF16 변형도 RNGD에서 컴파일·실행: 연산 2.00 ms, GPU 대비 recall 0.972(FP32는 0.988). **TESTED**
 
 미완료/한계: INT8 양자화(설치된 SDK에 vision 양자화 API 없음 — `reports/npu_compilation.md`), GT 기반 mAP,
 NPU-in-the-loop 제어, 전력 측정, TensorRT 등 컴파일된 GPU 경로와의 비교. 실차 검증 없음.

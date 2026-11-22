@@ -10,6 +10,7 @@ detection agreement; latency over all frames). The GPU FP32 output is the refere
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -22,12 +23,16 @@ from npu_ad.perception.yolo_raw import RawDecoder, load_raw_model
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dtype", choices=["fp32", "bf16"], default="fp32")
+    a = ap.parse_args()
+    sfx = "" if a.dtype == "fp32" else f"_{a.dtype}"
     cfg = load_config()
     m = cfg["model"]
     _, head = load_raw_model(str(resolve(m["weights"])))
     dec = RawDecoder(head, m["imgsz"])
     gpu = torch.load(resolve("outputs/gpu/fp32_clean/raw_outputs.pt"))
-    npu = torch.load(resolve("outputs/npu/npu_outputs_fp32.pt"))
+    npu = torch.load(resolve(f"outputs/npu/npu_outputs_{a.dtype}.pt"))
     assert gpu["names"] == npu["names"], "input order mismatch"
     manifest = json.loads(resolve("outputs/dataset/manifest.json").read_text(encoding="utf-8"))
     split = {f["path"]: f["split"] for f in manifest["frames"]}
@@ -44,7 +49,7 @@ def main() -> int:
         g = dec(gpu["boxes"][i : i + 1], gpu["scores"][i : i + 1], m["conf"], m["iou"], m["max_det"])[0].numpy()
         n = dec(npu["boxes"][i : i + 1], npu["scores"][i : i + 1], m["conf"], m["iou"], m["max_det"])[0].numpy()
         per_split[split[name]].append(match_detections(g, n, 0.5))
-    bench = json.loads(resolve("reports/evidence/npu_bench.json").read_text(encoding="utf-8"))
+    bench = json.loads(resolve(f"reports/evidence/npu_bench{sfx}.json").read_text(encoding="utf-8"))
     t = bench["result"]["timings_s"]
     dev_e2e = np.array(t["h2d"]) + np.array(t["compute"]) + np.array(t["d2h"])
     gpu_b = json.loads(resolve("reports/evidence/gpu_benchmark_fp32_clean.json").read_text(encoding="utf-8"))
@@ -66,7 +71,7 @@ def main() -> int:
         "npu_env": bench.get("env"),
         "npu_compile_or_cache_load_s": bench["result"]["compile_or_cache_load_s"],
     }
-    out = resolve("reports/evidence/gpu_vs_npu.json")
+    out = resolve(f"reports/evidence/gpu_vs_npu{sfx}.json")
     out.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result, indent=2))
     return 0

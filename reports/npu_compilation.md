@@ -53,4 +53,36 @@ remained in the raw module.
 | 02:23 | remote start | local ssh call hung | backgrounded and-list kept stdout open | only `nohup` is backgrounded |
 
 ## Quantization (Phase 4)
-<!-- QUANT_SECTION -->
+**Status: PARTIAL — INT8 quantization BLOCKED; BF16 precision reduction executed.**
+
+### INT8 / static quantization — BLOCKED (SDK capability)
+- `furiosa.torch` 2026.4.0 exposes no `quantize`/`calibrate` API; `get_amp_supported_dtype()` returns `[]`.
+- A source search of the installed `furiosa` packages (envs `furiosa-npu`, `furiosa02`) found quantization
+  code only in LLM kernels (`kernels/qwen3`, `kernels/qwen3_moe`, `kernels/exaone4`,
+  `kernels/common/dynamic_quantization.py`), i.e. the FP8 path used by `furiosa-llm`, not a vision/CNN path.
+- The KB records a student report that `furiosa-models` vision modules became empty after the RNGD
+  transition (2026-11-03, unverified). No officially documented INT8 path for a PyTorch CNN was found
+  in the installed SDK, so none was invented.
+- Prepared for later use: 18 calibration frames (`split == "calib"` in `outputs/dataset/manifest.json`),
+  never used for reported agreement metrics.
+
+### BF16 precision reduction — executed (`--dtype bf16`)
+Same raw module and inputs cast to `torch.bfloat16` before `CompileModule.from_module`.
+This is a precision change, **not** quantization, and needs no calibration.
+
+| Metric | NPU FP32 graph | NPU BF16 graph |
+|---|---|---|
+| AOT compile time | 1901.9 s | 1169.6 s |
+| Compute mean / p50 / p95 | 2.107 / 2.106 / 2.119 ms | 2.000 / 1.988 / 2.020 ms |
+| H2D mean | 0.80 ms | 0.74 ms |
+| D2H mean / p95 (includes host `.float()` of the outputs) | 0.90 / 1.76 ms | 11.16 / 21.36 ms |
+| Raw diff vs GPU FP32: boxes max / mean | 2.965 / 0.032 | 3.863 / 0.039 |
+| Raw diff vs GPU FP32: logits max / mean | 5.352 / 0.051 | 7.087 / 0.094 |
+| Eval split vs GPU FP32: recall / precision / mean IoU | 0.988 / 0.992 / 0.991 | 0.972 / 0.992 / 0.989 |
+| Mean / max abs Δconf (eval) | 0.0051 / 0.161 | 0.0074 / 0.032 |
+
+Observations: BF16 compute was 5 % faster and compile 38 % shorter (compile times on the shared host depend on its load and are not a stable metric), while recall vs GPU dropped from 0.988
+to 0.972 (4 more missed detections out of 254). The BF16 D2H figure is dominated by something on the host
+side of the output copy/conversion (~10× FP32); its cause was not isolated, so the BF16 device-side total is
+not used for any latency claim. Evidence: `reports/evidence/npu_{compile,bench}_bf16.json`,
+`reports/evidence/gpu_vs_npu_bf16.json`.

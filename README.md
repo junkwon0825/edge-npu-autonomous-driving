@@ -8,7 +8,24 @@ Every number in this repository comes from a recorded run under `reports/evidenc
 Status labels: **TESTED** (executed with evidence) · **IMPLEMENTED** (code exists, not fully exercised) ·
 **PARTIAL** · **BLOCKED** · **PLANNED**.
 
-<!-- RESULTS_TABLE -->
+## Results at a glance (measured 2026-11-22)
+
+| Area | Result | Status |
+|---|---|---|
+| CARLA capture | 3/3 runs × 100 contiguous frames, 0 orphaned actors | TESTED |
+| Raw-head split vs ultralytics | max abs diff 0.0 (CPU), 2.98e-8 (CUDA) | TESTED |
+| GPU (RTX 3060, eager FP32, batch 1) | model 13.54 ms mean, e2e 17.73 ms mean / 22.72 ms p95, 56 FPS | TESTED |
+| RNGD compile (furiosa-torch 2026.4.0) | AOT `CompileModule` in 1901.9 s | TESTED |
+| RNGD inference (`furiosa:0`) | compute 2.107 ms mean; H2D+compute+D2H 3.81 ms mean | TESTED |
+| NPU vs GPU detections (54 eval frames) | recall 0.988, precision 0.992, mean IoU 0.991 | TESTED (agreement, not GT mAP) |
+| INT8 quantization | no vision quantization API in installed SDK | BLOCKED |
+| BF16 on RNGD | compute 2.000 ms; recall vs GPU 0.972 | TESTED |
+| Closed-loop AEB, 5 hazard scenarios | AEB off: 5/5 collide · AEB on: 0/25 collide for 0–200 ms delay | TESTED (simulation) |
+| Latency effect (pedestrian crossing) | min gap 2.19 → 2.05 → 1.89 → 1.36 → 0.53 m at 0/10/30/100/200 ms | TESTED (NPU latency injected) |
+| NPU-in-the-loop driving, GT mAP, power | not done | PLANNED |
+
+The GPU/NPU latency ratio is not a hardware comparison: the GPU path is eager PyTorch, the NPU path an
+AOT-compiled graph on a different (shared, remote) host.
 
 ## Architecture
 
