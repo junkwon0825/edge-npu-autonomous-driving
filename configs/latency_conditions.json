@@ -1,0 +1,29 @@
+{
+  "conditions": [
+    {
+      "name": "aeb_off",
+      "delay_ms": null,
+      "source": "baseline without AEB"
+    },
+    {
+      "name": "ideal_0ms",
+      "delay_ms": 0.0,
+      "source": "idealised, no perception latency"
+    },
+    {
+      "name": "gpu_p95",
+      "delay_ms": 22.72497497615405,
+      "source": "measured: gpu_benchmark_fp32_clean.json e2e p95"
+    },
+    {
+      "name": "stress_100ms",
+      "delay_ms": 100.0,
+      "source": "sensitivity sweep"
+    },
+    {
+      "name": "stress_200ms",
+      "delay_ms": 200.0,
+      "source": "sensitivity sweep"
+    }
+  ]
+}

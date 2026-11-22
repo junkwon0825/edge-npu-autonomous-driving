@@ -93,6 +93,36 @@ def test_aeb_perception_hold_bridges_short_miss():
     assert d.reason == "full"
 
 
+def test_aeb_hold_expires_for_targets_absent_from_input():
+    # review finding (Kiro): a target missing from the list must not keep a stale perception hold
+    c = AebController(AebParams(perception_hold_ticks=2))
+    c.decide([_t(40.0, 8.0, perceived=True)], 8.0)
+    c.decide([], 8.0)
+    c.decide([], 8.0)
+    assert c.decide([_t(9.0, 8.0, perceived=False)], 8.0).brake == 0.0
+
+
+def test_aeb_v2_holds_partial_until_not_closing_and_holds_standstill():
+    c = AebController()
+    assert c.decide([_t(16.0, 8.0)], 8.0).reason == "partial"
+    d = c.decide([_t(15.0, 3.0)], 3.0)  # ttc 5 s: v1 would release here
+    assert d.reason == "partial_hold" and d.brake == 0.5
+    assert c.decide([_t(14.9, 0.3)], 0.3).reason == "standstill_hold"
+    assert c.decide([], 0.0).reason == "latched_stopped"
+
+
+def test_aeb_v1_releases_partial_when_ttc_recovers():
+    c = AebController(AebParams(hysteresis=False))
+    assert c.decide([_t(16.0, 8.0)], 8.0).reason == "partial"
+    assert c.decide([_t(15.0, 3.0)], 3.0).reason == "clear"
+
+
+def test_aeb_v2_releases_hold_when_target_leaves_corridor():
+    c = AebController()
+    c.decide([_t(16.0, 8.0)], 8.0)
+    assert c.decide([_t(15.0, 3.0, lat=3.0)], 3.0).reason == "clear"
+
+
 def test_delay_line():
     dl = DelayLine(2)
     out = [dl.push(Decision(float(i), str(i))).brake for i in range(1, 5)]

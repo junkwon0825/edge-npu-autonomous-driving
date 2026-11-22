@@ -1,0 +1,183 @@
+{
+  "project": "NPU Auto Driving Project 2",
+  "branch": "feature/npu-pipeline",
+  "updated": "2026-11-22T11:38:55+0900",
+  "tasks": {
+    "A0": {
+      "title": "Environment audit",
+      "phase": 0,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "reports/environment_audit.md records measured versions",
+      "artifacts": [],
+      "next": ""
+    },
+    "B1": {
+      "title": "CARLA session + capture smoke (3 runs)",
+      "phase": 1,
+      "owner": "claude",
+      "deps": [
+        "A0"
+      ],
+      "status": "PASS",
+      "acceptance": "3/3 runs: 100 contiguous frames, saved+reread, 0 orphans",
+      "artifacts": [
+        "reports/evidence/capture_smoke.json"
+      ],
+      "next": ""
+    },
+    "B2": {
+      "title": "Seeded multi-weather dataset (72 frames)",
+      "phase": 1,
+      "owner": "claude",
+      "deps": [
+        "B1"
+      ],
+      "status": "PASS",
+      "acceptance": "manifest with calib/eval split",
+      "artifacts": [
+        "outputs/dataset/manifest.json"
+      ],
+      "next": ""
+    },
+    "C1": {
+      "title": "Raw-head split validated vs ultralytics",
+      "phase": 2,
+      "owner": "claude",
+      "deps": [
+        "A0"
+      ],
+      "status": "PASS",
+      "acceptance": "decoded max abs diff <= 1e-4 CPU and CUDA",
+      "artifacts": [
+        "reports/evidence/raw_split_validation_cpu.json",
+        "reports/evidence/raw_split_validation_cuda.json"
+      ],
+      "next": ""
+    },
+    "C2": {
+      "title": "GPU baseline benchmark",
+      "phase": 2,
+      "owner": "claude",
+      "deps": [
+        "B2",
+        "C1"
+      ],
+      "status": "PASS",
+      "acceptance": "stage latencies, FPS, memory, util with warm-up excluded",
+      "artifacts": [
+        "reports/evidence/gpu_benchmark_fp32_clean.json",
+        "reports/evidence/gpu_benchmark_fp16_clean.json",
+        "reports/evidence/gpu_benchmark_fp32_carla_running.json"
+      ],
+      "next": ""
+    },
+    "N1": {
+      "title": "NPU hardware gate",
+      "phase": 3,
+      "owner": "claude",
+      "deps": [
+        "A0"
+      ],
+      "status": "PASS",
+      "acceptance": "device visible via furiosa-smi, SDK version recorded",
+      "artifacts": [
+        "reports/environment_audit.md"
+      ],
+      "next": ""
+    },
+    "N2": {
+      "title": "RNGD AOT compile of raw YOLO26n",
+      "phase": 3,
+      "owner": "claude",
+      "deps": [
+        "N1",
+        "C1"
+      ],
+      "status": "RUNNING",
+      "acceptance": "CompileModule.from_module returns; status_compile.json PASS",
+      "artifacts": [],
+      "next": "poll status_compile.json",
+      "note": "started 2026-11-22T02:30:54Z env furiosa-npu (furiosa-torch 2026.4.0)",
+      "last_checkpoint": "2026-11-22T11:38:55+0900"
+    },
+    "N3": {
+      "title": "NPU runtime inference + numerical check vs CPU",
+      "phase": 3,
+      "owner": "claude",
+      "deps": [
+        "N2"
+      ],
+      "status": "TODO",
+      "acceptance": "outputs on furiosa:0, max/mean abs diff vs CPU recorded",
+      "artifacts": [],
+      "next": ""
+    },
+    "Q1": {
+      "title": "Quantization",
+      "phase": 4,
+      "owner": "claude",
+      "deps": [
+        "N2"
+      ],
+      "status": "TODO",
+      "acceptance": "supported precision path executed or blocker documented",
+      "artifacts": [],
+      "next": ""
+    },
+    "P1": {
+      "title": "GPU vs NPU benchmark + detection agreement",
+      "phase": 5,
+      "owner": "claude",
+      "deps": [
+        "N3",
+        "C2"
+      ],
+      "status": "TODO",
+      "acceptance": "same inputs/pre/post; measured table",
+      "artifacts": [],
+      "next": ""
+    },
+    "F1": {
+      "title": "Closed-loop AEB scenarios x latency conditions",
+      "phase": 6,
+      "owner": "claude",
+      "deps": [
+        "B1",
+        "C2"
+      ],
+      "status": "RUNNING",
+      "acceptance": "6 scenarios; collisions/min gap/brake timing recorded",
+      "artifacts": [],
+      "next": ""
+    },
+    "R1": {
+      "title": "Independent review (Kiro, read-only via agent_lab)",
+      "phase": 7,
+      "owner": "kiro",
+      "deps": [
+        "F1"
+      ],
+      "status": "PASS",
+      "acceptance": "findings verified by coordinator",
+      "artifacts": [
+        "reports/review_findings.md"
+      ],
+      "next": ""
+    },
+    "G1": {
+      "title": "Portfolio docs",
+      "phase": 7,
+      "owner": "claude",
+      "deps": [
+        "P1",
+        "F1"
+      ],
+      "status": "TODO",
+      "acceptance": "README, reports, KO/EN summary with status labels",
+      "artifacts": [],
+      "next": ""
+    }
+  }
+}

@@ -30,6 +30,12 @@ class AebParams:
     min_gap_m: float = 4.0  # full brake below this gap regardless of TTC (when closing)
     partial_brake: float = 0.5
     perception_hold_ticks: int = 3  # keep a target "perceived" briefly through 1-2 frame misses
+    # v2: once partial braking starts for a target, hold it while that target is still closing in the
+    # corridor, and hold the vehicle (full brake) below standstill_mps. v1 (False) released the brake as
+    # soon as TTC rose above the threshold, which let cruise control re-accelerate towards a stopped
+    # obstacle (stop-and-go creep observed in lead_vehicle_braking, see reports/scenario_evaluation.md).
+    hysteresis: bool = True
+    standstill_mps: float = 0.5
 
 
 @dataclass
@@ -46,6 +52,7 @@ class AebController:
     params: AebParams = field(default_factory=AebParams)
     latched: bool = False
     _seen: dict[int, int] = field(default_factory=dict)
+    _partial_target: int | None = None
 
     def decide(self, targets: list[TargetState], ego_speed_mps: float) -> Decision:
         p = self.params
@@ -53,6 +60,12 @@ class AebController:
             if ego_speed_mps < 0.05:
                 return Decision(1.0, "latched_stopped")
             return Decision(1.0, "latched")
+        present = {t.actor_id for t in targets}
+        for aid in list(self._seen):  # targets absent this tick also lose their hold
+            if aid not in present:
+                self._seen[aid] -= 1
+                if self._seen[aid] <= 0:
+                    del self._seen[aid]
         for t in targets:
             self._seen[t.actor_id] = p.perception_hold_ticks if t.perceived else max(
                 0, self._seen.get(t.actor_id, 0) - 1)
@@ -70,6 +83,20 @@ class AebController:
                 return Decision(1.0, "full", t.actor_id, ttc, t.gap_m)
             if ttc < p.ttc_partial_s and best.brake < p.partial_brake:
                 best = Decision(p.partial_brake, "partial", t.actor_id, ttc, t.gap_m)
+        if not p.hysteresis:
+            return best
+        if best.brake == 0.0 and self._partial_target is not None:
+            held = next((t for t in targets if t.actor_id == self._partial_target), None)
+            if (held is not None and abs(held.lateral_m) <= p.corridor_half_width_m
+                    and self._seen.get(held.actor_id, 0) > 0 and held.closing_mps > 0.05):
+                best = Decision(p.partial_brake, "partial_hold", held.actor_id, None, held.gap_m)
+            else:
+                self._partial_target = None
+        if best.brake > 0.0:
+            self._partial_target = best.target_id
+            if ego_speed_mps < p.standstill_mps:
+                self.latched = True
+                return Decision(1.0, "standstill_hold", best.target_id, best.ttc_s, best.gap_m)
         return best
 
 

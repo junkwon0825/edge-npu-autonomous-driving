@@ -47,13 +47,16 @@ def _env() -> dict:
     return info
 
 
-def _build(weights: str, imgsz: int):
+def _build(weights: str, imgsz: int, dtype: str = "fp32"):
     import torch
 
     from npu_ad.perception.yolo_raw import load_raw_model
 
     raw, _ = load_raw_model(weights)
-    return raw, torch.zeros(1, 3, imgsz, imgsz)
+    x = torch.zeros(1, 3, imgsz, imgsz)
+    if dtype == "bf16":  # precision reduction experiment, not INT8 quantization
+        raw, x = raw.to(torch.bfloat16), x.to(torch.bfloat16)
+    return raw, x
 
 
 def cmd_dryrun(a) -> dict:
@@ -78,7 +81,7 @@ def cmd_compile(a) -> dict:
     import torch
     from furiosa.torch import CompileModule
 
-    raw, x = _build(a.weights, a.imgsz)
+    raw, x = _build(a.weights, a.imgsz, a.dtype)
     with torch.no_grad():
         cpu_boxes, cpu_scores = raw(x)
     t0 = time.perf_counter()
@@ -95,13 +98,13 @@ def cmd_bench(a) -> dict:
     import torch
     from furiosa.torch import CompileModule
 
-    raw, x0 = _build(a.weights, a.imgsz)
+    raw, x0 = _build(a.weights, a.imgsz, a.dtype)
     from npu_ad.perception.yolo_raw import to_tensor
 
     # {"names": [...], "lb_bgr_uint8": (K,H,W,3)} letterboxed on the host with the GPU-path code;
     # to_tensor is the same function the GPU path uses.
     data = torch.load(a.inputs)
-    xs = torch.cat([to_tensor(img.numpy()) for img in data["lb_bgr_uint8"]])
+    xs = torch.cat([to_tensor(img.numpy()) for img in data["lb_bgr_uint8"]]).to(x0.dtype)
     t0 = time.perf_counter()
     compiled = CompileModule.from_module(raw, (x0,))
     load_s = time.perf_counter() - t0
@@ -120,7 +123,7 @@ def cmd_bench(a) -> dict:
             out = compiled(xd)
         stream.synchronize()
         t_c = time.perf_counter()
-        boxes, scores = (o.cpu() for o in out)
+        boxes, scores = (o.cpu().float() for o in out)
         t_d = time.perf_counter()
         return boxes, scores, (t_b - t_a, t_c - t_b, t_d - t_c)
 
@@ -136,12 +139,12 @@ def cmd_bench(a) -> dict:
                 out_scores.append(s)
     torch.save(
         {"names": data["names"], "boxes": torch.cat(out_boxes), "scores": torch.cat(out_scores)},
-        a.workdir / "npu_outputs.pt",
+        a.workdir / f"npu_outputs_{a.dtype}.pt",
     )
     # Reference: same raw module on the host CPU of the NPU server (numerical check of the NPU)
     with torch.no_grad():
         cpu_b, cpu_s = zip(*(raw(x.unsqueeze(0)) for x in xs), strict=True)
-    cb, cs = torch.cat(cpu_b), torch.cat(cpu_s)
+    cb, cs = torch.cat(cpu_b).float(), torch.cat(cpu_s).float()
     nb, ns = torch.cat(out_boxes), torch.cat(out_scores)
     return {
         "compile_or_cache_load_s": load_s,
@@ -173,9 +176,11 @@ def main() -> int:
     ap.add_argument("--device", default="furiosa:0")
     ap.add_argument("--warmup", type=int, default=10)
     ap.add_argument("--repeats", type=int, default=3)
+    ap.add_argument("--dtype", choices=["fp32", "bf16"], default="fp32")
     a = ap.parse_args()
     payload = {"cmd": a.cmd, "state": "RUNNING", "started": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
-    _status(a.workdir, a.cmd, payload)
+    tag = a.cmd if a.dtype == "fp32" else f"{a.cmd}_{a.dtype}"
+    _status(a.workdir, tag, payload)
     try:
         payload["env"] = _env()
         payload["result"] = {"dryrun": cmd_dryrun, "compile": cmd_compile, "bench": cmd_bench}[a.cmd](a)
@@ -186,7 +191,8 @@ def main() -> int:
         payload["error"] = str(e)[:4000]
         payload["traceback"] = traceback.format_exc()[-6000:]
     payload["finished"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
-    _status(a.workdir, a.cmd, payload)
+    payload["dtype"] = a.dtype
+    _status(a.workdir, tag, payload)
     print(json.dumps({k: v for k, v in payload.items() if k != "traceback"}, indent=2, default=str))
     return 0 if payload["state"] == "PASS" else 1
 
