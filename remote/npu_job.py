@@ -153,8 +153,11 @@ def cmd_bench(a) -> dict:
         "n_inputs": len(xs),
         "warmup": a.warmup,
         "repeats": a.repeats,
-        "timings_s": {"h2d": [t[0] for t in timings], "compute": [t[1] for t in timings],
-                      "d2h": [t[2] for t in timings]},
+        "timings_s": {
+            "h2d": [t[0] for t in timings],
+            "compute": [t[1] for t in timings],
+            "d2h": [t[2] for t in timings],
+        },
         "npu_vs_cpu": {
             "boxes_max_abs": (nb - cb).abs().max().item(),
             "boxes_mean_abs": (nb - cb).abs().mean().item(),

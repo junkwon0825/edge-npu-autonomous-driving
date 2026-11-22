@@ -19,18 +19,23 @@ def main() -> int:
         d = json.loads(resolve(f"reports/evidence/scenarios_{v}.json").read_text(encoding="utf-8"))
         runs = {(r["scenario"], r["condition"]): r for r in d["runs"]}
         scen = list(dict.fromkeys(r["scenario"] for r in d["runs"]))
-        out += [f"## AEB {v}", "",
-                "| Scenario | Condition | Applied delay (ms) | Collision | Min gap (m) | First perceived (s) "
-                "| First brake applied (s) | Final speed (m/s) | In-loop GPU e2e p95 (ms) |",
-                "|---|---|---|---|---|---|---|---|---|"]
+        out += [
+            f"## AEB {v}",
+            "",
+            "| Scenario | Condition | Applied delay (ms) | Collision | Min gap (m) | First perceived (s) "
+            "| First brake applied (s) | Final speed (m/s) | In-loop GPU e2e p95 (ms) |",
+            "|---|---|---|---|---|---|---|---|---|",
+        ]
         for s in scen:
             for c in ORDER:
                 r = runs.get((s, c))
                 if r is None:
                     continue
-                out.append(f"| {s} | {c} | {fmt(r['delay_ms'], 0)} | {'**YES**' if r['collision'] else 'no'} "
-                           f"| {fmt(r['min_gap_m'])} | {fmt(r['first_perceived_t'])} | {fmt(r['first_applied_brake_t'])} "
-                           f"| {fmt(r['final_speed_mps'])} | {fmt(r['inloop_gpu_e2e_ms_p95'], 1)} |")
+                out.append(
+                    f"| {s} | {c} | {fmt(r['delay_ms'], 0)} | {'**YES**' if r['collision'] else 'no'} "
+                    f"| {fmt(r['min_gap_m'])} | {fmt(r['first_perceived_t'])} | {fmt(r['first_applied_brake_t'])} "
+                    f"| {fmt(r['final_speed_mps'])} | {fmt(r['inloop_gpu_e2e_ms_p95'], 1)} |"
+                )
         out.append("")
     p = resolve("reports/scenario_tables.md")
     p.write_text("\n".join(out), encoding="utf-8")

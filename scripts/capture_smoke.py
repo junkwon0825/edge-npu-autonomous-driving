@@ -18,8 +18,7 @@ from npu_ad.config import load_config, resolve
 from npu_ad.simulation.carla_env import CarlaSession, image_to_bgr
 
 
-def run_once(cfg: dict, frames: int, save_every: int, out_dir: Path, weather: str | None,
-             spawn_index: int) -> dict:
+def run_once(cfg: dict, frames: int, save_every: int, out_dir: Path, weather: str | None, spawn_index: int) -> dict:
     import carla
 
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -53,15 +52,23 @@ def run_once(cfg: dict, frames: int, save_every: int, out_dir: Path, weather: st
     rec["orphans"] = sorted(alive)
     reread_ok = all(cv2.imread(p) is not None for p in rec["saved"])
     ids = rec["frame_ids"]
-    rec.update({
-        "frames": len(ids),
-        "contiguous": all(b - a == 1 for a, b in zip(ids, ids[1:], strict=False)),
-        "saved_count": len(rec["saved"]),
-        "reread_ok": reread_ok,
-        "elapsed_s": time.perf_counter() - t0,
-    })
-    rec["pass"] = bool(len(ids) == frames and rec["shape_ok"] and rec["contiguous"] and reread_ok
-                       and not rec["orphans"] and not rec["errors"])
+    rec.update(
+        {
+            "frames": len(ids),
+            "contiguous": all(b - a == 1 for a, b in zip(ids, ids[1:], strict=False)),
+            "saved_count": len(rec["saved"]),
+            "reread_ok": reread_ok,
+            "elapsed_s": time.perf_counter() - t0,
+        }
+    )
+    rec["pass"] = bool(
+        len(ids) == frames
+        and rec["shape_ok"]
+        and rec["contiguous"]
+        and reread_ok
+        and not rec["orphans"]
+        and not rec["errors"]
+    )
     rec["frame_ids"] = [ids[0], ids[-1]] if ids else []
     return rec
 
@@ -82,11 +89,19 @@ def main() -> int:
         idx = a.spawn_index if a.spawn_index is not None else cfg["ego"]["spawn_index"] + 7 * r
         rec = run_once(cfg, a.frames, a.save_every, resolve(a.out) / f"run{r:02d}", a.weather, idx)
         rec["run"], rec["spawn_index"] = r, idx
-        print(json.dumps({k: rec[k] for k in ("run", "frames", "saved_count", "contiguous",
-                                                "orphans", "pass", "elapsed_s")}))
+        print(
+            json.dumps(
+                {k: rec[k] for k in ("run", "frames", "saved_count", "contiguous", "orphans", "pass", "elapsed_s")}
+            )
+        )
         runs.append({k: v for k, v in rec.items() if k != "saved"})
-    summary = {"runs": runs, "all_pass": all(r["pass"] for r in runs), "config": cfg["camera"],
-               "fixed_delta_seconds": cfg["carla"]["fixed_delta_seconds"], "weather": a.weather}
+    summary = {
+        "runs": runs,
+        "all_pass": all(r["pass"] for r in runs),
+        "config": cfg["camera"],
+        "fixed_delta_seconds": cfg["carla"]["fixed_delta_seconds"],
+        "weather": a.weather,
+    }
     out = resolve(a.report)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(summary, indent=2), encoding="utf-8")

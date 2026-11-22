@@ -21,8 +21,16 @@ class StageTimes:
 
 
 class GpuDetector:
-    def __init__(self, weights: str, imgsz: int, conf: float, iou: float, max_det: int,
-                 device: str = "cuda:0", half: bool = False):
+    def __init__(
+        self,
+        weights: str,
+        imgsz: int,
+        conf: float,
+        iou: float,
+        max_det: int,
+        device: str = "cuda:0",
+        half: bool = False,
+    ):
         self.raw, head = load_raw_model(weights)
         self.device = torch.device(device)
         self.half = half

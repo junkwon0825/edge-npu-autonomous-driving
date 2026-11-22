@@ -134,8 +134,13 @@ class CarlaSession:
         cam = self.cfg["camera"]
         tf = self.carla.Transform(self.carla.Location(x=cam["x"], z=cam["z"]))
         sensor = self.spawn(
-            "sensor.camera.rgb", tf, attach_to=parent,
-            image_size_x=cam["width"], image_size_y=cam["height"], fov=cam["fov"], sensor_tick=0.0,
+            "sensor.camera.rgb",
+            tf,
+            attach_to=parent,
+            image_size_x=cam["width"],
+            image_size_y=cam["height"],
+            fov=cam["fov"],
+            sensor_tick=0.0,
         )
         q: queue.Queue = queue.Queue()
         sensor.listen(q.put)  # exactly one listener per sensor
@@ -144,9 +149,11 @@ class CarlaSession:
 
     def attach_collision(self, parent: Any, events: list) -> Any:
         sensor = self.spawn("sensor.other.collision", self.carla.Transform(), attach_to=parent)
-        sensor.listen(lambda ev: events.append(
-            {"frame": ev.frame, "other": ev.other_actor.type_id,
-             "impulse": ev.normal_impulse.length()}))
+        sensor.listen(
+            lambda ev: events.append(
+                {"frame": ev.frame, "other": ev.other_actor.type_id, "impulse": ev.normal_impulse.length()}
+            )
+        )
         return sensor
 
     # ---- stepping --------------------------------------------------------------------------

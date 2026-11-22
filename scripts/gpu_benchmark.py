@@ -45,9 +45,13 @@ class NvmlSampler(threading.Thread):
         self._halt.set()
         self.join()
         u = np.asarray(self.util or [0])
-        return {"gpu_util_mean_pct": float(u.mean()), "gpu_util_max_pct": float(u.max()),
-                "device_mem_used_max_mib": float(max(self.mem or [0])),
-                "temp_max_c": float(max(self.temp or [0])), "samples": len(self.util)}
+        return {
+            "gpu_util_mean_pct": float(u.mean()),
+            "gpu_util_max_pct": float(u.max()),
+            "device_mem_used_max_mib": float(max(self.mem or [0])),
+            "temp_max_c": float(max(self.temp or [0])),
+            "samples": len(self.util),
+        }
 
 
 def carla_running() -> bool:
@@ -104,8 +108,12 @@ def main() -> int:
         "repeats": a.repeats,
         "warmup": a.warmup,
         "carla_server_running": carla_running(),
-        "env": {"torch": torch.__version__, "cuda": torch.version.cuda,
-                "gpu": torch.cuda.get_device_name(0), "python": platform.python_version()},
+        "env": {
+            "torch": torch.__version__,
+            "cuda": torch.version.cuda,
+            "gpu": torch.cuda.get_device_name(0),
+            "python": platform.python_version(),
+        },
         "latency": {k: latency_stats(v) for k, v in stages.items()},
         "throughput_fps_sequential": n / wall,
         "peak_torch_allocated_mib": torch.cuda.max_memory_allocated() / 2**20,
@@ -114,24 +122,39 @@ def main() -> int:
     }
     (out_dir / "benchmark.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     (out_dir / "detections.json").write_text(json.dumps(dets), encoding="utf-8")
-    torch.save({"names": [f["path"] for f in frames], "boxes": torch.cat(raw_b), "scores": torch.cat(raw_s)},
-               out_dir / "raw_outputs.pt")
+    torch.save(
+        {"names": [f["path"] for f in frames], "boxes": torch.cat(raw_b), "scores": torch.cat(raw_s)},
+        out_dir / "raw_outputs.pt",
+    )
     names = det.raw.model.names
     for f, im in list(zip(frames, images, strict=True))[::12]:
         vis = im.copy()
         for x1, y1, x2, y2, c, k in dets[f["path"]]:
             cv2.rectangle(vis, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-            cv2.putText(vis, f"{names[int(k)]} {c:.2f}", (int(x1), max(12, int(y1) - 4)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1)
+            cv2.putText(
+                vis,
+                f"{names[int(k)]} {c:.2f}",
+                (int(x1), max(12, int(y1) - 4)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.45,
+                (0, 255, 0),
+                1,
+            )
         cv2.imwrite(str(out_dir / f"vis_{f['weather']}_{f['frame']}.jpg"), vis)
     if a.export_npu_inputs:
         lbs = np.stack([letterbox(im, m["imgsz"])[0] for im in images])
         npu_dir = resolve("outputs/npu")
         npu_dir.mkdir(parents=True, exist_ok=True)
-        torch.save({"names": [f["path"] for f in frames], "lb_bgr_uint8": torch.from_numpy(lbs)},
-                   npu_dir / "inputs.pt")
-    print(json.dumps({k: result[k] for k in ("tag", "carla_server_running", "throughput_fps_sequential",
-                                             "peak_torch_allocated_mib")}, indent=2))
+        torch.save({"names": [f["path"] for f in frames], "lb_bgr_uint8": torch.from_numpy(lbs)}, npu_dir / "inputs.pt")
+    print(
+        json.dumps(
+            {
+                k: result[k]
+                for k in ("tag", "carla_server_running", "throughput_fps_sequential", "peak_torch_allocated_mib")
+            },
+            indent=2,
+        )
+    )
     for k, v in result["latency"].items():
         print(f"{k:12s} mean {v['mean_ms']:.3f} ms  p50 {v['p50_ms']:.3f}  p95 {v['p95_ms']:.3f}")
     print("nvml", nv)

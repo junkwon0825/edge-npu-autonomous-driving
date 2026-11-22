@@ -27,15 +27,41 @@ from npu_ad.simulation.carla_env import CarlaSession, image_to_bgr
 
 SCENARIOS: dict[str, dict] = {
     "straight_road": {"kind": "none", "weather": "ClearNoon", "duration_s": 10.0},
-    "lead_vehicle_braking": {"kind": "lead_brake", "weather": "ClearNoon", "duration_s": 12.0,
-                             "gap_m": 25.0, "lead_speed_mps": 5.0, "brake_at_s": 3.0},
-    "pedestrian_crossing": {"kind": "ped_cross", "weather": "ClearNoon", "duration_s": 10.0,
-                            "ahead_m": 30.0, "side_m": 4.5, "trigger_gap_m": 24.0, "walk_mps": 1.6},
+    "lead_vehicle_braking": {
+        "kind": "lead_brake",
+        "weather": "ClearNoon",
+        "duration_s": 12.0,
+        "gap_m": 25.0,
+        "lead_speed_mps": 5.0,
+        "brake_at_s": 3.0,
+    },
+    "pedestrian_crossing": {
+        "kind": "ped_cross",
+        "weather": "ClearNoon",
+        "duration_s": 10.0,
+        "ahead_m": 30.0,
+        "side_m": 4.5,
+        "trigger_gap_m": 24.0,
+        "walk_mps": 1.6,
+    },
     "static_obstacle": {"kind": "static_vehicle", "weather": "ClearNoon", "duration_s": 10.0, "gap_m": 40.0},
-    "low_light": {"kind": "lead_brake", "weather": "ClearNight", "duration_s": 12.0,
-                  "gap_m": 25.0, "lead_speed_mps": 5.0, "brake_at_s": 3.0},
-    "rain": {"kind": "ped_cross", "weather": "HardRainNoon", "duration_s": 10.0,
-             "ahead_m": 30.0, "side_m": 4.5, "trigger_gap_m": 24.0, "walk_mps": 1.6},
+    "low_light": {
+        "kind": "lead_brake",
+        "weather": "ClearNight",
+        "duration_s": 12.0,
+        "gap_m": 25.0,
+        "lead_speed_mps": 5.0,
+        "brake_at_s": 3.0,
+    },
+    "rain": {
+        "kind": "ped_cross",
+        "weather": "HardRainNoon",
+        "duration_s": 10.0,
+        "ahead_m": 30.0,
+        "side_m": 4.5,
+        "trigger_gap_m": 24.0,
+        "walk_mps": 1.6,
+    },
 }
 EGO_TARGET_MPS = 30 / 3.6
 
@@ -63,8 +89,9 @@ def lane_follow(ego, cmap, carla):
     """Lateral: pursue a waypoint 8 m ahead; longitudinal: P speed control to 30 km/h."""
     tf = ego.get_transform()
     wp = cmap.get_waypoint(tf.location).next(8.0)[0]
-    lon, lat = geo.to_ego_frame(wp.transform.location.x, wp.transform.location.y,
-                                tf.location.x, tf.location.y, tf.rotation.yaw)
+    lon, lat = geo.to_ego_frame(
+        wp.transform.location.x, wp.transform.location.y, tf.location.x, tf.location.y, tf.rotation.yaw
+    )
     steer = float(np.clip(math.atan2(lat, lon) * 1.2, -0.5, 0.5))
     v = ego.get_velocity().length()
     throttle = float(np.clip(0.35 + 0.6 * (EGO_TARGET_MPS - v), 0.0, 0.8))
@@ -82,8 +109,16 @@ def target_state(ego, actor, kind: str, perceived: bool) -> TargetState:
     return TargetState(actor.id, kind, gap, lat, closing, perceived)
 
 
-def run(cfg: dict, name: str, sc: dict, condition: str, delay_ticks: int | None, detector: GpuDetector,
-        log_dir: Path, aeb_version: str = "v2") -> dict:
+def run(
+    cfg: dict,
+    name: str,
+    sc: dict,
+    condition: str,
+    delay_ticks: int | None,
+    detector: GpuDetector,
+    log_dir: Path,
+    aeb_version: str = "v2",
+) -> dict:
     import carla
 
     groups = {"vehicle": set(cfg["classes"]["vehicle"]), "pedestrian": set(cfg["classes"]["pedestrian"])}
@@ -124,7 +159,7 @@ def run(cfg: dict, name: str, sc: dict, condition: str, delay_ticks: int | None,
         ego.set_target_velocity(carla.Vector3D(fwd.x * EGO_TARGET_MPS, fwd.y * EGO_TARGET_MPS, 0))
         if target is not None and sc["kind"] == "lead_brake":
             target.enable_constant_velocity(carla.Vector3D(sc["lead_speed_mps"], 0, 0))
-        aeb = (AebController(AebParams(hysteresis=aeb_version == "v2")) if condition != "aeb_off" else None)
+        aeb = AebController(AebParams(hysteresis=aeb_version == "v2")) if condition != "aeb_off" else None
         delay = DelayLine(delay_ticks or 0)
         triggered = False
         n_ticks = int(sc["duration_s"] / dt)
@@ -138,8 +173,7 @@ def run(cfg: dict, name: str, sc: dict, condition: str, delay_ticks: int | None,
             if target is not None:
                 bb = target.bounding_box
                 c = target.get_transform().transform(bb.location)
-                uv = geo.project(np.array([c.x, c.y, c.z]), np.array(cam.get_transform().get_inverse_matrix()),
-                                 k_mat)
+                uv = geo.project(np.array([c.x, c.y, c.z]), np.array(cam.get_transform().get_inverse_matrix()), k_mat)
                 perceived = uv is not None and geo.point_in_any_box(uv, dets, groups[tkind])
                 ts = target_state(ego, target, tkind, perceived)
                 if sc["kind"] == "lead_brake" and t_sim >= sc["brake_at_s"] and not triggered:
@@ -158,14 +192,26 @@ def run(cfg: dict, name: str, sc: dict, condition: str, delay_ticks: int | None,
             if brake > 0:
                 throttle = 0.0
             ego.apply_control(carla.VehicleControl(throttle=throttle, steer=steer, brake=brake))
-            rows.append({
-                "step": step, "t_sim": round(t_sim, 3), "frame": fid, "ego_mps": v, "n_dets": len(dets),
-                "infer_e2e_ms": times.e2e * 1000, "perceived": perceived,
-                "gap_m": ts.gap_m if ts else None, "lat_m": ts.lateral_m if ts else None,
-                "closing_mps": ts.closing_mps if ts else None,
-                "decision": decision.reason, "decision_brake": decision.brake, "applied_brake": brake,
-                "throttle": throttle, "steer": steer, "collisions": len(collisions),
-            })
+            rows.append(
+                {
+                    "step": step,
+                    "t_sim": round(t_sim, 3),
+                    "frame": fid,
+                    "ego_mps": v,
+                    "n_dets": len(dets),
+                    "infer_e2e_ms": times.e2e * 1000,
+                    "perceived": perceived,
+                    "gap_m": ts.gap_m if ts else None,
+                    "lat_m": ts.lateral_m if ts else None,
+                    "closing_mps": ts.closing_mps if ts else None,
+                    "decision": decision.reason,
+                    "decision_brake": decision.brake,
+                    "applied_brake": brake,
+                    "throttle": throttle,
+                    "steer": steer,
+                    "collisions": len(collisions),
+                }
+            )
             if v < 0.05 and step * dt > 2.0 and brake >= 1.0:
                 break  # ego stopped by AEB; outcome is decided
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -178,10 +224,16 @@ def run(cfg: dict, name: str, sc: dict, condition: str, delay_ticks: int | None,
     first = lambda key, pred: next((r["t_sim"] for r in rows if pred(r[key])), None)  # noqa: E731
     lat_ms = [r["infer_e2e_ms"] for r in rows]
     return {
-        "scenario": name, "condition": condition, "aeb_version": aeb_version, "delay_ticks": delay_ticks, "dt_s": dt,
+        "scenario": name,
+        "condition": condition,
+        "aeb_version": aeb_version,
+        "delay_ticks": delay_ticks,
+        "dt_s": dt,
         "delay_ms": None if delay_ticks is None else delay_ticks * dt * 1000,
-        "weather": sc["weather"], "ticks": len(rows),
-        "collision": bool(collisions), "collision_with": collisions[0]["other"] if collisions else None,
+        "weather": sc["weather"],
+        "ticks": len(rows),
+        "collision": bool(collisions),
+        "collision_with": collisions[0]["other"] if collisions else None,
         "min_gap_m": min(gaps) if gaps else None,
         "first_perceived_t": first("perceived", bool),
         "first_decision_brake_t": first("decision_brake", lambda b: b > 0),
@@ -220,8 +272,9 @@ def main() -> int:
             c = conds[cname]
             delay_ticks = None if c["delay_ms"] is None else math.ceil(round(c["delay_ms"] / 1000 / a.dt, 6))
             t0 = time.perf_counter()
-            r = run(cfg, sname, SCENARIOS[sname], cname, delay_ticks, det, resolve("outputs/scenario_logs"),
-                  a.aeb_version)
+            r = run(
+                cfg, sname, SCENARIOS[sname], cname, delay_ticks, det, resolve("outputs/scenario_logs"), a.aeb_version
+            )
             r["source"] = c.get("source")
             r["wall_s"] = time.perf_counter() - t0
             results["runs"].append(r)
@@ -229,8 +282,22 @@ def main() -> int:
             tmp = out.with_suffix(".tmp")
             tmp.write_text(json.dumps(results, indent=2), encoding="utf-8")
             tmp.replace(out)  # atomic checkpoint after every run (resumable)
-            print(json.dumps({k: r[k] for k in ("scenario", "condition", "delay_ms", "collision", "min_gap_m",
-                                                "first_perceived_t", "first_applied_brake_t")}))
+            print(
+                json.dumps(
+                    {
+                        k: r[k]
+                        for k in (
+                            "scenario",
+                            "condition",
+                            "delay_ms",
+                            "collision",
+                            "min_gap_m",
+                            "first_perceived_t",
+                            "first_applied_brake_t",
+                        )
+                    }
+                )
+            )
     return 0
 
 

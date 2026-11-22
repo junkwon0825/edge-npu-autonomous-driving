@@ -67,8 +67,9 @@ class AebController:
                 if self._seen[aid] <= 0:
                     del self._seen[aid]
         for t in targets:
-            self._seen[t.actor_id] = p.perception_hold_ticks if t.perceived else max(
-                0, self._seen.get(t.actor_id, 0) - 1)
+            self._seen[t.actor_id] = (
+                p.perception_hold_ticks if t.perceived else max(0, self._seen.get(t.actor_id, 0) - 1)
+            )
         best: Decision = Decision(0.0, "clear")
         for t in targets:
             if abs(t.lateral_m) > p.corridor_half_width_m or t.gap_m < -1.0:
@@ -87,8 +88,12 @@ class AebController:
             return best
         if best.brake == 0.0 and self._partial_target is not None:
             held = next((t for t in targets if t.actor_id == self._partial_target), None)
-            if (held is not None and abs(held.lateral_m) <= p.corridor_half_width_m
-                    and self._seen.get(held.actor_id, 0) > 0 and held.closing_mps > 0.05):
+            if (
+                held is not None
+                and abs(held.lateral_m) <= p.corridor_half_width_m
+                and self._seen.get(held.actor_id, 0) > 0
+                and held.closing_mps > 0.05
+            ):
                 best = Decision(p.partial_brake, "partial_hold", held.actor_id, None, held.gap_m)
             else:
                 self._partial_target = None

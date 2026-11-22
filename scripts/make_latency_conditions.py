@@ -21,17 +21,23 @@ def main() -> int:
     ]
     gpu_p = resolve("reports/evidence/gpu_benchmark_fp32_clean.json")
     gpu = json.loads(gpu_p.read_text(encoding="utf-8"))
-    conds.append({"name": "gpu_p95", "delay_ms": gpu["latency"]["e2e"]["p95_ms"],
-                  "source": f"measured: {gpu_p.name} e2e p95"})
+    conds.append(
+        {"name": "gpu_p95", "delay_ms": gpu["latency"]["e2e"]["p95_ms"], "source": f"measured: {gpu_p.name} e2e p95"}
+    )
     npu_p = resolve("reports/evidence/npu_bench.json")
     if npu_p.exists():
         npu = json.loads(npu_p.read_text(encoding="utf-8"))
         t = npu["result"]["timings_s"]
         dev = np.array(t["h2d"]) + np.array(t["compute"]) + np.array(t["d2h"])
-        host = (gpu["latency"]["preprocess"]["p95_ms"] + gpu["latency"]["postprocess"]["p95_ms"])
-        conds.append({"name": "npu_p95", "delay_ms": float(np.percentile(dev * 1000, 95)) + host,
-                      "source": f"measured: {npu_p.name} device-side p95 + host pre/post p95 from GPU run "
-                                "(excludes network transfer to the remote NPU host)"})
+        host = gpu["latency"]["preprocess"]["p95_ms"] + gpu["latency"]["postprocess"]["p95_ms"]
+        conds.append(
+            {
+                "name": "npu_p95",
+                "delay_ms": float(np.percentile(dev * 1000, 95)) + host,
+                "source": f"measured: {npu_p.name} device-side p95 + host pre/post p95 from GPU run "
+                "(excludes network transfer to the remote NPU host)",
+            }
+        )
     conds += [
         {"name": "stress_100ms", "delay_ms": 100.0, "source": "sensitivity sweep"},
         {"name": "stress_200ms", "delay_ms": 200.0, "source": "sensitivity sweep"},

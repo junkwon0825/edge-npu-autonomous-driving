@@ -31,8 +31,14 @@ def main() -> int:
     a = ap.parse_args()
     cfg = load_config()
     out = resolve(a.out)
-    manifest = {"weathers": WEATHERS, "seed": cfg["carla"]["seed"], "ticks": a.ticks, "every": a.every,
-                "map": None, "frames": []}
+    manifest = {
+        "weathers": WEATHERS,
+        "seed": cfg["carla"]["seed"],
+        "ticks": a.ticks,
+        "every": a.every,
+        "map": None,
+        "frames": [],
+    }
     for wi, weather in enumerate(WEATHERS):
         seed = cfg["carla"]["seed"] + wi
         with CarlaSession(cfg) as s:
@@ -50,8 +56,9 @@ def main() -> int:
                 if t >= 40 and t % a.every == 0:  # skip spawn transients
                     p = out / weather / f"{fid:08d}.png"
                     assert cv2.imwrite(str(p), image_to_bgr(img)), p
-                    manifest["frames"].append({"path": str(p.relative_to(resolve("."))).replace("\\", "/"),
-                                               "weather": weather, "frame": fid})
+                    manifest["frames"].append(
+                        {"path": str(p.relative_to(resolve("."))).replace("\\", "/"), "weather": weather, "frame": fid}
+                    )
             print(weather, counts, "frames so far:", len(manifest["frames"]))
     for i, f in enumerate(manifest["frames"]):
         f["split"] = "calib" if i % 4 == 0 else "eval"

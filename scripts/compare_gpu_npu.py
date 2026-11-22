@@ -56,8 +56,10 @@ def main() -> int:
         "detection_agreement_eval_split": aggregate_agreement(per_split["eval"]),
         "detection_agreement_calib_split": aggregate_agreement(per_split["calib"]),
         "npu_latency": {
-            "h2d": latency_stats(t["h2d"]), "compute": latency_stats(t["compute"]),
-            "d2h": latency_stats(t["d2h"]), "device_side_total": latency_stats(dev_e2e.tolist()),
+            "h2d": latency_stats(t["h2d"]),
+            "compute": latency_stats(t["compute"]),
+            "d2h": latency_stats(t["d2h"]),
+            "device_side_total": latency_stats(dev_e2e.tolist()),
         },
         "gpu_latency": {k: gpu_b["latency"][k] for k in ("h2d", "model", "e2e")},
         "artifact_sizes": {"weights_pt_bytes": weights.stat().st_size},

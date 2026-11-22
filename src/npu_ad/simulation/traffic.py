@@ -8,13 +8,19 @@ from typing import Any
 from npu_ad.simulation.carla_env import CarlaSession
 
 
-def spawn_traffic(s: CarlaSession, n_vehicles: int, n_walkers: int, seed: int,
-                  exclude_index: int | None = None) -> dict[str, int]:
+def spawn_traffic(
+    s: CarlaSession, n_vehicles: int, n_walkers: int, seed: int, exclude_index: int | None = None
+) -> dict[str, int]:
     rng = random.Random(seed)
     lib = s.world.get_blueprint_library()
-    vbps = sorted((bp.id for bp in lib.filter("vehicle.*")
-                   if bp.has_attribute("number_of_wheels")
-                   and int(bp.get_attribute("number_of_wheels")) == 4), key=str)
+    vbps = sorted(
+        (
+            bp.id
+            for bp in lib.filter("vehicle.*")
+            if bp.has_attribute("number_of_wheels") and int(bp.get_attribute("number_of_wheels")) == 4
+        ),
+        key=str,
+    )
     points = list(enumerate(s.spawn_points()))
     rng.shuffle(points)
     nv = 0

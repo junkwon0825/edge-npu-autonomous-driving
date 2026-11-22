@@ -92,8 +92,9 @@ class FakeClient:
         return self.world
 
     def get_trafficmanager(self, port):
-        return SimpleNamespace(set_synchronous_mode=lambda v: None, set_random_device_seed=lambda s: None,
-                               get_port=lambda: port)
+        return SimpleNamespace(
+            set_synchronous_mode=lambda v: None, set_random_device_seed=lambda s: None, get_port=lambda: port
+        )
 
     def apply_batch_sync(self, cmds, do_tick):
         out = []

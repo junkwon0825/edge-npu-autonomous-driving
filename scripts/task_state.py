@@ -41,11 +41,17 @@ def save(state: dict) -> None:
 
 
 def render(state: dict) -> None:
-    lines = [f"# Latest status ({state['updated']})", "", "| Task | Phase | Owner | Status | Retries | Next |",
-             "|---|---|---|---|---|---|"]
+    lines = [
+        f"# Latest status ({state['updated']})",
+        "",
+        "| Task | Phase | Owner | Status | Retries | Next |",
+        "|---|---|---|---|---|---|",
+    ]
     for tid, t in state["tasks"].items():
-        lines.append(f"| {tid} {t['title']} | {t['phase']} | {t['owner']} | **{t['status']}** | "
-                     f"{t.get('retries', 0)} | {t.get('next', '')} |")
+        lines.append(
+            f"| {tid} {t['title']} | {t['phase']} | {t['owner']} | **{t['status']}** | "
+            f"{t.get('retries', 0)} | {t.get('next', '')} |"
+        )
     lines += ["", "Status values: PASS / PARTIAL / BLOCKED / BLOCKED_APPROVAL / NOT_RUN / RUNNING / TODO.", ""]
     tmp = STATUS_MD.with_suffix(".tmp")
     tmp.write_text("\n".join(lines), encoding="utf-8")
@@ -79,10 +85,18 @@ def main() -> int:
         t["retries"] = t.get("retries", 0) + 1
         t["error_signature"] = a.signature
         with FAIL.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps({"time": _now(), "task": a.task, "signature": a.signature, "note": a.note,
-                                 "retry": t["retries"]}, ensure_ascii=False) + "\n")
-        same = sum(1 for line in FAIL.read_text(encoding="utf-8").splitlines()
-                   if json.loads(line).get("task") == a.task and json.loads(line).get("signature") == a.signature)
+            fh.write(
+                json.dumps(
+                    {"time": _now(), "task": a.task, "signature": a.signature, "note": a.note, "retry": t["retries"]},
+                    ensure_ascii=False,
+                )
+                + "\n"
+            )
+        same = sum(
+            1
+            for line in FAIL.read_text(encoding="utf-8").splitlines()
+            if json.loads(line).get("task") == a.task and json.loads(line).get("signature") == a.signature
+        )
         t["status"] = "BLOCKED" if same >= MAX_RETRIES else "FAILED_RETRYABLE"
     save(state)
     print(a.task, t["status"])
