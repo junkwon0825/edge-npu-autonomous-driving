@@ -16,6 +16,11 @@
       "source": "measured: gpu_benchmark_fp32_clean.json e2e p95"
     },
     {
+      "name": "npu_p95",
+      "delay_ms": 9.846600645687431,
+      "source": "measured: npu_bench.json device-side p95 + host pre/post p95 from GPU run (excludes network transfer to the remote NPU host)"
+    },
+    {
       "name": "stress_100ms",
       "delay_ms": 100.0,
       "source": "sensitivity sweep"

@@ -1,0 +1,140 @@
+{
+  "reference": "GPU FP32 (CUDA) raw-split outputs, same host decode/NMS",
+  "raw_tensor_diff_npu_vs_gpu": {
+    "boxes_max_abs": 2.9652559757232666,
+    "boxes_mean_abs": 0.03221055120229721,
+    "scores_logit_max_abs": 5.35162353515625,
+    "scores_logit_mean_abs": 0.050693053752183914,
+    "sigmoid_scores_max_abs": 0.2980133593082428
+  },
+  "npu_vs_cpu_on_npu_host": {
+    "boxes_max_abs": 2.958228349685669,
+    "boxes_mean_abs": 0.032365813851356506,
+    "scores_max_abs": 5.56591796875,
+    "scores_mean_abs": 0.0495564229786396,
+    "out_dtype": "torch.float32"
+  },
+  "detection_agreement_eval_split": {
+    "images": 54,
+    "ref_dets": 254,
+    "test_dets": 253,
+    "matched": 251,
+    "recall_vs_ref": 0.9881889763779528,
+    "precision_vs_ref": 0.9920948616600791,
+    "mean_iou_matched": 0.9906885736173103,
+    "mean_abs_conf_delta": 0.005131565242174612,
+    "max_abs_conf_delta": 0.1606673300266266
+  },
+  "detection_agreement_calib_split": {
+    "images": 18,
+    "ref_dets": 94,
+    "test_dets": 95,
+    "matched": 94,
+    "recall_vs_ref": 1.0,
+    "precision_vs_ref": 0.9894736842105263,
+    "mean_iou_matched": 0.9907625368635151,
+    "mean_abs_conf_delta": 0.00412522573420342,
+    "max_abs_conf_delta": 0.017989248037338257
+  },
+  "npu_latency": {
+    "h2d": {
+      "n": 216,
+      "mean_ms": 0.8044340949574554,
+      "std_ms": 0.1294446807793788,
+      "p50_ms": 0.7678347174078226,
+      "p95_ms": 1.0548669379204512,
+      "p99_ms": 1.06613056268543,
+      "min_ms": 0.6624418310821056,
+      "max_ms": 1.0869200341403484,
+      "fps_from_mean": 1243.1099157388246
+    },
+    "compute": {
+      "n": 216,
+      "mean_ms": 2.1068003541720963,
+      "std_ms": 0.007161541890672184,
+      "p50_ms": 2.105794148519635,
+      "p95_ms": 2.1186714293435216,
+      "p99_ms": 2.124708495102823,
+      "min_ms": 2.090797759592533,
+      "max_ms": 2.1419203840196133,
+      "fps_from_mean": 474.653423149327
+    },
+    "d2h": {
+      "n": 216,
+      "mean_ms": 0.9035795681282051,
+      "std_ms": 0.5415676352173154,
+      "p50_ms": 0.5265448708087206,
+      "p95_ms": 1.759657054208219,
+      "p99_ms": 1.7939718905836344,
+      "min_ms": 0.504419207572937,
+      "max_ms": 1.8148832023143768,
+      "fps_from_mean": 1106.7093981236574
+    },
+    "device_side_total": {
+      "n": 216,
+      "mean_ms": 3.8148140172577567,
+      "std_ms": 0.5605778770120993,
+      "p50_ms": 3.535225987434387,
+      "p95_ms": 4.798665642738342,
+      "p99_ms": 4.897764488123357,
+      "min_ms": 3.276190720498562,
+      "max_ms": 4.933341406285763,
+      "fps_from_mean": 262.1359771344346
+    }
+  },
+  "gpu_latency": {
+    "h2d": {
+      "n": 360,
+      "mean_ms": 0.39230388873774147,
+      "std_ms": 0.06563030425813078,
+      "p50_ms": 0.36604999331757426,
+      "p95_ms": 0.5314599722623826,
+      "p99_ms": 0.5983040365390483,
+      "min_ms": 0.3341999836266041,
+      "max_ms": 0.7207000162452459,
+      "fps_from_mean": 2549.0443217821594
+    },
+    "model": {
+      "n": 360,
+      "mean_ms": 13.535875092612372,
+      "std_ms": 2.6172117722685186,
+      "p50_ms": 12.635183811187744,
+      "p95_ms": 18.427461338043216,
+      "p99_ms": 25.192796993255623,
+      "min_ms": 11.054783821105957,
+      "max_ms": 30.34022331237793,
+      "fps_from_mean": 73.87775028640604
+    },
+    "e2e": {
+      "n": 360,
+      "mean_ms": 17.72680860918222,
+      "std_ms": 2.855200107450302,
+      "p50_ms": 16.84674998978153,
+      "p95_ms": 22.72497497615405,
+      "p99_ms": 30.067212987924037,
+      "min_ms": 14.698899933137,
+      "max_ms": 36.043499945662916,
+      "fps_from_mean": 56.41173332700252
+    }
+  },
+  "artifact_sizes": {
+    "weights_pt_bytes": 5544453
+  },
+  "npu_env": {
+    "python": "3.11.18",
+    "torch": "2.10.0+cpu",
+    "host": "<REMOTE_NPU_HOST>",
+    "furiosa_torch": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+    "devices": [
+      "furiosa:0",
+      "furiosa:1",
+      "furiosa:2",
+      "furiosa:3",
+      "furiosa:4",
+      "furiosa:5",
+      "furiosa:6",
+      "furiosa:7"
+    ]
+  },
+  "npu_compile_or_cache_load_s": 3.119203494861722
+}

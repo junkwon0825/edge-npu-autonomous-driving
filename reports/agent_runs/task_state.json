@@ -1,7 +1,7 @@
 {
   "project": "NPU Auto Driving Project 2",
   "branch": "feature/npu-pipeline",
-  "updated": "2026-11-22T11:38:55+0900",
+  "updated": "2026-11-22T12:11:04+0900",
   "tasks": {
     "A0": {
       "title": "Environment audit",
@@ -95,12 +95,14 @@
         "N1",
         "C1"
       ],
-      "status": "RUNNING",
+      "status": "PASS",
       "acceptance": "CompileModule.from_module returns; status_compile.json PASS",
-      "artifacts": [],
+      "artifacts": [
+        "reports/evidence/npu_compile.json"
+      ],
       "next": "poll status_compile.json",
-      "note": "started 2026-11-22T02:30:54Z env furiosa-npu (furiosa-torch 2026.4.0)",
-      "last_checkpoint": "2026-11-22T11:38:55+0900"
+      "note": "AOT compile 1901.9 s, furiosa-torch 2026.4.0",
+      "last_checkpoint": "2026-11-22T12:03:39+0900"
     },
     "N3": {
       "title": "NPU runtime inference + numerical check vs CPU",
@@ -109,10 +111,16 @@
       "deps": [
         "N2"
       ],
-      "status": "TODO",
+      "status": "PASS",
       "acceptance": "outputs on furiosa:0, max/mean abs diff vs CPU recorded",
-      "artifacts": [],
-      "next": ""
+      "artifacts": [
+        "reports/evidence/npu_bench.json"
+      ],
+      "next": "",
+      "retries": 1,
+      "error_signature": "TypeError:current_stream() missing device",
+      "note": "furiosa:0 compute mean 2.107 ms; NPU vs CPU raw mean abs 0.032/0.050, max 2.96/5.57",
+      "last_checkpoint": "2026-11-22T12:11:04+0900"
     },
     "Q1": {
       "title": "Quantization",
@@ -121,10 +129,12 @@
       "deps": [
         "N2"
       ],
-      "status": "TODO",
+      "status": "RUNNING",
       "acceptance": "supported precision path executed or blocker documented",
       "artifacts": [],
-      "next": ""
+      "next": "",
+      "note": "no INT8/vision quantization API in furiosa-torch 2026.4.0; running BF16 compile experiment",
+      "last_checkpoint": "2026-11-22T12:11:04+0900"
     },
     "P1": {
       "title": "GPU vs NPU benchmark + detection agreement",
@@ -134,10 +144,14 @@
         "N3",
         "C2"
       ],
-      "status": "TODO",
+      "status": "PASS",
       "acceptance": "same inputs/pre/post; measured table",
-      "artifacts": [],
-      "next": ""
+      "artifacts": [
+        "reports/evidence/gpu_vs_npu.json"
+      ],
+      "next": "",
+      "note": "eval split recall 0.988 precision 0.992 mean IoU 0.991 vs GPU FP32",
+      "last_checkpoint": "2026-11-22T12:11:04+0900"
     },
     "F1": {
       "title": "Closed-loop AEB scenarios x latency conditions",
@@ -147,10 +161,15 @@
         "B1",
         "C2"
       ],
-      "status": "RUNNING",
+      "status": "PASS",
       "acceptance": "6 scenarios; collisions/min gap/brake timing recorded",
-      "artifacts": [],
-      "next": ""
+      "artifacts": [
+        "reports/evidence/scenarios_v1.json",
+        "reports/evidence/scenarios_v2.json"
+      ],
+      "next": "",
+      "note": "6 scenarios x 6 conditions x v1/v2; AEB-off collides in 5/5 hazard scenarios, AEB-on 0 collisions",
+      "last_checkpoint": "2026-11-22T12:11:04+0900"
     },
     "R1": {
       "title": "Independent review (Kiro, read-only via agent_lab)",

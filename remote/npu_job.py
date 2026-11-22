@@ -40,7 +40,7 @@ def _env() -> dict:
     try:
         import furiosa.torch as ft
 
-        info["furiosa_torch"] = ft.version if isinstance(ft.version, str) else str(ft.version)
+        info["furiosa_torch"] = ft.version() if callable(ft.version) else str(ft.version)
         info["devices"] = ft.get_available_devices()
     except Exception as e:  # recorded, not hidden
         info["furiosa_import_error"] = repr(e)
@@ -112,7 +112,7 @@ def cmd_bench(a) -> dict:
     t0 = time.perf_counter()
     compiled = compiled.to(dev)
     to_device_s = time.perf_counter() - t0
-    stream = ft.current_stream()
+    stream = ft.current_stream(dev)
 
     def run_one(x):
         t_a = time.perf_counter()
