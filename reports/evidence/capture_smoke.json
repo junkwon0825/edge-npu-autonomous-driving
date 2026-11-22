@@ -1,0 +1,78 @@
+{
+  "runs": [
+    {
+      "frame_ids": [
+        33224,
+        33323
+      ],
+      "shape_ok": true,
+      "errors": [],
+      "actor_ids": [
+        24,
+        25
+      ],
+      "orphans": [],
+      "frames": 100,
+      "contiguous": true,
+      "saved_count": 10,
+      "reread_ok": true,
+      "elapsed_s": 4.642250300035812,
+      "pass": true,
+      "run": 0,
+      "spawn_index": 0
+    },
+    {
+      "frame_ids": [
+        33531,
+        33630
+      ],
+      "shape_ok": true,
+      "errors": [],
+      "actor_ids": [
+        26,
+        27
+      ],
+      "orphans": [],
+      "frames": 100,
+      "contiguous": true,
+      "saved_count": 10,
+      "reread_ok": true,
+      "elapsed_s": 4.378605099976994,
+      "pass": true,
+      "run": 1,
+      "spawn_index": 7
+    },
+    {
+      "frame_ids": [
+        33839,
+        33938
+      ],
+      "shape_ok": true,
+      "errors": [],
+      "actor_ids": [
+        28,
+        29
+      ],
+      "orphans": [],
+      "frames": 100,
+      "contiguous": true,
+      "saved_count": 10,
+      "reread_ok": true,
+      "elapsed_s": 4.263343699974939,
+      "pass": true,
+      "run": 2,
+      "spawn_index": 14
+    }
+  ],
+  "all_pass": true,
+  "config": {
+    "width": 800,
+    "height": 450,
+    "fov": 90.0,
+    "x": 1.5,
+    "z": 1.7,
+    "frame_timeout_s": 5.0
+  },
+  "fixed_delta_seconds": 0.05,
+  "weather": null
+}

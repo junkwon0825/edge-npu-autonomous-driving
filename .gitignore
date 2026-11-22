@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+# Large or regenerable artifacts (paths and SHA-256 are recorded in reports instead)
+*.pt
+*.fxb
+models/
+data/
+outputs/
+# Raw per-run logs can be large; summaries live in reports/
+reports/agent_runs/raw/

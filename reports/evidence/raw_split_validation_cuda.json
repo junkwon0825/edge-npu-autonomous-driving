@@ -1,0 +1,28 @@
+{
+  "image": "data/rgb/139438.png",
+  "device": "cuda",
+  "raw_shapes": {
+    "boxes": [
+      1,
+      4,
+      8400
+    ],
+    "scores": [
+      1,
+      80,
+      8400
+    ]
+  },
+  "decoded_shape": [
+    1,
+    84,
+    8400
+  ],
+  "decoded_max_abs_diff": 2.9802322387695312e-08,
+  "detections_ours": 1,
+  "detections_ref": 1,
+  "detections_max_abs_diff": 0.0,
+  "end2end": false,
+  "tolerance": 0.0001,
+  "pass": true
+}

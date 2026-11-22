@@ -1,0 +1,21 @@
+[project]
+name = "npu-auto-driving"
+version = "0.1.0"
+description = "CARLA -> YOLO -> GPU / Furiosa RNGD NPU perception and AEB research prototype"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+markers = [
+    "carla: needs a running CARLA 0.9.16 server on localhost:2000",
+    "gpu: needs a CUDA GPU",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["code"]  # original learning scripts, kept unchanged
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
