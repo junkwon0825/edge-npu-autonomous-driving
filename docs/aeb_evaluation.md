@@ -90,6 +90,8 @@ identical (pedestrian case). The non-determinism is in the perception input, see
   client and live tests need `NPU_AD_LIVE_CARLA=1`.
 
 ## Limitations
+Scenario start transient: right after the settle phase the ego speed dips from ~29 to ~20 km/h for
+~0.5 s (hand-brake release) before the speed controller recovers; identical in every mode and run.
 Simulation only, one map, one weather per scenario, one seed, single target per scenario, 100 Hz
 perception, latency modelled as actuation delay, no sensor noise model beyond rendering, flat-ground
 range assumption (fails on slopes/pitch), simple corridor logic (no path prediction).

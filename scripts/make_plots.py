@@ -62,12 +62,13 @@ def _save(fig, name: str) -> None:
     print("wrote", OUT / name)
 
 
-def _bars(ax, labels, values, colors, fmt="{:.2f}"):
+def _bars(ax, labels, values, colors, fmt="{:.2f}", label_at=None):
     bars = ax.bar(labels, values, color=colors, width=0.6, edgecolor=SURF, linewidth=2)
-    for b, v in zip(bars, values, strict=True):
+    label_at = label_at or values
+    for b, v, y in zip(bars, values, label_at, strict=True):
         ax.annotate(
             fmt.format(v),
-            (b.get_x() + b.get_width() / 2, b.get_height()),
+            (b.get_x() + b.get_width() / 2, max(y, b.get_height())),
             ha="center",
             va="bottom",
             xytext=(0, 3),
@@ -92,7 +93,7 @@ def latency_model_only() -> None:
             c = np.array(d["result"]["timings_s"]["compute"]) * 1000
             rows.append((label, float(c.mean()), float(np.percentile(c, 95)), C[1]))
     fig, ax = plt.subplots(figsize=(8, 4))
-    _bars(ax, [r[0] for r in rows], [r[1] for r in rows], [r[3] for r in rows])
+    _bars(ax, [r[0] for r in rows], [r[1] for r in rows], [r[3] for r in rows], label_at=[r[2] for r in rows])
     ax.scatter([r[0] for r in rows], [r[2] for r in rows], marker="_", s=300, color=INK, zorder=3, label="p95")
     ax.set_ylabel("ms per 640×640 frame (batch 1)")
     ax.set_title("Model-only latency: RTX 3060 vs Furiosa RNGD (mean, p95 tick)")
@@ -153,23 +154,26 @@ def detection_agreement() -> None:
     metrics = [("recall_vs_ref", "recall"), ("precision_vs_ref", "precision"), ("mean_iou_matched", "mean IoU")]
     fig, ax = plt.subplots(figsize=(7, 3.6))
     x = np.arange(len(metrics))
-    w = 0.8 / len(sets)
+    w = 0.25
+    # dot plot, not bars: the axis is zoomed to 0.90-1.00, which would exaggerate bar lengths
     for i, (name, d) in enumerate(sets):
         vals = [d[k] for k, _ in metrics]
-        bars = ax.bar(x + i * w - 0.4 + w / 2, vals, w, color=C[i], edgecolor=SURF, linewidth=2, label=f"RNGD {name}")
-        for b, v in zip(bars, vals, strict=True):
+        xs = x + (i - (len(sets) - 1) / 2) * w
+        ax.scatter(xs, vals, s=60, color=C[i], edgecolor=SURF, linewidth=2, label=f"RNGD {name}", zorder=3)
+        for xi, v in zip(xs, vals, strict=True):
             ax.annotate(
                 f"{v:.3f}",
-                (b.get_x() + b.get_width() / 2, v),
+                (xi, v),
                 ha="center",
                 va="bottom",
-                xytext=(0, 2),
+                xytext=(0, 6),
                 textcoords="offset points",
                 fontsize=8,
                 color=INK,
             )
     ax.set_xticks(x, [m[1] for m in metrics])
     ax.set_ylim(0.9, 1.01)
+    ax.set_ylabel("agreement (zoomed: 0.90-1.00)")
     ax.set_title("NPU detections vs GPU FP32 reference (54 held-out CARLA frames)")
     ax.legend(loc="lower right")
     _save(fig, "detection_agreement.png")
@@ -240,6 +244,15 @@ def speed_sweep() -> None:
                 if p[2]:
                     ax.annotate(
                         "collision", (p[0], p[1]), xytext=(4, -10), textcoords="offset points", fontsize=8, color=INK
+                    )
+                elif p[1] is not None and p[1] < 0:
+                    ax.annotate(
+                        "no contact (passed)",
+                        (p[0], p[1]),
+                        xytext=(-110, -4),
+                        textcoords="offset points",
+                        fontsize=8,
+                        color=INK,
                     )
         ax.axhline(0, color=INK2, linewidth=1)
         ax.set_title(sc.replace("_", " "))
@@ -322,7 +335,10 @@ def mono_range_error() -> None:
     ax.set_xlabel("ground-truth gap (m)")
     ax.set_ylabel("camera estimate − GT (m)")
     ax.set_title("Flat-ground monocular range error vs CARLA ground truth")
-    ax.legend(fontsize=8, markerscale=3)
+    leg = ax.legend(fontsize=8)
+    for h in leg.legend_handles[:2]:
+        h.set_sizes([30])
+        h.set_alpha(1)
     _save(fig, "mono_range_error.png")
 
 
