@@ -59,15 +59,19 @@ class CarlaSession:
         if c.get("map") and not self.world.get_map().name.endswith(c["map"]):
             self.world = self.client.load_world(c["map"])
         self._original_settings = self.world.get_settings()
-        settings = self.world.get_settings()
-        settings.synchronous_mode = True
-        settings.fixed_delta_seconds = c["fixed_delta_seconds"]
-        self.world.apply_settings(settings)
-        self.tm = self.client.get_trafficmanager(c["tm_port"])
-        self.tm.set_synchronous_mode(True)
-        self.tm.set_random_device_seed(c["seed"])
-        random.seed(c["seed"])
-        self.world.tick()
+        try:
+            settings = self.world.get_settings()
+            settings.synchronous_mode = True
+            settings.fixed_delta_seconds = c["fixed_delta_seconds"]
+            self.world.apply_settings(settings)
+            self.tm = self.client.get_trafficmanager(c["tm_port"])
+            self.tm.set_synchronous_mode(True)
+            self.tm.set_random_device_seed(c["seed"])
+            random.seed(c["seed"])
+            self.world.tick()
+        except BaseException:
+            self.close()  # never leave the server in synchronous mode after a failed start
+            raise
         return self
 
     def __exit__(self, *exc: object) -> None:
@@ -85,11 +89,14 @@ class CarlaSession:
             except Exception as e:  # keep tearing down
                 log.warning("stop failed for %s: %s", getattr(actor, "id", "?"), e)
         ids = [a.id for a in reversed(self._actors)]
-        if ids:
-            cmd = self.carla.command.DestroyActor
-            for resp in self.client.apply_batch_sync([cmd(i) for i in ids], True):
-                if resp.error:
-                    log.warning("destroy error: %s", resp.error)
+        try:
+            if ids:
+                cmd = self.carla.command.DestroyActor
+                for resp in self.client.apply_batch_sync([cmd(i) for i in ids], True):
+                    if resp.error:
+                        log.warning("destroy error: %s", resp.error)
+        except Exception as e:  # world settings must still be restored below
+            log.error("batch destroy failed: %s", e)
         self._actors.clear()
         self._sensor_queues.clear()
         try:

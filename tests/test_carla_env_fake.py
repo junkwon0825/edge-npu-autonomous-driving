@@ -152,3 +152,27 @@ def test_teardown_runs_on_exception():
         s.spawn_ego()
         raise ValueError("boom")
     assert world.actors == {} and world.settings.synchronous_mode is False
+
+
+def test_failed_enter_restores_settings():
+    mod, world, client = make_fake()
+
+    def bad_tm(port):
+        raise RuntimeError("traffic manager port busy")
+
+    client.get_trafficmanager = bad_tm
+    with pytest.raises(RuntimeError, match="port busy"):
+        CarlaSession(load_config(), carla_module=mod).__enter__()
+    assert world.settings.synchronous_mode is False  # not left in sync mode
+
+
+def test_destroy_error_still_restores_settings():
+    mod, world, client = make_fake()
+
+    def boom(cmds, do_tick):
+        raise RuntimeError("rpc timeout")
+
+    with CarlaSession(load_config(), carla_module=mod) as s:
+        s.spawn_ego()
+        client.apply_batch_sync = boom
+    assert world.settings.synchronous_mode is False
