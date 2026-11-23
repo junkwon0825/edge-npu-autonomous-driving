@@ -30,15 +30,15 @@ ground-plane range is validated per tick against GT (below). NPU perception in t
 ## Results (30 km/h)
 | Mode | Hazard runs (AEB on) | Collisions | Median min gap | FP brake events in no-hazard runs | Median GT TTC at first brake |
 |---|---|---|---|---|---|
-| GT oracle | see table | 0 | see table | 0 / 15 | see table |
-| GT-assisted | 24 | 0 | 8.84 m | 0 / 15 | 2.14 s |
-| perception-driven | 25 | 0 | 9.53 m | 0 / 15 | 2.51 s |
+| GT oracle | 25 (no remote-latency runs) | 0 | 9.04 m | 0 / 15 | 2.28 s |
+| GT-assisted | 30 | 0 | 9.04 m | 0 / 15 | 2.16 s |
+| perception-driven | 30 | 0 | 9.37 m | 0 / 15 | 2.39 s |
 
 AEB off: every hazard scenario collides. Per-cell values: `reports/scenario_tables_v3.md`.
 
 Findings:
-1. **Perception-driven AEB works in these scenarios** (0 collisions at 0–200 ms) and brakes *earlier*
-   than GT-assisted (median GT TTC at first brake 2.51 s vs 2.14 s). The earlier onset is not better
+1. **Perception-driven AEB works in these scenarios** (0 collisions at 0–200 ms, incl. the 134.7 ms remote-NPU delay) and brakes *earlier*
+   than GT-assisted (median GT TTC at first brake 2.39 s vs 2.16 s). The earlier onset is not better
    perception; it comes from **overestimated closing speed** (next point).
 2. **Range is good, range rate is not.** Range error vs GT (MAE): 0.11 m pedestrian, 0.26 m lead
    vehicle, 0.46 m lead at night, 0.79 m static vehicle at 15–40 m (p95 ≤ 2 m).
