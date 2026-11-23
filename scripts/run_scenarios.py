@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import math
 import time
 from pathlib import Path
@@ -29,11 +30,14 @@ import numpy as np
 
 from npu_ad.config import load_config, resolve
 from npu_ad.control.aeb import AebController, AebParams, Decision, DelayLine, TargetState
+from npu_ad.logutil import setup_logging
 from npu_ad.perception.gpu_runner import GpuDetector
 from npu_ad.perception.mono_range import CipoTracker, GroundPlaneRanger
 from npu_ad.perception.yolo_raw import letterbox
 from npu_ad.simulation import geometry as geo
 from npu_ad.simulation.carla_env import CarlaSession, image_to_bgr
+
+log = logging.getLogger("run_scenarios")
 
 SCENARIOS: dict[str, dict] = {
     "straight_road": {"kind": "none", "weather": "ClearNoon", "duration_s": 10.0},
@@ -407,6 +411,7 @@ def main() -> int:
     ap.add_argument("--tag", default="", help="distinguishes repeated runs (determinism check)")
     ap.add_argument("--dump-every", type=int, default=0, help="save every N-th letterboxed frame (replay)")
     a = ap.parse_args()
+    setup_logging("run_scenarios")
     cfg = load_config(overrides={"carla": {"fixed_delta_seconds": a.dt}})
     lat_cfg = json.loads(resolve(a.latency_config).read_text(encoding="utf-8"))
     conds = {c["name"]: c for c in lat_cfg["conditions"]}
@@ -454,6 +459,7 @@ def main() -> int:
                     keys = ("scenario", "mode", "ego_kmh", "condition", "collision", "min_gap_m")
                     keys += ("first_applied_brake_t", "gt_ttc_at_first_brake_s", "brake_onsets")
                     print(json.dumps({k: r[k] for k in keys}), flush=True)
+                    log.info("run finished", extra={k: r[k] for k in keys + ("delay_ms", "wall_s", "tag")})
     return 0
 
 

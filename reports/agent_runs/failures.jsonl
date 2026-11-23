@@ -1,1 +1,2 @@
 {"time": "2026-11-22T12:03:40+0900", "task": "N3", "signature": "TypeError:current_stream() missing device", "note": "own bug: API signature not checked; fixed to current_stream(dev)", "retry": 1}
+{"time": "2026-11-23T22:36:00+0900", "task": "F2", "signature": "experiment-interference:pytest-live-carla-during-matrix", "note": "pytest live CARLA test ticked the shared world during v3 matrix; runs lead_vehicle_braking/gt_oracle/stress_100ms+stress_200ms marked suspect and re-run; live tests made opt-in (NPU_AD_LIVE_CARLA=1)", "retry": 1}

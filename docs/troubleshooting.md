@@ -25,3 +25,13 @@ Each entry was observed in this project (date 2026-11-22 unless noted). Symptoms
 | Local `ssh` call never returns after starting a remote job | `a && b && nohup cmd &` backgrounds a subshell that keeps ssh's stdout open | Only background the `nohup` command (`scripts/npu_remote.py start`) |
 | `furiosa.torch.dryrun` full probe takes > 7 min on a loaded host | Compile-probes every node; host load 14–37 on 16 cores (shared) | Use `--trace-only`, or rely on the AOT compile result |
 | `ModuleNotFoundError: furiosa.*` | Wrong conda env (envs differ in installed SDK packages) | Use env `furiosa-npu` (furiosa-torch 2026.4.0 matching firmware 2026.4.0) |
+
+## Added 2026-11-23
+| Symptom | Cause | Fix |
+|---|---|---|
+| Monocular range estimate 35 % too long; camera height measured as 2.30 m | Vehicles are spawned ~0.6 m above the road and were still falling when the camera height was calibrated | 1 s settle phase (hand brake) before the scenario clock starts; calibrate at rest (`run_scenarios.py`, `SETTLE_S`) |
+| Early, spurious braking in the first second of a perception-driven run | Suspension pitch oscillation after spawn makes the ground-plane range jump by several metres; the range-rate fit then reports huge closing speeds | Settle phase + `CipoTracker.max_fit_residual_m` (no closing estimate from a noisy range history) |
+| `npu_remote.py start` prints `BUSY` | Another `npu_job.py`/`int8_probe.py` of this project is still running on the host (one NPU job at a time) | Wait, check `npu_remote.py status <cmd>`; the lock matches only processes whose argv starts with `python` (a `pgrep -f` pattern matched its own shell command) |
+| `codex` in the `agent_lab` orchestrator refuses to review `carla_project` | Codex is sandboxed to its own worktree | Run it directly read-only: `codex exec -s read-only -C <LOCAL_PROJECT_ROOT> "<prompt>"` |
+| `int8` conv compiles on RNGD but results are wrong | Output is int8 with modulo-256 (wrap-around) accumulation; no int32-accumulating formulation compiles | Not usable for INT8 inference; see `docs/quantization_limitations.md` |
+| A raw frame to the remote NPU takes ~121 ms | ~10 MB/s through the SSH session; a 640×640×3 frame is 1.23 MB | NPU-in-the-loop from this desktop is transport-bound; evaluate with `npu_remote_p95` latency or offline replay |

@@ -1,6 +1,11 @@
+import os
 import socket
 
 import pytest
+
+# Live CARLA tests are opt-in: a test that connects while an experiment holds the server in
+# synchronous mode would tick the shared world and corrupt that experiment (happened 2026-11-23).
+LIVE = os.environ.get("NPU_AD_LIVE_CARLA") == "1"
 
 
 def _carla_up(host: str = "localhost", port: int = 2000) -> bool:
@@ -12,9 +17,10 @@ def _carla_up(host: str = "localhost", port: int = 2000) -> bool:
 
 
 def pytest_collection_modifyitems(config, items):
-    if _carla_up():
+    if LIVE and _carla_up():
         return
-    skip = pytest.mark.skip(reason="CARLA server not reachable on localhost:2000")
+    reason = "set NPU_AD_LIVE_CARLA=1 to run live CARLA tests" if not LIVE else "CARLA server not reachable"
+    skip = pytest.mark.skip(reason=reason)
     for item in items:
         if "carla" in item.keywords:
             item.add_marker(skip)
