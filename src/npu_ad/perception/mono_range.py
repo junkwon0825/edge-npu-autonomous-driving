@@ -65,6 +65,7 @@ class CipoTracker:
     min_samples: int = 5
     gate_m: float = 3.0  # max range jump (beyond expected motion) to keep the same track
     max_range_m: float = 60.0
+    max_fit_residual_m: float = 0.5  # noisy range history (pitch, box jitter) -> no closing estimate
     _hist: deque = field(default_factory=deque)
     _track_id: int = 0
     _kind: str | None = None
@@ -105,6 +106,9 @@ class CipoTracker:
         if len(self._hist) >= self.min_samples:
             ts = np.array([h[0] for h in self._hist])
             gs = np.array([h[1] for h in self._hist])
-            closing = -float(np.polyfit(ts - ts[0], gs, 1)[0])
+            coef = np.polyfit(ts - ts[0], gs, 1)
+            resid = gs - np.polyval(coef, ts - ts[0])
+            if float(np.std(resid)) <= self.max_fit_residual_m:
+                closing = -float(coef[0])
         # actor_id is the perception track id (negative so it cannot collide with CARLA actor ids)
         return TargetState(-1 - self._track_id, kind, r.gap_m, r.lateral_m, closing, True), r

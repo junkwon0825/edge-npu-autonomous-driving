@@ -21,6 +21,11 @@
       "source": "measured: npu_bench.json device-side p95 + host pre/post p95 from GPU run (excludes network transfer to the remote NPU host)"
     },
     {
+      "name": "npu_remote_p95",
+      "delay_ms": 134.68007561168633,
+      "source": "measured: npu_p95 + npu_link.json p95 round trip of a 1.23 MB letterboxed frame over the persistent SSH session (remote NPU in the loop)"
+    },
+    {
       "name": "stress_100ms",
       "delay_ms": 100.0,
       "source": "sensitivity sweep"

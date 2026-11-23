@@ -3,6 +3,7 @@
 GPU: p95 end-to-end latency of the clean GPU benchmark.
 NPU: p95 of (host preprocess from the GPU run) + H2D + compute + D2H (measured on the RNGD host)
      + host postprocess (from the GPU run, identical code). Added only if the NPU benchmark exists.
+NPU remote: NPU p95 + measured SSH round trip of one raw frame (scripts/measure_link.py).
 """
 
 from __future__ import annotations
@@ -38,6 +39,17 @@ def main() -> int:
                 "(excludes network transfer to the remote NPU host)",
             }
         )
+        link_p = resolve("reports/evidence/npu_link.json")
+        if link_p.exists():  # remote NPU in the loop: add the measured SSH round trip of one raw frame
+            link = json.loads(link_p.read_text(encoding="utf-8"))["letterboxed_frame_1.23MB"]
+            conds.append(
+                {
+                    "name": "npu_remote_p95",
+                    "delay_ms": conds[-1]["delay_ms"] + link["p95_ms"],
+                    "source": f"measured: npu_p95 + {link_p.name} p95 round trip of a 1.23 MB letterboxed frame "
+                    "over the persistent SSH session (remote NPU in the loop)",
+                }
+            )
     conds += [
         {"name": "stress_100ms", "delay_ms": 100.0, "source": "sensitivity sweep"},
         {"name": "stress_200ms", "delay_ms": 200.0, "source": "sensitivity sweep"},

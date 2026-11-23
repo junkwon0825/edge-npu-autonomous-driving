@@ -31,6 +31,7 @@ from npu_ad.config import load_config, resolve
 from npu_ad.control.aeb import AebController, AebParams, Decision, DelayLine, TargetState
 from npu_ad.perception.gpu_runner import GpuDetector
 from npu_ad.perception.mono_range import CipoTracker, GroundPlaneRanger
+from npu_ad.perception.yolo_raw import letterbox
 from npu_ad.simulation import geometry as geo
 from npu_ad.simulation.carla_env import CarlaSession, image_to_bgr
 
@@ -89,6 +90,7 @@ SCENARIOS: dict[str, dict] = {
 }
 HAZARD_KINDS = {"lead_brake", "ped_cross", "static_vehicle"}
 DEFAULT_EGO_KMH = 30.0
+SETTLE_S = 1.0
 MODES = ("gt_oracle", "gt_gated", "mono")
 
 
@@ -157,6 +159,7 @@ def run(
     mode: str = "gt_gated",
     ego_kmh: float = DEFAULT_EGO_KMH,
     tag: str = "",
+    dump_every: int = 0,
 ) -> dict:
     import carla
 
@@ -200,14 +203,19 @@ def run(
                 raise RuntimeError("could not place pedestrian")
             tkind = "pedestrian"
             walk_dir = carla.Vector3D(-right.x, -right.y, 0.0)
-        s.tick()
+        # settle phase: spawn points are elevated; let ego and target drop and the suspension come to
+        # rest before the scenario clock starts (otherwise pitch oscillation corrupts camera geometry)
+        for _ in range(int(SETTLE_S / dt)):
+            ego.apply_control(carla.VehicleControl(brake=1.0, hand_brake=True))
+            s.tick()
+        ego.apply_control(carla.VehicleControl(hand_brake=False))
         fwd = sp.get_forward_vector()
         ego.set_target_velocity(carla.Vector3D(fwd.x * ego_mps, fwd.y * ego_mps, 0))
         if target is not None and sc["kind"] == "lead_brake":
             target.enable_constant_velocity(carla.Vector3D(sc["lead_speed_mps"], 0, 0))
         # pedestrian trigger scales with ego speed so the hazard appears at the same time-to-arrival
         trigger_gap = sc.get("trigger_gap_m", 0.0) * ego_mps / (DEFAULT_EGO_KMH / 3.6)
-        # camera mounting calibration, measured once: height above the road and offset to the bumper
+        # camera mounting calibration, measured once at rest: height above the road, offset to the bumper
         cam_tf = cam.get_transform()
         ranger = GroundPlaneRanger(
             k=k_mat,
@@ -221,6 +229,8 @@ def run(
         delay = DelayLine(delay_ticks or 0)
         triggered = False
         n_ticks = int(sc["duration_s"] / dt)
+        dump_frames: list[np.ndarray] = []
+        dump_steps: list[int] = []
         w, h = cfg["camera"]["width"], cfg["camera"]["height"]
         for step in range(n_ticks):
             fid = s.tick()
@@ -228,6 +238,9 @@ def run(
             img = s.get_image(cam, fid)
             bgr = image_to_bgr(img)
             dets, times, _ = detector(bgr)
+            if dump_every and step % dump_every == 0:  # exact detector inputs for offline NPU replay
+                dump_frames.append(letterbox(bgr, cfg["model"]["imgsz"])[0])
+                dump_steps.append(step)
             perceived, ts, uv = False, None, None
             if target is not None:
                 bb = target.bounding_box
@@ -299,6 +312,11 @@ def run(
         for _ in range(3):  # collision callbacks are asynchronous: let late events land before teardown
             s.tick()
     log_dir.mkdir(parents=True, exist_ok=True)
+    if dump_frames:
+        dump_dir = resolve("outputs/replay")
+        dump_dir.mkdir(parents=True, exist_ok=True)
+        stem = f"{name}__{condition}__{aeb_version}__{mode}__{int(ego_kmh)}kmh" + (f"__{tag}" if tag else "")
+        np.savez_compressed(dump_dir / f"{stem}.npz", frames=np.stack(dump_frames), steps=np.array(dump_steps))
     suffix = f"__{mode}__{int(ego_kmh)}kmh" + (f"__{tag}" if tag else "")
     with (log_dir / f"{name}__{condition}__{aeb_version}{suffix}.jsonl").open("w", encoding="utf-8") as fh:
         for r in rows:
@@ -380,6 +398,7 @@ def main() -> int:
     ap.add_argument("--modes", nargs="*", choices=MODES, default=["gt_gated"])
     ap.add_argument("--speeds-kmh", nargs="*", type=float, default=[DEFAULT_EGO_KMH])
     ap.add_argument("--tag", default="", help="distinguishes repeated runs (determinism check)")
+    ap.add_argument("--dump-every", type=int, default=0, help="save every N-th letterboxed frame (replay)")
     a = ap.parse_args()
     cfg = load_config(overrides={"carla": {"fixed_delta_seconds": a.dt}})
     lat_cfg = json.loads(resolve(a.latency_config).read_text(encoding="utf-8"))
@@ -416,6 +435,7 @@ def main() -> int:
                         mode,
                         kmh,
                         a.tag,
+                        a.dump_every,
                     )
                     r["source"] = c.get("source")
                     r["wall_s"] = time.perf_counter() - t0

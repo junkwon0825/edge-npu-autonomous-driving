@@ -55,3 +55,11 @@ def test_cipo_resets_track_on_range_jump_and_reports_nothing_without_detection()
     assert s2.actor_id != s1.actor_id
     assert s2.closing_mps == 0.0  # not enough history on the new track
     assert tr.update(0.11, np.zeros((0, 6))) == (None, None)
+
+
+def test_noisy_range_history_gives_no_closing_estimate():
+    tr = CipoTracker(RANGER, GROUPS)
+    rng = np.random.default_rng(0)
+    for i in range(30):
+        state, _ = tr.update(i * 0.01, box_at(20.0 + rng.normal(0, 1.5))[None])
+    assert state.closing_mps == 0.0

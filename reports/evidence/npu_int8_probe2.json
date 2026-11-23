@@ -1,0 +1,40 @@
+{
+  "started": "2026-11-23T13:24:17+0000",
+  "cases": {
+    "int8_conv": {
+      "state": "PASS",
+      "compile_s": 0.3259207112714648,
+      "out_dtype": "torch.int8",
+      "out_shape": [
+        1,
+        32,
+        80,
+        80
+      ],
+      "max_abs_vs_cpu": 0.0,
+      "accumulator": {
+        "exact_abs_max": 115687.0,
+        "frac_equal_exact": 0.004453125,
+        "frac_equal_saturated_int8": 0.0080078125,
+        "frac_equal_wrapped_int8": 1.0
+      },
+      "wall_s": 2.7
+    },
+    "int32_conv": {
+      "state": "FAIL",
+      "returncode": 1,
+      "error": "compile error:",
+      "stderr_tail": [
+        "(cache at <REMOTE_HOME>/.cache/furiosa/compiler/d76770b723eceec7)",
+        "Caused by:",
+        "   0: O117 is not an operator that is yet supported by the compiler",
+        "   1: TensorOperation must not have non-tile operations",
+        "Location:",
+        "    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26"
+      ],
+      "wall_s": 2.5
+    }
+  },
+  "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+  "finished": "2026-11-23T13:24:23+0000"
+}

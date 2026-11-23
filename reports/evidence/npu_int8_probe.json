@@ -1,0 +1,73 @@
+{
+  "started": "2026-11-23T13:19:46+0000",
+  "cases": {
+    "fp32_control": {
+      "state": "PASS",
+      "compile_s": 18.58395107090473,
+      "out_dtype": "torch.float32",
+      "out_shape": [
+        1,
+        32,
+        80,
+        80
+      ],
+      "max_abs_vs_cpu": 0.0065059661865234375,
+      "wall_s": 21.1
+    },
+    "w8_dequant_bf16": {
+      "state": "PASS",
+      "compile_s": 17.475756568834186,
+      "out_dtype": "torch.bfloat16",
+      "out_shape": [
+        1,
+        32,
+        80,
+        80
+      ],
+      "max_abs_vs_cpu": 0.000244140625,
+      "wall_s": 20.0
+    },
+    "int8_conv": {
+      "state": "PASS",
+      "compile_s": 14.575155592057854,
+      "out_dtype": "torch.int8",
+      "out_shape": [
+        1,
+        32,
+        80,
+        80
+      ],
+      "max_abs_vs_cpu": 0.0,
+      "wall_s": 17.0
+    },
+    "int_mm_1x1": {
+      "state": "FAIL",
+      "returncode": 1,
+      "error": "compile error:",
+      "stderr_tail": [
+        "    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/npu-torch-common/src/dfg_import/metadata_ops.rs:40:14",
+        "marker_err: Not importable, Node { origin: Py(0x70ca7ca84e50), name: \"_int_mm\", op: CallFunction, target: TorchOp(\"aten::_int_mm\", Py(0x70ca90218910)), args: [Node(\"view\"), Node(\"b_w1t\")], kwargs: {}, stack_trace: Some(Py(0x70ca7cdb5160)), meta: {\"stack_trace\": Py(0x70ca7cdb5160), \"nn_module_stack\": Py(0x70ca7cc9e340), \"torch_fn\": Py(0x70ca7cdd5c00), \"original_aten\": Py(0x70ca7cc9dbd0), \"from_node\": Py(0x70ca7ccaef40), \"seq_nr\": Py(0x6108de027a08), \"val\": Py(0x70ca7cde9590), \"tensor_meta\": Py(0x70ca7cb1f760)}, tensor_meta: Some([TensorMeta { shape: [Const(6400), Const(32)], dtype: Int32, requires_grad: false, stride: [Const(32), Const(1)], memory_format: Some(ContiguousFormat), is_quantized: false, qparams: {} }]), users: [\"output\"] }",
+        "Location:",
+        "    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/npu-torch-common/src/dfg_import/marker_ops.rs:23:14",
+        "Location:",
+        "    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/npu-torch-common/src/dfg_import/mod.rs:608:13"
+      ],
+      "wall_s": 2.6
+    },
+    "fp8_conv": {
+      "state": "PASS",
+      "compile_s": 15.986133547965437,
+      "out_dtype": "torch.float8_e4m3fn",
+      "out_shape": [
+        1,
+        32,
+        80,
+        80
+      ],
+      "cpu_reference": "unavailable: NotImplementedError: \"slow_conv2d_cpu\" not implemented for 'Float8_e4m3fn'",
+      "wall_s": 18.5
+    }
+  },
+  "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+  "finished": "2026-11-23T13:21:07+0000"
+}
