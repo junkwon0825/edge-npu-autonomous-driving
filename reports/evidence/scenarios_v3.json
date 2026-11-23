@@ -3279,6 +3279,46 @@
       "inloop_gpu_e2e_ms_p95": 22.141249966807663,
       "source": "idealised, no perception latency",
       "wall_s": 15.625551700009964
+    },
+    {
+      "scenario": "rain",
+      "kind": "ped_cross",
+      "hazard": true,
+      "condition": "gpu_p95",
+      "mode": "gt_oracle",
+      "ego_kmh": 30.0,
+      "tag": "",
+      "aeb_version": "v2",
+      "delay_ticks": 3,
+      "dt_s": 0.01,
+      "delay_ms": 30.0,
+      "weather": "HardRainNoon",
+      "camera_height_m": 1.6991307735443115,
+      "ticks": 339,
+      "collision": false,
+      "collision_with": null,
+      "min_gap_m": 2.9756362582645255,
+      "first_perceived_t": 0.61,
+      "first_decision_brake_t": 2.64,
+      "first_applied_brake_t": 2.67,
+      "gt_ttc_at_first_brake_s": 0.8654944632370896,
+      "gt_gap_at_first_brake_m": 7.160493156369331,
+      "braking_distance_m": 4.259424678124487,
+      "brake_onsets": 1,
+      "false_positive_brake_events": null,
+      "in_path_visible_ticks": 75,
+      "in_path_missed_ratio": 0.0,
+      "mono_range_err": {
+        "n": 74,
+        "mean_m": 0.30559670468055367,
+        "mae_m": 0.30559670468055367,
+        "p95_abs_m": 0.9614154211594361
+      },
+      "final_speed_mps": 0.004396829754114151,
+      "inloop_gpu_e2e_ms_p50": 19.361200043931603,
+      "inloop_gpu_e2e_ms_p95": 22.049279999919236,
+      "source": "measured: gpu_benchmark_fp32_clean.json e2e p95",
+      "wall_s": 15.591198300011456
     }
   ]
 }

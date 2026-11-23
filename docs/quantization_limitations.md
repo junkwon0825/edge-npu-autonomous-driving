@@ -1,7 +1,7 @@
 # Quantization on Furiosa RNGD (furiosa-torch 2026.4.0): what works, what does not, and why
 
 Status: **INT8 compute (W8A8) — BLOCKED by the toolchain** · **INT8 weight-only (W8, BF16 compute) —
-see results table** · **BF16 — TESTED** · FP8 conv — compiles, numerically not evaluated.
+accuracy loss (§4)** · **BF16 — TESTED, recommended** · FP8 conv — compiles, numerically not evaluated.
 
 ## 1. API level (2026-11-22)
 - `furiosa.torch` exposes no `quantize` / `calibrate` / QAT entry point; `get_amp_supported_dtype()` returns `[]`.
@@ -43,9 +43,37 @@ What is possible and was done:
 Calibration frames (18, `split == "calib"`) remain reserved and unused because no activation
 quantization path exists.
 
-## 4. W8 weight-only results
-See `reports/npu_compilation.md` § "W8 weight-only" (filled from `reports/evidence/npu_compile_w8.json`,
-`npu_bench_w8.json`, `gpu_vs_npu_w8.json`).
+## 4. W8 weight-only results (measured 2026-11-23)
+**This is weight-only INT8, not INT8 inference**: weights are stored as int8 and converted to BF16
+inside the graph; every multiply-accumulate runs in BF16.
+
+| Metric | FP32 | BF16 | W8 (weight-only) | Source |
+|---|---|---|---|---|
+| Weight bytes handed to the compiler | 9.64 MB | 4.82 MB | **2.44 MB** (2.40 int8 + 0.035 bf16 scales/bias) | `evidence/model_size.json` |
+| AOT compile (shared host) | 1901.9 s | 1169.6 s | 1161.7 s | `npu_compile*.json` |
+| `bench` compute, mean / p95 / p99 (n=216, per-frame H2D before) | 2.107 / 2.119 / 2.125 ms | 2.000 / 2.020 / 2.071 ms | **2.352 / 2.371 / 2.682 ms** | `npu_bench*.json` |
+| `perf` sequential, inputs resident, mean / p99 (n=500) | 2.149 / 2.203 ms | 1.854 / 1.905 ms | 2.155 / 2.175 ms | `npu_perf*.json` |
+| Sustained 20 s, sync every frame | 470 fps | 543 fps | 446 fps | `npu_perf*.json` |
+| Board power under that load (idle 39 W) | 53.3 W | 53.6 W | 51.2 W | `npu_perf*.json` (furiosa-smi, 1 W resolution, n≈28) |
+| NPU vs same graph on host CPU, boxes mean abs | 0.032 | 0.034 | 0.029 | `npu_bench*.json` |
+| Recall / precision / mean IoU vs GPU FP32 (54 eval frames) | 0.988 / 0.992 / 0.991 | 0.972 / 0.992 / 0.989 | **0.957 / 0.980 / 0.966** | `gpu_vs_npu*.json` |
+| Mean / max abs Δconf vs GPU | 0.005 / 0.161 | 0.007 / 0.032 | 0.022 / 0.152 | `gpu_vs_npu*.json` |
+
+Interpretation:
+- W8 is **not faster**. It is slower than BF16 in both protocols, and slower than or equal to FP32
+  depending on the protocol (2.35 vs 2.11 ms in `bench`, 2.16 vs 2.15 ms in `perf`). This is
+  consistent with the dequantisation (int8→bf16 multiply by scale) being executed in the graph at
+  every inference instead of being constant-folded.
+- The NPU executes the W8 graph faithfully (0.029 mean abs vs the same graph on CPU); the accuracy
+  drop vs GPU (recall 0.957, IoU 0.966) is caused by the quantisation itself (per-output-channel
+  absmax on fused Conv+BN weights, no calibration, no per-layer exclusion).
+- The only benefit measured is weight storage (−49 % vs BF16). Device memory use could not be
+  observed: `furiosa-smi status` reported 0.00 GiB during all runs.
+- The two NPU timing protocols differ by up to 0.2 ms for the same compiled graph (shared host,
+  load average 19–34); differences below that are not significant.
+
+Verdict: on this SDK, **BF16 is the best supported precision** for this detector (fastest, smallest
+accuracy loss after FP32). W8 is kept as a documented negative result.
 
 ## 5. Alternatives (not executed)
 - Ask Furiosa for the RNGD vision quantization workflow / a release with `furiosa-models` vision support.
