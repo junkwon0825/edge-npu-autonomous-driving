@@ -1,4 +1,4 @@
-"""Durable task state for unattended runs: reports/agent_runs/{task_state.json,failures.jsonl,latest_status.md}.
+"""Durable task state for unattended runs: reports/agent_runs/{task_state.json,failures.jsonl,task_table.md}.
 
   python scripts/task_state.py show
   python scripts/task_state.py set C1 PASS --artifact reports/evidence/x.json --note "..."
@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DIR = ROOT / "reports" / "agent_runs"
 STATE = DIR / "task_state.json"
 FAIL = DIR / "failures.jsonl"
-STATUS_MD = DIR / "latest_status.md"
+STATUS_MD = DIR / "task_table.md"  # latest_status.md is the human-written handoff
 MAX_RETRIES = 3
 
 

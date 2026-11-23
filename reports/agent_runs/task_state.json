@@ -1,7 +1,7 @@
 {
   "project": "NPU Auto Driving Project 2",
-  "branch": "feature/npu-pipeline",
-  "updated": "2026-11-22T12:35:09+0900",
+  "branch": "feature/portfolio-hardening",
+  "updated": "2026-11-23T23:52:59+0900",
   "tasks": {
     "A0": {
       "title": "Environment audit",
@@ -135,7 +135,7 @@
         "reports/evidence/npu_bench_bf16.json",
         "reports/evidence/gpu_vs_npu_bf16.json"
       ],
-      "next": "INT8 needs an officially documented SDK path",
+      "next": "INT8 compute BLOCKED by SDK 2026.4.0 (compiler probe); W8 weight-only TESTED (no speed-up); BF16 recommended",
       "note": "INT8 BLOCKED: no vision quantization API in furiosa-torch 2026.4.0; BF16 compiled 1169.6 s, compute 2.000 ms, recall vs GPU 0.972",
       "last_checkpoint": "2026-11-22T12:35:09+0900"
     },
@@ -175,7 +175,7 @@
       "last_checkpoint": "2026-11-22T12:11:04+0900"
     },
     "R1": {
-      "title": "Independent review (Kiro, read-only via agent_lab)",
+      "title": "Independent review (Kiro 2026-11-22; Codex+Kiro 2026-11-23)",
       "phase": 7,
       "owner": "kiro",
       "deps": [
@@ -205,6 +205,178 @@
       ],
       "next": "",
       "last_checkpoint": "2026-11-22T12:35:09+0900"
+    },
+    "H1": {
+      "title": "Phase 1 technical audit (Codex, Kiro, Claude)",
+      "phase": 1,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/technical_audit.md"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "H2": {
+      "title": "Raw split vs unfused original, all 72 frames",
+      "phase": 1,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/raw_split_validation_all_cpu.json"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "H3": {
+      "title": "CarlaSession hardening + exclusive server lock + opt-in live tests",
+      "phase": 5,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "src/npu_ad/simulation/server_lock.py"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "Q2": {
+      "title": "INT8/FP8 compiler probe",
+      "phase": 4,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/npu_int8_probe.json",
+        "reports/evidence/npu_int8_probe2.json"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "Q3": {
+      "title": "W8 weight-only compile/bench/agreement",
+      "phase": 4,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/npu_bench_w8.json",
+        "reports/evidence/gpu_vs_npu_w8.json"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "P2": {
+      "title": "NPU perf: cold start, throughput, power",
+      "phase": 2,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/npu_perf.json"
+      ],
+      "next": "pipelined burst>1 FAILED on device (HAL PXI-122); not retried",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "P3": {
+      "title": "GPU ext: batch sweep, CUDA Graphs, power, cold start",
+      "phase": 2,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/gpu_benchmark_ext.json"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "P4": {
+      "title": "Desktop<->RNGD link latency",
+      "phase": 2,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/npu_link.json"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "F2": {
+      "title": "AEB v3 matrix: 3 modes x 8 scenarios x 7 latencies + speed sweep + repeat",
+      "phase": 4,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/scenarios_v3.json",
+        "reports/scenario_tables_v3.md"
+      ],
+      "next": "6 runs quarantined and re-run",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "F3": {
+      "title": "Open-loop GPU vs NPU AEB replay (738 frames)",
+      "phase": 4,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/replay_npu_vs_gpu.json"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "N4": {
+      "title": "NPU batch>1 compile",
+      "phase": 2,
+      "owner": "claude",
+      "deps": [],
+      "status": "NOT_RUN",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [],
+      "next": "each static shape = new 20-30 min compile on shared host",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "N5": {
+      "title": "NPU-in-the-loop closed-loop driving",
+      "phase": 4,
+      "owner": "claude",
+      "deps": [],
+      "status": "BLOCKED",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "reports/evidence/npu_link.json"
+      ],
+      "next": "121 ms SSH transfer per raw frame; needs co-located NPU",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
+    },
+    "G2": {
+      "title": "Docs, plots, README, portfolio summaries",
+      "phase": 6,
+      "owner": "claude",
+      "deps": [],
+      "status": "PASS",
+      "acceptance": "evidence file exists and is referenced in docs",
+      "artifacts": [
+        "README.md",
+        "docs/",
+        "assets/plots/"
+      ],
+      "next": "",
+      "last_checkpoint": "2026-11-23T23:52:59+0900"
     }
   }
 }
