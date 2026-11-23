@@ -55,7 +55,12 @@ remained in the raw module.
 ## Quantization (Phase 4)
 **Status: PARTIAL — INT8 quantization BLOCKED; BF16 precision reduction executed.**
 
-### INT8 / static quantization — BLOCKED (SDK capability)
+### INT8 / static quantization — BLOCKED (toolchain capability; re-examined 2026-11-23)
+> Update 2026-11-23: the conclusion below was first drawn from the absence of an API. It has since been
+> tested at the compiler level (`remote/int8_probe.py`, `evidence/npu_int8_probe*.json`): an int8 conv
+> compiles but accumulates with int8 wrap-around; int32-accumulating conv (`O117 ... not yet supported`)
+> and `aten::_int_mm` ("Not importable") fail. Full analysis: `docs/quantization_limitations.md`.
+
 - `furiosa.torch` 2026.4.0 exposes no `quantize`/`calibrate` API; `get_amp_supported_dtype()` returns `[]`.
 - A source search of the installed `furiosa` packages (envs `furiosa-npu`, `furiosa02`) found quantization
   code only in LLM kernels (`kernels/qwen3`, `kernels/qwen3_moe`, `kernels/exaone4`,
