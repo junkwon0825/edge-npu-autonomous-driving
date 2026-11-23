@@ -2439,6 +2439,46 @@
       "inloop_gpu_e2e_ms_p95": 24.09774999250658,
       "source": "measured: gpu_benchmark_fp32_clean.json e2e p95",
       "wall_s": 23.02780989999883
+    },
+    {
+      "scenario": "static_obstacle",
+      "kind": "static_vehicle",
+      "hazard": true,
+      "condition": "npu_p95",
+      "mode": "mono",
+      "ego_kmh": 30.0,
+      "tag": "",
+      "aeb_version": "v2",
+      "delay_ticks": 1,
+      "dt_s": 0.01,
+      "delay_ms": 10.0,
+      "weather": "ClearNoon",
+      "camera_height_m": 1.6991307735443115,
+      "ticks": 509,
+      "collision": false,
+      "collision_with": null,
+      "min_gap_m": 11.28733404957492,
+      "first_perceived_t": 0.0,
+      "first_decision_brake_t": 1.36,
+      "first_applied_brake_t": 1.37,
+      "gt_ttc_at_first_brake_s": 3.651799111292336,
+      "gt_gap_at_first_brake_m": 30.760242315020676,
+      "braking_distance_m": 19.56485977070872,
+      "brake_onsets": 2,
+      "false_positive_brake_events": null,
+      "in_path_visible_ticks": 509,
+      "in_path_missed_ratio": 0.0,
+      "mono_range_err": {
+        "n": 509,
+        "mean_m": 0.7747556437486742,
+        "mae_m": 0.7933774924041381,
+        "p95_abs_m": 1.9786460154174916
+      },
+      "final_speed_mps": 0.005582306068390608,
+      "inloop_gpu_e2e_ms_p50": 20.64150001388043,
+      "inloop_gpu_e2e_ms_p95": 24.5911399833858,
+      "source": "measured: npu_bench.json device-side p95 + host pre/post p95 from GPU run (excludes network transfer to the remote NPU host)",
+      "wall_s": 22.52578020002693
     }
   ]
 }
