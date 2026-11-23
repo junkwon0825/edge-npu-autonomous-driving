@@ -1,0 +1,142 @@
+{
+  "method": "open-loop replay at 20 Hz on identical letterboxed frames; perception-driven mono chain; compared up to the first brake decision; NPU = furiosa:0 FP32 compiled raw module",
+  "runs": {
+    "adjacent_vehicle__npu_p95__v2__mono__30kmh__replay": {
+      "frames_compared": 160,
+      "gpu_first_brake_t": null,
+      "npu_first_brake_t": null,
+      "gpu_gt_ttc_at_first_brake_s": null,
+      "npu_gt_ttc_at_first_brake_s": null,
+      "detection_agreement": {
+        "images": 160,
+        "ref_dets": 401,
+        "test_dets": 404,
+        "matched": 395,
+        "recall_vs_ref": 0.9850374064837906,
+        "precision_vs_ref": 0.9777227722772277,
+        "mean_iou_matched": 0.994464723655441,
+        "mean_abs_conf_delta": 0.004514719640152364,
+        "max_abs_conf_delta": 0.025249958038330078
+      }
+    },
+    "lead_vehicle_braking__npu_p95__v2__mono__30kmh__replay": {
+      "frames_compared": 72,
+      "gpu_first_brake_t": 3.5500000000000003,
+      "npu_first_brake_t": 3.5500000000000003,
+      "gpu_gt_ttc_at_first_brake_s": 2.6707186851861398,
+      "npu_gt_ttc_at_first_brake_s": 2.6707186851861398,
+      "detection_agreement": {
+        "images": 72,
+        "ref_dets": 250,
+        "test_dets": 247,
+        "matched": 246,
+        "recall_vs_ref": 0.984,
+        "precision_vs_ref": 0.9959514170040485,
+        "mean_iou_matched": 0.9931346228343524,
+        "mean_abs_conf_delta": 0.003987054030100505,
+        "max_abs_conf_delta": 0.023535460233688354
+      }
+    },
+    "low_light__npu_p95__v2__mono__30kmh__replay": {
+      "frames_compared": 80,
+      "gpu_first_brake_t": 3.95,
+      "npu_first_brake_t": 3.95,
+      "gpu_gt_ttc_at_first_brake_s": 1.8289012115745182,
+      "npu_gt_ttc_at_first_brake_s": 1.8289012115745182,
+      "detection_agreement": {
+        "images": 80,
+        "ref_dets": 187,
+        "test_dets": 186,
+        "matched": 184,
+        "recall_vs_ref": 0.983957219251337,
+        "precision_vs_ref": 0.989247311827957,
+        "mean_iou_matched": 0.9946213518497539,
+        "mean_abs_conf_delta": 0.0038037199688994365,
+        "max_abs_conf_delta": 0.021336227655410767
+      }
+    },
+    "pedestrian_crossing__npu_p95__v2__mono__30kmh__replay": {
+      "frames_compared": 58,
+      "gpu_first_brake_t": 2.85,
+      "npu_first_brake_t": 2.85,
+      "gpu_gt_ttc_at_first_brake_s": 0.7223288556330218,
+      "npu_gt_ttc_at_first_brake_s": 0.7223288556330218,
+      "detection_agreement": {
+        "images": 58,
+        "ref_dets": 167,
+        "test_dets": 167,
+        "matched": 166,
+        "recall_vs_ref": 0.9940119760479041,
+        "precision_vs_ref": 0.9940119760479041,
+        "mean_iou_matched": 0.9943533788746746,
+        "mean_abs_conf_delta": 0.004086968230913921,
+        "max_abs_conf_delta": 0.016682356595993042
+      }
+    },
+    "pedestrian_roadside__npu_p95__v2__mono__30kmh__replay": {
+      "frames_compared": 160,
+      "gpu_first_brake_t": null,
+      "npu_first_brake_t": null,
+      "gpu_gt_ttc_at_first_brake_s": null,
+      "npu_gt_ttc_at_first_brake_s": null,
+      "detection_agreement": {
+        "images": 160,
+        "ref_dets": 358,
+        "test_dets": 356,
+        "matched": 353,
+        "recall_vs_ref": 0.9860335195530726,
+        "precision_vs_ref": 0.9915730337078652,
+        "mean_iou_matched": 0.9925922378080928,
+        "mean_abs_conf_delta": 0.00510937558017439,
+        "max_abs_conf_delta": 0.024182289838790894
+      }
+    },
+    "rain__npu_p95__v2__mono__30kmh__replay": {
+      "frames_compared": 58,
+      "gpu_first_brake_t": 2.85,
+      "npu_first_brake_t": 2.85,
+      "gpu_gt_ttc_at_first_brake_s": 0.71811795302309,
+      "npu_gt_ttc_at_first_brake_s": 0.71811795302309,
+      "detection_agreement": {
+        "images": 58,
+        "ref_dets": 129,
+        "test_dets": 128,
+        "matched": 127,
+        "recall_vs_ref": 0.9844961240310077,
+        "precision_vs_ref": 0.9921875,
+        "mean_iou_matched": 0.992162283353548,
+        "mean_abs_conf_delta": 0.005150013082609402,
+        "max_abs_conf_delta": 0.02960282564163208
+      }
+    },
+    "static_obstacle__npu_p95__v2__mono__30kmh__replay": {
+      "frames_compared": 28,
+      "gpu_first_brake_t": 1.35,
+      "npu_first_brake_t": 1.35,
+      "gpu_gt_ttc_at_first_brake_s": 3.667220673890772,
+      "npu_gt_ttc_at_first_brake_s": 3.667220673890772,
+      "detection_agreement": {
+        "images": 28,
+        "ref_dets": 80,
+        "test_dets": 80,
+        "matched": 80,
+        "recall_vs_ref": 1.0,
+        "precision_vs_ref": 1.0,
+        "mean_iou_matched": 0.9924863985881055,
+        "mean_abs_conf_delta": 0.004420633614063263,
+        "max_abs_conf_delta": 0.01611328125
+      }
+    }
+  },
+  "detection_agreement_all": {
+    "images": 616,
+    "ref_dets": 1572,
+    "test_dets": 1568,
+    "matched": 1551,
+    "recall_vs_ref": 0.9866412213740458,
+    "precision_vs_ref": 0.9891581632653061,
+    "mean_iou_matched": 0.9935436844061292,
+    "mean_abs_conf_delta": 0.004483405983424971,
+    "max_abs_conf_delta": 0.02960282564163208
+  }
+}
