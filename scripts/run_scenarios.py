@@ -177,6 +177,13 @@ def run(
         s.world.set_weather(getattr(carla.WeatherParameters, sc["weather"]))
         cmap = s.world.get_map()
         sp = s.spawn_points()[find_straight_spawn(s.world)]
+        map_name = cmap.name
+        spawn_pose = [
+            round(sp.location.x, 3),
+            round(sp.location.y, 3),
+            round(sp.location.z, 3),
+            round(sp.rotation.yaw, 3),
+        ]
         ego = s.spawn_ego(sp)
         cam = s.attach_rgb(ego)
         s.attach_collision(ego, collisions)
@@ -346,6 +353,15 @@ def run(
         "delay_ms": None if delay_ticks is None else delay_ticks * dt * 1000,
         "weather": sc["weather"],
         "camera_height_m": ranger.cam_height_m,
+        "world": {
+            "map": map_name,
+            "spawn_xyz_yaw": spawn_pose,
+            "seed": cfg["carla"]["seed"],
+            "fixed_delta_s": dt,
+            "settle_s": SETTLE_S,
+            "scenario_ticks_max": int(sc["duration_s"] / dt),
+            "initial_speed_mps": ego_mps,
+        },
     }
     return meta | summarize(rows, collisions, dt, meta["hazard"], params.corridor_half_width_m)
 

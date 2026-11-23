@@ -35,7 +35,9 @@ class FrameTimeout(RuntimeError):
 
 
 class CarlaSession:
-    def __init__(self, cfg: dict[str, Any], carla_module: Any = None):
+    def __init__(self, cfg: dict[str, Any], carla_module: Any = None, exclusive: bool | None = None):
+        # a real server is always owned exclusively (see server_lock); injected fakes are not
+        self.exclusive = carla_module is None if exclusive is None else exclusive
         if carla_module is None:
             import carla as carla_module  # imported lazily so unit tests can inject a fake
         self.carla = carla_module
@@ -50,6 +52,10 @@ class CarlaSession:
     # ---- lifecycle -------------------------------------------------------------------------
     def __enter__(self) -> CarlaSession:
         c = self.cfg["carla"]
+        if self.exclusive:
+            from npu_ad.simulation.server_lock import acquire
+
+            acquire(c["host"], c["port"])  # raises ServerBusy if another process owns the server
         self.client = self.carla.Client(c["host"], c["port"])
         self.client.set_timeout(c["timeout_s"])
         server, client_v = self.client.get_server_version(), self.client.get_client_version()
