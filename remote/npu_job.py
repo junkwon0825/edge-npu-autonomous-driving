@@ -233,7 +233,7 @@ def cmd_bench(a) -> dict:
                 out_scores.append(s)
     torch.save(
         {"names": data["names"], "boxes": torch.cat(out_boxes), "scores": torch.cat(out_scores)},
-        a.workdir / f"npu_outputs_{a.dtype}.pt",
+        a.workdir / f"npu_outputs_{a.dtype}{a.tag}.pt",
     )
     # Reference: same raw module on the host CPU of the NPU server (numerical check of the NPU)
     with torch.no_grad():
@@ -335,9 +335,10 @@ def main() -> int:
     ap.add_argument("--burst", type=int, default=8)
     ap.add_argument("--load-s", type=float, default=20.0)
     ap.add_argument("--idle-s", type=float, default=5.0)
+    ap.add_argument("--tag", default="", help="suffix for status/output files, e.g. _replay")
     a = ap.parse_args()
     payload = {"cmd": a.cmd, "state": "RUNNING", "started": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
-    tag = a.cmd if a.dtype == "fp32" else f"{a.cmd}_{a.dtype}"
+    tag = (a.cmd if a.dtype == "fp32" else f"{a.cmd}_{a.dtype}") + a.tag
     _status(a.workdir, tag, payload)
     try:
         payload["env"] = _env()

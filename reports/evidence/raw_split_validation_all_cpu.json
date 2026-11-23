@@ -1,0 +1,20 @@
+{
+  "frames": 72,
+  "device": "cpu",
+  "reference": "unfused ultralytics DetectionModel (YOLO(weights).model), same letterboxed input",
+  "decoded_max_abs_diff": 0.01690673828125,
+  "detections_max_abs_diff_when_same_count": 0.00030517578125,
+  "frames_with_count_mismatch": 0,
+  "agreement": {
+    "images": 72,
+    "ref_dets": 348,
+    "test_dets": 348,
+    "matched": 348,
+    "recall_vs_ref": 1.0,
+    "precision_vs_ref": 1.0,
+    "mean_iou_matched": 0.9999984860966178,
+    "mean_abs_conf_delta": 6.31757851304679e-07,
+    "max_abs_conf_delta": 2.8908252716064453e-06
+  },
+  "pass": true
+}

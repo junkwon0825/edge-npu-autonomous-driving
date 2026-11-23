@@ -316,7 +316,14 @@ def run(
         dump_dir = resolve("outputs/replay")
         dump_dir.mkdir(parents=True, exist_ok=True)
         stem = f"{name}__{condition}__{aeb_version}__{mode}__{int(ego_kmh)}kmh" + (f"__{tag}" if tag else "")
-        np.savez_compressed(dump_dir / f"{stem}.npz", frames=np.stack(dump_frames), steps=np.array(dump_steps))
+        np.savez_compressed(
+            dump_dir / f"{stem}.npz",
+            frames=np.stack(dump_frames),
+            steps=np.array(dump_steps),
+            cam_height_m=ranger.cam_height_m,
+            ego_half_len_m=ranger.ego_half_len_m,
+            dt=dt,
+        )
     suffix = f"__{mode}__{int(ego_kmh)}kmh" + (f"__{tag}" if tag else "")
     with (log_dir / f"{name}__{condition}__{aeb_version}{suffix}.jsonl").open("w", encoding="utf-8") as fh:
         for r in rows:
