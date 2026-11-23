@@ -1,0 +1,25 @@
+{
+  "weights_file_bytes": 5544453,
+  "fp32": {
+    "total_bytes": 9635728,
+    "by_dtype": {
+      "torch.float32": 9635728
+    },
+    "n_tensors": 204
+  },
+  "bf16": {
+    "total_bytes": 4817864,
+    "by_dtype": {
+      "torch.bfloat16": 4817864
+    },
+    "n_tensors": 204
+  },
+  "w8": {
+    "total_bytes": 2435248,
+    "by_dtype": {
+      "torch.int8": 2400160,
+      "torch.bfloat16": 35088
+    },
+    "n_tensors": 306
+  }
+}

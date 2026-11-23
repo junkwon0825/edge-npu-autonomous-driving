@@ -272,7 +272,13 @@ def cmd_perf(a) -> dict:
 
     data = torch.load(a.inputs)
     xs = torch.cat([to_tensor(img.numpy()) for img in data["lb_bgr_uint8"]]).to(x0.dtype)
-    res: dict = {"dtype": a.dtype, "n_w8_convs": getattr(raw, "n_w8_convs", None)}
+    import os
+
+    res: dict = {
+        "dtype": a.dtype,
+        "n_w8_convs": getattr(raw, "n_w8_convs", None),
+        "host_loadavg_start": os.getloadavg(),
+    }
     with SmiSampler() as idle:
         time.sleep(a.idle_s)
     res["idle"] = idle.summary()
@@ -316,6 +322,8 @@ def cmd_perf(a) -> dict:
             del outs
         res["pipelined"] = {"burst": a.burst, "frames": n, "seconds": elapsed, "fps": n / elapsed}
         res["under_load"] = load.summary()
+    res["host_loadavg_end"] = os.getloadavg()
+    res["host_cpus"] = os.cpu_count()
     return res
 
 

@@ -24,7 +24,7 @@ from npu_ad.perception.yolo_raw import RawDecoder, load_raw_model
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dtype", choices=["fp32", "bf16"], default="fp32")
+    ap.add_argument("--dtype", choices=["fp32", "bf16", "w8"], default="fp32")
     a = ap.parse_args()
     sfx = "" if a.dtype == "fp32" else f"_{a.dtype}"
     cfg = load_config()
