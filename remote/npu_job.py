@@ -311,16 +311,21 @@ def cmd_perf(a) -> dict:
             "p99_ms": seq[max(0, int(len(seq) * 0.99) - 1)] * 1000,
             "fps": len(seq) / sum(seq),
         }
+        _status(a.workdir, f"perf_partial{'' if a.dtype == 'fp32' else '_' + a.dtype}", res)
+        # Sustained loop for power. burst > 1 enqueues several executions before one synchronize;
+        # with furiosa-torch 2026.4.0 that failed on 2026-11-23 ("failed to synchronize stream ...
+        # Connection timed out", then "PXI-122 IPC: Duplicate submission" in the next processes),
+        # so the default is burst = 1 (synchronize after every frame).
         with SmiSampler() as load:
             t_end = time.perf_counter() + a.load_s
             n, t0 = 0, time.perf_counter()
-            while time.perf_counter() < t_end:  # pipelined: enqueue a burst, sync once per burst
+            while time.perf_counter() < t_end:
                 outs = [compiled(xds[(n + k) % len(xds)]) for k in range(a.burst)]
                 stream.synchronize()
                 n += a.burst
             elapsed = time.perf_counter() - t0
             del outs
-        res["pipelined"] = {"burst": a.burst, "frames": n, "seconds": elapsed, "fps": n / elapsed}
+        res["sustained"] = {"burst": a.burst, "frames": n, "seconds": elapsed, "fps": n / elapsed}
         res["under_load"] = load.summary()
     res["host_loadavg_end"] = os.getloadavg()
     res["host_cpus"] = os.cpu_count()
@@ -340,7 +345,7 @@ def main() -> int:
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--dtype", choices=["fp32", "bf16", "w8"], default="fp32")
     ap.add_argument("--n-seq", type=int, default=500)
-    ap.add_argument("--burst", type=int, default=8)
+    ap.add_argument("--burst", type=int, default=1)
     ap.add_argument("--load-s", type=float, default=20.0)
     ap.add_argument("--idle-s", type=float, default=5.0)
     ap.add_argument("--tag", default="", help="suffix for status/output files, e.g. _replay")

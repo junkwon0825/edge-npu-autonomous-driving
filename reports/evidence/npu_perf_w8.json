@@ -1,0 +1,26 @@
+{
+  "cmd": "perf",
+  "state": "FAIL",
+  "started": "2026-11-23T13:51:11+0000",
+  "env": {
+    "python": "3.11.18",
+    "torch": "2.10.0+cpu",
+    "host": "<REMOTE_NPU_HOST>",
+    "furiosa_torch": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+    "devices": [
+      "furiosa:0",
+      "furiosa:1",
+      "furiosa:2",
+      "furiosa:3",
+      "furiosa:4",
+      "furiosa:5",
+      "furiosa:6",
+      "furiosa:7"
+    ]
+  },
+  "error_type": "RuntimeError",
+  "error": "failed to launch binary on stream, device_id: npu0pe0, stream_id: 0, error: HAL error on ClusterId(npu0pe0): PXI-122 (IPC: Duplicate submission)",
+  "traceback": "Traceback (most recent call last):\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 354, in main\n    payload[\"result\"] = cmds[a.cmd](a)\n                        ^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 318, in cmd_perf\n    outs = [compiled(xds[(n + k) % len(xds)]) for k in range(a.burst)]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 318, in <listcomp>\n    outs = [compiled(xds[(n + k) % len(xds)]) for k in range(a.burst)]\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1776, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1787, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/profiler/__init__.py\", line 59, in wrapped\n    return f(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/_module/runnable.py\", line 258, in forward\n    outputs = self.runnable(*inputs)\n              ^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1776, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1787, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/profiler/__init__.py\", line 59, in wrapped\n    return f(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/_module/runnable.py\", line 180, in forward\n    outputs = self._inner.execute(args)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: failed to launch binary on stream, device_id: npu0pe0, stream_id: 0, error: HAL error on ClusterId(npu0pe0): PXI-122 (IPC: Duplicate submission)\n",
+  "finished": "2026-11-23T13:51:27+0000",
+  "dtype": "w8"
+}
