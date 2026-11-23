@@ -1,6 +1,6 @@
 # Quantization on Furiosa RNGD (furiosa-torch 2026.4.0): what works, what does not, and why
 
-Status: **INT8 compute (W8A8) — BLOCKED by the toolchain** · **INT8 weight-only (W8, BF16 compute) —
+Status: **INT8 compute (W8A8) — BLOCKED by the toolchain** · **INT8 weight-only (W8, BF16 compute) — TESTED: no speed-up,
 accuracy loss (§4)** · **BF16 — TESTED, recommended** · FP8 conv — compiles, numerically not evaluated.
 
 ## 1. API level (2026-11-22)
