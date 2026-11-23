@@ -1,7 +1,7 @@
 {
   "cmd": "perf",
-  "state": "FAIL",
-  "started": "2026-11-23T13:47:53+0000",
+  "state": "PASS",
+  "started": "2026-11-23T13:53:56+0000",
   "env": {
     "python": "3.11.18",
     "torch": "2.10.0+cpu",
@@ -18,9 +18,51 @@
       "furiosa:7"
     ]
   },
-  "error_type": "RuntimeError",
-  "error": "failed to synchronize stream, device_id: npu0pe0, stream_id: 0, error: HAL error on ClusterId(npu0pe0): Connection timed out (os error 110)",
-  "traceback": "Traceback (most recent call last):\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 354, in main\n    payload[\"result\"] = cmds[a.cmd](a)\n                        ^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 319, in cmd_perf\n    stream.synchronize()\nRuntimeError: failed to synchronize stream, device_id: npu0pe0, stream_id: 0, error: HAL error on ClusterId(npu0pe0): Connection timed out (os error 110)\n",
-  "finished": "2026-11-23T13:49:24+0000",
+  "result": {
+    "dtype": "fp32",
+    "n_w8_convs": null,
+    "host_loadavg_start": [
+      25.0947265625,
+      23.02001953125,
+      23.5400390625
+    ],
+    "idle": {
+      "n": 8,
+      "power_w_mean": 39.0,
+      "power_w_max": 39.0,
+      "mem_used_gib_max": 0.0,
+      "errors": 0
+    },
+    "compile_or_cache_load_s": 3.0807785517536104,
+    "to_device_s": 0.0521158529445529,
+    "first_inference_ms": 2.4744439870119095,
+    "sequential": {
+      "n": 500,
+      "mean_ms": 2.14904014673084,
+      "p50_ms": 2.1385769359767437,
+      "p99_ms": 2.20264820381999,
+      "fps": 465.3240198984735
+    },
+    "sustained": {
+      "burst": 1,
+      "frames": 9409,
+      "seconds": 20.00187942525372,
+      "fps": 470.405795373434
+    },
+    "under_load": {
+      "n": 28,
+      "power_w_mean": 53.32142857142857,
+      "power_w_max": 56.0,
+      "mem_used_gib_max": 0.0,
+      "errors": 0
+    },
+    "host_loadavg_end": [
+      27.0615234375,
+      23.791015625,
+      23.787109375
+    ],
+    "host_cpus": 128
+  },
+  "finished": "2026-11-23T13:54:30+0000",
   "dtype": "fp32"
 }

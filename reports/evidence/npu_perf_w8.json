@@ -1,7 +1,7 @@
 {
   "cmd": "perf",
-  "state": "FAIL",
-  "started": "2026-11-23T13:51:11+0000",
+  "state": "PASS",
+  "started": "2026-11-23T13:56:13+0000",
   "env": {
     "python": "3.11.18",
     "torch": "2.10.0+cpu",
@@ -18,9 +18,51 @@
       "furiosa:7"
     ]
   },
-  "error_type": "RuntimeError",
-  "error": "failed to launch binary on stream, device_id: npu0pe0, stream_id: 0, error: HAL error on ClusterId(npu0pe0): PXI-122 (IPC: Duplicate submission)",
-  "traceback": "Traceback (most recent call last):\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 354, in main\n    payload[\"result\"] = cmds[a.cmd](a)\n                        ^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 318, in cmd_perf\n    outs = [compiled(xds[(n + k) % len(xds)]) for k in range(a.burst)]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/npu_auto_driving_p2/npu_job.py\", line 318, in <listcomp>\n    outs = [compiled(xds[(n + k) % len(xds)]) for k in range(a.burst)]\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1776, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1787, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/profiler/__init__.py\", line 59, in wrapped\n    return f(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/_module/runnable.py\", line 258, in forward\n    outputs = self.runnable(*inputs)\n              ^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1776, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1787, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/profiler/__init__.py\", line 59, in wrapped\n    return f(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^\n  File \"<REMOTE_HOME>/miniconda3/envs/furiosa-npu/lib/python3.11/site-packages/furiosa/torch/_module/runnable.py\", line 180, in forward\n    outputs = self._inner.execute(args)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: failed to launch binary on stream, device_id: npu0pe0, stream_id: 0, error: HAL error on ClusterId(npu0pe0): PXI-122 (IPC: Duplicate submission)\n",
-  "finished": "2026-11-23T13:51:27+0000",
+  "result": {
+    "dtype": "w8",
+    "n_w8_convs": 102,
+    "host_loadavg_start": [
+      31.8525390625,
+      27.2216796875,
+      25.0859375
+    ],
+    "idle": {
+      "n": 8,
+      "power_w_mean": 39.0,
+      "power_w_max": 39.0,
+      "mem_used_gib_max": 0.0,
+      "errors": 0
+    },
+    "compile_or_cache_load_s": 5.242179676424712,
+    "to_device_s": 0.05551121570169926,
+    "first_inference_ms": 2.4901707656681538,
+    "sequential": {
+      "n": 500,
+      "mean_ms": 2.1553442468866706,
+      "p50_ms": 2.1551940590143204,
+      "p99_ms": 2.1745851263403893,
+      "fps": 463.9630079716823
+    },
+    "sustained": {
+      "burst": 1,
+      "frames": 8912,
+      "seconds": 20.002208241727203,
+      "fps": 445.55080580595154
+    },
+    "under_load": {
+      "n": 29,
+      "power_w_mean": 51.241379310344826,
+      "power_w_max": 53.0,
+      "mem_used_gib_max": 0.0,
+      "errors": 0
+    },
+    "host_loadavg_end": [
+      26.3896484375,
+      26.3388671875,
+      24.8603515625
+    ],
+    "host_cpus": 128
+  },
+  "finished": "2026-11-23T13:56:55+0000",
   "dtype": "w8"
 }
