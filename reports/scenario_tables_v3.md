@@ -9,50 +9,50 @@ and TTC gated by detection; *perception-driven* uses only camera detections (fla
 
 ### GT oracle (`gt_oracle`)
 
-| scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | stress_200ms |
-|---|---|---|---|---|---|---|
-| straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| lead_vehicle_braking | **COLLISION** |  |  |  |  |  |
-| pedestrian_crossing | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
-| static_obstacle | **COLLISION** | 15.67 m | 15.52 m | 15.35 m | 14.84 m | 14.02 m |
-| low_light | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 9.04 m |
-| rain | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
-| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
+| scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | npu_remote_p95 | stress_200ms |
+|---|---|---|---|---|---|---|---|
+| straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
+| lead_vehicle_braking | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m |  | 9.04 m |
+| pedestrian_crossing | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m |  | 1.52 m |
+| static_obstacle | **COLLISION** | 15.67 m | 15.52 m | 15.35 m | 14.84 m |  | 14.02 m |
+| low_light | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m |  | 9.04 m |
+| rain | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m |  | 1.52 m |
+| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
+| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
 
 ### GT-assisted (`gt_gated`)
 
-| scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | stress_200ms |
-|---|---|---|---|---|---|---|
-| straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| lead_vehicle_braking | **COLLISION** |  | 9.46 m | 9.29 m | 8.64 m | 9.04 m |
-| pedestrian_crossing | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
-| static_obstacle | **COLLISION** | 15.67 m | 15.52 m | 15.35 m | 14.84 m | 14.02 m |
-| low_light | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 9.04 m |
-| rain | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
-| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
+| scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | npu_remote_p95 | stress_200ms |
+|---|---|---|---|---|---|---|---|
+| straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
+| lead_vehicle_braking | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 9.36 m | 9.04 m |
+| pedestrian_crossing | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 2.01 m | 1.52 m |
+| static_obstacle | **COLLISION** | 15.67 m | 15.52 m | 15.35 m | 14.84 m | 14.51 m | 14.02 m |
+| low_light | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 9.36 m | 9.04 m |
+| rain | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 2.01 m | 1.52 m |
+| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
+| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
 
 ### perception-driven (`mono`)
 
-| scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | stress_200ms |
-|---|---|---|---|---|---|---|
-| straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| lead_vehicle_braking | **COLLISION** | 10.13 m | 10.12 m | 10.05 m | 9.53 m | 8.77 m |
-| pedestrian_crossing | **COLLISION** | 2.98 m | 2.84 m | 2.68 m | 2.15 m | 1.29 m |
-| static_obstacle | **COLLISION** | 11.45 m | 11.29 m | 11.14 m | 10.49 m | 23.42 m |
-| low_light | **COLLISION** | 10.35 m | 10.22 m | 10.15 m | 9.73 m | 9.21 m |
-| rain | **COLLISION** | 2.81 m | 2.81 m | 2.51 m | 1.98 m | 1.12 m |
-| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
+| scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | npu_remote_p95 | stress_200ms |
+|---|---|---|---|---|---|---|---|
+| straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
+| lead_vehicle_braking | **COLLISION** | 10.13 m | 10.12 m | 10.05 m | 9.53 m | 9.20 m | 8.77 m |
+| pedestrian_crossing | **COLLISION** | 2.98 m | 2.84 m | 2.68 m | 2.15 m | 1.79 m | 1.29 m |
+| static_obstacle | **COLLISION** | 11.45 m | 11.29 m | 11.14 m | 10.49 m | 9.86 m | 23.42 m |
+| low_light | **COLLISION** | 10.35 m | 10.22 m | 10.15 m | 9.73 m | 9.60 m | 9.21 m |
+| rain | **COLLISION** | 2.81 m | 2.81 m | 2.51 m | 1.98 m | 1.68 m | 1.12 m |
+| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
+| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |  | FP brakes: 0 |
 
 ## Summary per AEB input mode (30 km/h, AEB on, all latency conditions)
 
 | mode | hazard runs | collisions | min gap median (m) | FP brake events (no-hazard runs) | GT TTC at first brake, median (s) | in-path detection miss ratio, mean |
 |---|---|---|---|---|---|---|
-| GT oracle | 20 | 0 | 5.90 | 0 in 15 runs | 1.45 | 0.005 |
-| GT-assisted | 24 | 0 | 8.84 | 0 in 15 runs | 2.14 | 0.004 |
-| perception-driven | 25 | 0 | 9.53 | 0 in 15 runs | 2.51 | 0.004 |
+| GT oracle | 25 | 0 | 9.04 | 0 in 15 runs | 2.28 | 0.004 |
+| GT-assisted | 30 | 0 | 9.04 | 0 in 15 runs | 2.16 | 0.004 |
+| perception-driven | 30 | 0 | 9.37 | 0 in 15 runs | 2.39 | 0.004 |
 
 ## Perception-driven range error vs ground truth (per run, before contact)
 
