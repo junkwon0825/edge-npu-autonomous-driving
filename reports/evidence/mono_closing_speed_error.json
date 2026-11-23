@@ -1,0 +1,33 @@
+{
+  "definition": "mono closing speed (least-squares range rate) minus GT closing speed; ticks where the CIPO box contains the GT target, |GT closing|>0.5 m/s, before contact; all mono 30 km/h runs of scenarios_v3 (no rep/replay tags)",
+  "bins": {
+    "0-10m": {
+      "n": 816,
+      "mean_err_mps": 1.1618304184634538,
+      "mae_mps": 1.276257529641522,
+      "p95_abs_mps": 3.2087777373593838,
+      "rel_mae": 0.39330491788933425
+    },
+    "10-20m": {
+      "n": 2735,
+      "mean_err_mps": -0.06212538270822786,
+      "mae_mps": 1.2240481058389163,
+      "p95_abs_mps": 3.066160691788942,
+      "rel_mae": 0.31510765708232735
+    },
+    "20-30m": {
+      "n": 3024,
+      "mean_err_mps": 0.18213556925823304,
+      "mae_mps": 1.5069500479329554,
+      "p95_abs_mps": 3.9232869008119216,
+      "rel_mae": 0.996219560650087
+    },
+    "30-45m": {
+      "n": 594,
+      "mean_err_mps": -1.4222659773773718,
+      "mae_mps": 3.2457187913320245,
+      "p95_abs_mps": 14.260591773596941,
+      "rel_mae": 0.4597680776836577
+    }
+  }
+}

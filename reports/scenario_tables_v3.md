@@ -12,38 +12,82 @@ and TTC gated by detection; *perception-driven* uses only camera detections (fla
 | scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | stress_200ms |
 |---|---|---|---|---|---|---|
 | straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| lead_vehicle_braking | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 4.78 m |
+| lead_vehicle_braking | **COLLISION** |  |  |  |  |  |
+| pedestrian_crossing | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
+| static_obstacle | **COLLISION** | 15.67 m | 15.52 m | 15.35 m | 14.84 m | 14.02 m |
+| low_light | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 9.04 m |
+| rain | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
+| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
+| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
 
 ### GT-assisted (`gt_gated`)
 
 | scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | stress_200ms |
 |---|---|---|---|---|---|---|
 | straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| lead_vehicle_braking | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 9.04 m |
+| lead_vehicle_braking | **COLLISION** |  | 9.46 m | 9.29 m | 8.64 m | 9.04 m |
+| pedestrian_crossing | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
+| static_obstacle | **COLLISION** | 15.67 m | 15.52 m | 15.35 m | 14.84 m | 14.02 m |
+| low_light | **COLLISION** | 9.46 m | 9.46 m | 9.29 m | 8.64 m | 9.04 m |
+| rain | **COLLISION** | 3.17 m | 3.14 m | 2.98 m | 2.34 m | 1.52 m |
+| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
+| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
 
 ### perception-driven (`mono`)
 
 | scenario | aeb_off | ideal_0ms | npu_p95 | gpu_p95 | stress_100ms | stress_200ms |
 |---|---|---|---|---|---|---|
 | straight_road | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
-| lead_vehicle_braking | **COLLISION** |  |  |  |  |  |
+| lead_vehicle_braking | **COLLISION** | 10.13 m | 10.12 m | 10.05 m | 9.53 m | 8.77 m |
+| pedestrian_crossing | **COLLISION** | 2.98 m | 2.84 m | 2.68 m | 2.15 m | 1.29 m |
+| static_obstacle | **COLLISION** | 11.45 m | 11.29 m | 11.14 m | 10.49 m | 23.42 m |
+| low_light | **COLLISION** | 10.35 m | 10.22 m | 10.15 m | 9.73 m | 9.21 m |
+| rain | **COLLISION** | 2.81 m | 2.81 m | 2.51 m | 1.98 m | 1.12 m |
+| adjacent_vehicle | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
+| pedestrian_roadside | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 | FP brakes: 0 |
 
 ## Summary per AEB input mode (30 km/h, AEB on, all latency conditions)
 
 | mode | hazard runs | collisions | min gap median (m) | FP brake events (no-hazard runs) | GT TTC at first brake, median (s) | in-path detection miss ratio, mean |
 |---|---|---|---|---|---|---|
-| GT oracle | 5 | 0 | 9.29 | 0 in 5 runs | 2.47 | 0.000 |
-| GT-assisted | 5 | 0 | 9.29 | 0 in 5 runs | 2.47 | 0.000 |
-| perception-driven | 0 | 0 | — | 0 in 5 runs | — | — |
+| GT oracle | 20 | 0 | 5.90 | 0 in 15 runs | 1.45 | 0.005 |
+| GT-assisted | 24 | 0 | 8.84 | 0 in 15 runs | 2.14 | 0.004 |
+| perception-driven | 25 | 0 | 9.53 | 0 in 15 runs | 2.51 | 0.004 |
 
 ## Perception-driven range error vs ground truth (per run, before contact)
 
 | scenario | condition | n | mean (m) | MAE (m) | p95 abs (m) |
 |---|---|---|---|---|---|
 | straight_road | npu_p95 | 0 | — | — | — |
+| lead_vehicle_braking | npu_p95 | 446 | -0.09 | 0.26 | 0.70 |
+| pedestrian_crossing | npu_p95 | 77 | 0.11 | 0.11 | 0.26 |
+| static_obstacle | npu_p95 | 509 | 0.77 | 0.79 | 1.98 |
+| low_light | npu_p95 | 435 | 0.22 | 0.46 | 0.90 |
+| rain | npu_p95 | 77 | 0.34 | 0.34 | 1.10 |
+| adjacent_vehicle | npu_p95 | 0 | — | — | — |
+| pedestrian_roadside | npu_p95 | 0 | — | — | — |
 
 ## Speed sweep (NPU latency 9.85 ms)
 
 | scenario | km/h | AEB off | GT-assisted: min gap / brake dist | perception-driven: min gap / brake dist |
 |---|---|---|---|---|
-| lead_vehicle_braking | 30 | collision | 9.46 m / 5.82 m |  |
+| lead_vehicle_braking | 20 | collision | 12.65 m / 1.84 m | 13.32 m / 1.84 m |
+| lead_vehicle_braking | 30 | collision | 9.46 m / 5.82 m | 10.12 m / 5.82 m |
+| lead_vehicle_braking | 40 | collision | 6.97 m / 16.92 m | 7.34 m / 15.90 m |
+| lead_vehicle_braking | 50 | collision | 8.33 m / 23.73 m | 7.37 m / 34.76 m |
+| pedestrian_crossing | 20 | collision | 3.10 m / 1.39 m | 2.77 m / 1.44 m |
+| pedestrian_crossing | 30 | collision | 3.14 m / 4.26 m | 2.84 m / 4.31 m |
+| pedestrian_crossing | 40 | collision | **COLLISION** | **COLLISION** |
+| pedestrian_crossing | 50 | no collision | **COLLISION** | -4.97 m / — m |
+| static_obstacle | 20 | collision | 12.61 m / 1.84 m | 15.28 m / 1.84 m |
+| static_obstacle | 30 | collision | 15.52 m / 5.90 m | 11.29 m / 19.56 m |
+| static_obstacle | 40 | collision | 16.95 m / 11.72 m | 20.12 m / 16.63 m |
+| static_obstacle | 50 | collision | 16.82 m / 13.73 m | 19.29 m / 11.49 m |
+
+## Repeatability (same configuration run twice)
+
+| scenario | mode | min gap run 1 / run 2 (m) | first brake t run 1 / run 2 (s) | identical logs |
+|---|---|---|---|---|
+| static_obstacle | mono | 11.2873 / 11.3136 | 1.37 / 1.37 | no |
+| pedestrian_crossing | mono | 2.8413 / 2.8413 | 2.68 / 2.68 | no |
+| lead_vehicle_braking | mono | 10.1209 / 10.1209 | 3.50 / 3.50 | no |
