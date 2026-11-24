@@ -393,6 +393,9 @@ def main() -> int:
     client = None
     git = ["git", "-C", str(resolve(".")), "rev-parse", "--short", "HEAD"]
     commit = subprocess.run(git, capture_output=True, text=True).stdout.strip()
+    dirty = subprocess.run(["git", "-C", str(resolve(".")), "status", "--porcelain", "src", "scripts", "remote"],
+                           capture_output=True, text=True).stdout.strip()  # fmt: skip
+    commit += "+dirty" if dirty else ""  # uncommitted code must be visible in the evidence
     out = resolve(a.out)
     results = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"runs": []}
     done = {_key(r) for r in results["runs"]}
