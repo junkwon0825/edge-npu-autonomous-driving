@@ -1,113 +1,84 @@
-# GitHub sanitization report (before any public push)
+# GitHub sanitization log
 
-Status: **analysis only. No history has been rewritten and nothing has been pushed.**
-Scanned on 2026-11-25: all 46 commits on all local branches and tags (`v1.0.0-rc1`, `v2.0.0-rc1`).
+Status: **history rewritten locally (option B) and verified. Nothing has been pushed.**
+Date: 2026-11-25. Tool: `git-filter-repo` 2.47.0, installed in the project virtual environment only.
 
-In this report the remote container hostname is written as `<REMOTE_HOSTNAME>`, so this file does not
-spread it further. The literal replacement list is in `outputs/sanitize/replacements.txt`, which is
-git-ignored and stays local.
+## What was done
+1. **Backup.** A full bundle of the private repository (`git bundle create … --all`) was made and checked
+   with `git bundle verify`. Refs, commit list, HEAD tree and working-tree status were recorded before the
+   rewrite. The backup stays outside this repository.
+2. **Separate clone.** The rewrite ran in a fresh clone. The private development repository was not
+   modified.
+3. **Rewrite:** `git filter-repo --replace-text <rules> --replace-message <rules> --mailmap <mailmap>`
+   over all branches and tags. The rule file is kept locally, because it contains the original strings.
+4. **Tags.** `v1.0.0-rc1` and `v2.0.0-rc1` were rewritten in place: same names, messages and tagger
+   timestamps. The old `v3.0.0-rc1` was dropped. It is re-created on the final sanitized V3 commit, after
+   the public-facing checks.
 
-## Findings
-| # | Item | Sensitivity | In HEAD (tracked now) | In history |
+**Rewritten:** 59 commits on 4 branches. Author names, commit messages, commit order and author/committer
+timestamps are unchanged.
+
+| Replaced (all blobs and messages, all commits) | Replacement | Where it occurred |
+|---|---|---|
+| remote NPU container hostname (contains an organization name) | `<REMOTE_NPU_HOST>` | `"host"` field of 13 V1 NPU evidence files, 2 V1 reports |
+| the organization name on its own (case-insensitive safeguard) | `<ORG>` | no further occurrences |
+| remote home directory (`/` + `root/`) in compiler cache paths and tracebacks | `<REMOTE_HOME>/` | V1 and V2 NPU evidence (port lab, INT8 probe, perf tracebacks) |
+| local project root on the development PC | `<LOCAL_PROJECT_ROOT>` | README, early reports, 3 CARLA learning scripts |
+| local paths of the AI-agent tooling used during development | `<AGENT_LAB_ROOT>` | early process logs |
+| local virtual-environment directory | `<LOCAL_VENV_DIR>` | environment audit |
+| personal author/committer/tagger e-mail | the owner's GitHub no-reply address | all commits and tags |
+
+**Where the no-reply address comes from.** It was taken from the owner's GitHub account (`gh api user`
+gives the account id), and the owner's GitHub-generated merge commits in another repository already use
+it. It was not constructed by hand.
+
+**Evidence is modified only in metadata.** The rewrite changed only:
+- a non-measurement `"host"` field
+- path prefixes inside error tracebacks and compiler cache messages
+
+No measured value was changed. The V1/V2 SHA-256 manifests (`reports/v1/`, `reports/v2/`) are kept
+unchanged and describe the files as they were before sanitization. `scripts/verify_manifests.py` checks
+them against this checkout. It accepts CRLF or LF, because the original manifests were generated on a
+CRLF Windows checkout.
+
+| Manifest | Files | Match | Differ | Why they differ |
 |---|---|---|---|---|
-| 1 | Remote container hostname `<REMOTE_HOSTNAME>` (contains an organization name) in the `"host"` field of V1 NPU evidence, and in two V1 docs | medium: identifies the provider's machine | **yes, 15 files** (list below) | introduced in `94593a1` (2026-11-22); present in 45 of 46 commit trees, including both tags |
-| 2 | Remote home path `<REMOTE_HOME>/npu_auto_driving_p2/...` inside Python tracebacks stored in NPU evidence | low: reveals the remote user is root and the directory name | **yes, 1 file:** `reports/evidence/npu_int8_probe2.json`. `scripts/v2_fetch_npu_status.py` contains `<REMOTE_HOME>/` only as the redaction pattern, which is intended | introduced in `bf872a2`; at most 6 files at `bd8dd8c` (V2 port-lab evidence), reduced to 1 by `bc7aefb` |
-| 3 | Author/committer e-mail (a personal Gmail address) in all 46 commits | personal data; public on GitHub after a push | commit metadata | all commits |
-| 4 | Local project paths such as `<LOCAL_PROJECT_ROOT>` and `<AGENT_LAB_ROOT>` | low (no user name) | `README.md:334`, `code/04_rgb_camera.py`, `code/05_rgb_sync.py`, `code/06_lidar_sync.py`, `reports/agent_runs/latest_status.md`, `reports/environment_audit.md`, `reports/review_findings.md` | yes |
-| 5 | SSH alias `furiosa-npu` and remote directory name `npu_auto_driving_p2` | low: an alias only; host, user and key are not stored | 17 files | yes |
+| V1 | 46 | 32 | 14 | exactly the 14 sanitized NPU evidence files (`host` field, traceback paths) |
+| V2 | 49 | 48 | 1 | `docs/npu_operator_compatibility.md` was regenerated in V3 (74 rows), after the V2 manifest; it matches the V3 manifest |
+| V3 | regenerated after sanitization | all | 0 | — |
 
-**Correction to an earlier statement.** I previously reported "the remote home path in early V2
-commits". That is only partly accurate:
-- The `<REMOTE_HOME>/` path was introduced by V1 evidence (`bf872a2`, `6402f5b`).
-- V2 evidence briefly added more occurrences (`bd8dd8c`).
-- One V1 file in HEAD still contains it.
+## Commit hashes
+- **All hashes changed.** Hashes written inside files were not rewritten. This includes `code_commit` in
+  evidence JSON and hashes quoted in reports.
+- **Translation tables:**
+  - [`sanitization/commit_map.txt`](sanitization/commit_map.txt): old → new, for every commit
+  - [`sanitization/ref_map.txt`](sanitization/ref_map.txt): branches and tags
+- **Example:** the V3 matrix evidence cites `5400927` and `75d8ecd`. In this repository they are
+  `265fc5e` and `7d0874d`.
 
-An earlier scan for `/root` missed all of this. Git Bash rewrites `/root` arguments into Windows
-paths; the scan was repeated with `MSYS_NO_PATHCONV=1`.
+## Post-rewrite scan (all reachable commits and tags, text and binary blobs)
+| Check | Result |
+|---|---|
+| remote hostname, organization name | 0 |
+| personal e-mail (contents, author, committer, tagger) | 0 |
+| Windows user name, user-profile paths, `/home/<user>` | 0 |
+| local project / tooling / venv absolute paths | 0 (only the placeholders remain) |
+| private keys, GitHub / OpenAI / Anthropic / AWS / Slack / Google token patterns | 0 |
+| password / secret / token assignments | 0 |
+| `.env`, `*.pem`, `*.key`, `id_rsa*` files ever committed | 0 |
+| model weights, compiler caches, replay data, `outputs/`, `data/` ever committed | 0 |
 
-**Nothing found** in any commit, for:
-- private keys (`BEGIN … PRIVATE KEY`)
-- GitHub, OpenAI, AWS or Slack token patterns
-- `password=` / `password:`
-- `IdentityFile`
-- SSH user names, `/home/…` paths
-- the Windows user name
-- the e-mail address inside file contents
-- private IP addresses (the only IPv4-like string is a version number)
+**Allowed occurrences** (reviewed; not private):
+- **Redaction code:** `scripts/v2_fetch_npu_status.py` contains the remote-home redaction pattern
+  itself.
+- **Install path:** `C:\CARLA_0.9.16` is the CARLA installation directory, with no user name.
+  - It appears in V1/V3 reports and in the `carla` wheel line of `requirements-lock-windows.txt`.
+- **IPv4-like strings:** the only one is a package version number.
+- **SSH alias and remote directory name:** `furiosa-npu` and `npu_auto_driving_p2`. They are an alias
+  and a directory name; host, user and key are not stored.
 
-### Files in HEAD containing `<REMOTE_HOSTNAME>` (finding 1)
-- **Evidence JSON:**
-  - `reports/evidence/gpu_vs_npu.json`, `gpu_vs_npu_bf16.json`, `gpu_vs_npu_w8.json`
-  - `npu_bench.json`, `npu_bench_bf16.json`, `npu_bench_replay.json`, `npu_bench_w8.json`
-  - `npu_compile.json`, `npu_compile_bf16.json`, `npu_compile_w8.json`
-  - `npu_perf.json`, `npu_perf_bf16.json`, `npu_perf_w8.json`
-- **Reports:** `reports/environment_audit.md`, `reports/npu_compilation.md`
-
-Since V2, new evidence records `"host": "<redacted>"` (`scripts/v2_fetch_npu_status.py`).
-
-## Re-scan after V3 (2026-11-25, HEAD after the V3 evidence commits, 56 commits)
-- **Unchanged:**
-  - `<REMOTE_HOSTNAME>` in the same 15 files
-  - `<REMOTE_HOME>/` in `reports/evidence/npu_int8_probe2.json`
-- **Intended occurrences:** `<REMOTE_HOME>/` also appears in this report and in the redaction pattern of
-  `scripts/v2_fetch_npu_status.py`.
-- **New V3 evidence** (`v3_*.json`, closed-loop logs, memory trace): no hostname, no remote path, no
-  personal data.
-- **Key / token / password patterns:** none found. The only matches are this report's own list of
-  search patterns.
-
-## Options
-| | A: minimal (current files only) | B: rewrite history | C: clean portfolio repository |
-|---|---|---|---|
-| What | one new commit replacing the two strings in the 16 current files | `git filter-repo --replace-text` over all commits (+ optional mailmap) | new repository from the validated final tree, with a few curated milestone commits/tags (V1, V2, V3) |
-| Hostname / path still public? | **yes, in history** | no | no |
-| Personal e-mail in metadata | stays (fixable only with a rewrite) | can be mapped to the GitHub no-reply address | new commits made with the no-reply address |
-| Development history | kept | kept (new hashes) | lost; only milestones |
-| `code_commit` hashes inside evidence | still resolve | **no longer resolve**: needs the published old → new commit map | do not resolve; needs a note that evidence was produced in a private repository |
-| Risk | low; insufficient for a public repo | medium: irreversible without the backup bundle; tags move | low; credibility depends on the reports instead of the commit trail |
-| Suitable for | a private repository only | **a public portfolio** | a public portfolio when history is not needed |
-
-**Recommendation: B.**
-- The commit trail is part of the engineering evidence: quarantined runs, fixes driven by failed tests,
-  evidence committed separately from code. B keeps that trail and removes the two strings.
-- Publish the `filter-repo` commit map next to the sanitization log, so `code_commit` fields in the
-  evidence can be translated.
-- Choose **C** if a smaller, curated history is preferred over the full trail.
-- **A** is not enough for a public push.
-
-## Recommended procedure for B (after approval only)
-1. Back up: `git bundle create ../carla_project_backup.bundle --all`, then verify it with
-   `git bundle verify`.
-2. Work on a fresh mirror clone, never in the working repository:
-   `git clone --mirror . ../carla_sanitize.git`
-3. In the mirror, run
-   `git filter-repo --replace-text <path>/replacements.txt`.
-   - The replacements are `<REMOTE_HOSTNAME>` → `<REMOTE_HOST>` and `<REMOTE_HOME>/` → `~/`.
-   - Optionally add `--mailmap` to use the GitHub no-reply e-mail.
-   - `git-filter-repo` is a pip package. Installing it in a project venv is a local install, not a
-     system-wide one.
-4. Verify in the mirror:
-   - `git grep` over all commits returns nothing for both strings
-   - tests pass on the rewritten `HEAD`
-   - every evidence JSON still parses
-5. Tags `v1.0.0-rc1` and `v2.0.0-rc1` are rewritten with new hashes. Record the old → new mapping
-   (`filter-repo` writes `commit-map`) in a sanitization log.
-6. Push only the sanitized mirror. That needs separate approval.
-
-## Risks of rewriting
-- **Every commit hash changes.**
-  - Hashes quoted in docs, reports and evidence `code_commit` fields no longer resolve.
-  - The commit map is needed to translate them. Hashes written *inside* files are not rewritten.
-- **Evidence "frozen" at V1 is modified.**
-  - Only a non-measurement metadata field and traceback paths change.
-  - This must be documented in the sanitization log, so the evidence is not presented as untouched.
-- **Other worktrees or clones** of this repository would diverge and must be re-cloned. Nothing has
-  been pushed, so there is no remote copy to reconcile.
-- **Irreversible without the backup bundle,** so step 1 is mandatory.
-
-## Items requiring user approval
-- [ ] Choose option A, B or C
-- [ ] Approve installing `git-filter-repo` in the project venv
-- [ ] Approve the history rewrite, on the mirror
-- [ ] Decide whether to replace the commit e-mail with the GitHub no-reply address
-- [ ] Approve the push, separately
+## Size
+- **Repository size:** pack 22.4 MiB, about 310 tracked files.
+- **Largest files:** the four demo videos, 3.1–5.5 MB each. The full-size V3 video stays local.
+- **Not tracked:** weights (`*.pt`, `*.onnx`), compiler caches, datasets, replay frames and local outputs
+  are ignored by `.gitignore`.

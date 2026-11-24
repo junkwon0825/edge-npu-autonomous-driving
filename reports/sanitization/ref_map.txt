@@ -1,0 +1,7 @@
+old                                      new                                      ref
+2fdf0391b4376792b346bded6dbb3eadef1e852f 4dcfb47c2d93b6edecbd36adaf29bd6c79e543c4 refs/heads/feature/npu-pipeline
+ec159eac142de686264b1f320eef73fc68a12071 04a505bab757e9339f5bb2f21fe11f1690e006a5 refs/heads/feature/portfolio-hardening
+bc7aefbf410b0edc682253ecebdbe46fafb7ef9e 5b2bcbadd3316cb9ddf153ce1a70accd33852c37 refs/heads/feature/v2-npu-closed-loop
+49813bae6655feec409608e01dbf1fc31784c502 370530905f48b66fa0b4b34a119f189e6b0e2ea4 refs/heads/feature/v3-multimodel-npu
+075ca2bfd86a413b52bb642bbd6b91c5bb847ce8 9c03db8d2b73f7e9e4054e052d5f91bac413550f refs/tags/v1.0.0-rc1
+94303ea1e090e794cf589dfe241e4bc8270f1b10 593579a6c7b9ecb111add478536c505df07405c8 refs/tags/v2.0.0-rc1

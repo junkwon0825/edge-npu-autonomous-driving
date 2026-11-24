@@ -13,7 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GLOBS = ["reports/evidence/v3_*", "reports/v3_*.md", "assets/plots/v3_*.png", "assets/demo/v3/*",
          "assets/diagrams/v3_*.png", "docs/v3_*.md", "docs/npu_*.md", "docs/portfolio_key_results.md",
-         "docs/interview_questions_v3.md", "reports/github_sanitization_report.md", "README.md"]  # fmt: skip
+         "docs/interview_questions_v3.md", "docs/resume_project_summary_*.md", "reports/github_sanitization_report.md",
+         "reports/sanitization/*", "README.md"]  # fmt: skip
 WEIGHTS = ["models/yolo26n.pt", "models/lane_unet_s3c32.pt"]
 CLOSED_LOOP = ["v3_closed_loop.json", "v3_closed_loop_rerun_nightrain.json", "v3_closed_loop_rerun_stale.json"]
 
@@ -41,8 +42,12 @@ def main() -> int:
         d = json.loads((ROOT / "reports" / "evidence" / name).read_text(encoding="utf-8"))
         runs[name] = {"runs": len(d["runs"]), "code_commits": sorted({r["code_commit"] for r in d["runs"]})}
         problems += [f"{name}: run without code_commit" for r in d["runs"] if not r.get("code_commit")]
-    weights = [{"path": w, "sha256": sha256(ROOT / w), "committed": False} for w in WEIGHTS if (ROOT / w).exists()]
     out = ROOT / "reports" / "v3" / "evidence_manifest.json"
+    # Weights are not committed; in a checkout without them keep the hashes recorded by the previous manifest.
+    old = json.loads(out.read_text(encoding="utf-8")).get("weights", []) if out.exists() else []
+    known = {w["path"]: w for w in old}
+    weights = [{"path": w, "sha256": sha256(ROOT / w), "committed": False} if (ROOT / w).exists() else known[w]
+               for w in WEIGHTS if (ROOT / w).exists() or w in known]  # fmt: skip
     out.parent.mkdir(parents=True, exist_ok=True)
     doc = {"release": "v3.0.0-rc1", "closed_loop": runs, "weights": weights, "validation_problems": problems,
            "files": rows}  # fmt: skip
