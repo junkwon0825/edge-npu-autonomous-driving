@@ -1,0 +1,670 @@
+{
+  "runs": [
+    {
+      "scenario": "lk_night",
+      "kind": "none",
+      "route": "mild",
+      "map": "Town04",
+      "mode": "C",
+      "ego_kmh": 30.0,
+      "radar": false,
+      "scheduler": "fixed",
+      "fault": null,
+      "weather": "ClearNight",
+      "sched_counts": {
+        "det": 400,
+        "lane": 200,
+        "frames": 400
+      },
+      "failover_events": [],
+      "lane_geometry_stats": {
+        "ok": 114,
+        "one_side": 0,
+        "fail": 0
+      },
+      "det_gate": {
+        "n_new": 385,
+        "n_stale": 1,
+        "n_failed": 0,
+        "n_none": 47
+      },
+      "lane_gate": {
+        "n_new": 114,
+        "n_stale": 1,
+        "n_failed": 0,
+        "n_none": 0
+      },
+      "det_age_ms": {
+        "n": 385,
+        "mean": 24.07792207792208,
+        "p50": 20.000000000000462,
+        "p95": 30.00000000000025,
+        "p99": 40.000000000000036,
+        "max": 50.00000000000004
+      },
+      "lane_age_ms": {
+        "n": 114,
+        "mean": 136.49122807017545,
+        "p50": 134.9999999999998,
+        "p95": 169.99999999999994,
+        "p99": 199.99999999999997,
+        "max": 220.00000000000063
+      },
+      "det_latency_ms": {
+        "n": 385,
+        "mean": 19.731989604505625,
+        "p50": 19.05340002849698,
+        "p95": 23.872800078243014,
+        "p99": 25.62660802155733,
+        "max": 44.0868001896888
+      },
+      "lane_latency_ms": {
+        "n": 114,
+        "mean": 101.04447544201098,
+        "p50": 100.06050008814782,
+        "p95": 119.2010599770583,
+        "p99": 188.80815101787462,
+        "max": 210.3782999329269
+      },
+      "det_queue_ms": {
+        "n": 386,
+        "mean": 0.14275596057272014,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 3.3268902008420684,
+        "max": 19.286700012162317
+      },
+      "lane_queue_ms": {
+        "n": 116,
+        "mean": 29.92132847976173,
+        "p50": 30.26615012437095,
+        "p95": 54.691199969965936,
+        "p99": 57.109284877312746,
+        "max": 59.115599747747716
+      },
+      "mode_d_ops": null,
+      "control_stack_ms": {
+        "n": 1200,
+        "mean": 0.3065383288776502,
+        "p50": 0.0954499701038003,
+        "p95": 2.186590002384037,
+        "p99": 2.5968629820272326,
+        "max": 20.14359994791448
+      },
+      "lane_device": null,
+      "dropped_frames": {
+        "det": 14,
+        "lane": 83
+      },
+      "collision": false,
+      "collision_with": null,
+      "lat_rmse_m": 0.026233869961590675,
+      "lat_max_m": 0.03657107663593706,
+      "heading_mae_deg": 0.19933397538707745,
+      "lane_departures": 0,
+      "steer_rate_rms": 0.09623131891300674,
+      "lane_est_offset_mae_m": 0.04792424176986958,
+      "lane_est_heading_mae_deg": 0.49577876052356573,
+      "lka_unavailable_frac": 0.025833333333333333,
+      "min_gap_m": null,
+      "first_brake_t": null,
+      "gt_ttc_at_first_brake_s": null,
+      "brake_onsets": 0,
+      "unneeded_brake": false,
+      "stopped": false,
+      "ticks": 1200,
+      "distance_m": 96.56252423763276,
+      "est_samples": 0,
+      "range_mae_m": null,
+      "closing_mae_mps": null,
+      "ttc_mae_s": null,
+      "ttc_median_err_s": null,
+      "radar_fused_frac": null,
+      "memory_before": {
+        "free_gb": 4.76,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.69,
+        "python_rss_gb": 0.94,
+        "vscode_rss_gb": 0.89,
+        "agent_rss_gb": 0.49,
+        "browser_rss_gb": 1.34
+      },
+      "memory_after": {
+        "free_gb": 4.49,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.85,
+        "python_rss_gb": 1.32,
+        "vscode_rss_gb": 0.97,
+        "agent_rss_gb": 0.5,
+        "browser_rss_gb": 1.38
+      },
+      "fault_arg": "",
+      "wall_s": 51.00209319987334,
+      "code_commit": "e9aac5a",
+      "timestamp": "2026-11-25T01:46:20",
+      "npu_server": {
+        "ready": true,
+        "server": "v3",
+        "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+        "dtype": "bf16",
+        "threads": 2,
+        "models": {
+          "det": {
+            "device": "furiosa:0",
+            "load_s": 3.58
+          },
+          "lane": {
+            "device": "furiosa:1",
+            "load_s": 0.63
+          }
+        },
+        "imgsz": 640,
+        "lane_input": [
+          256,
+          512
+        ]
+      }
+    },
+    {
+      "scenario": "lk_night",
+      "kind": "none",
+      "route": "mild",
+      "map": "Town04",
+      "mode": "D",
+      "ego_kmh": 30.0,
+      "radar": false,
+      "scheduler": "fixed",
+      "fault": null,
+      "weather": "ClearNight",
+      "sched_counts": {
+        "det": 400,
+        "lane": 200,
+        "frames": 400
+      },
+      "failover_events": [],
+      "lane_geometry_stats": {
+        "ok": 115,
+        "one_side": 0,
+        "fail": 0
+      },
+      "det_gate": {
+        "n_new": 116,
+        "n_stale": 1,
+        "n_failed": 0,
+        "n_none": 12
+      },
+      "lane_gate": {
+        "n_new": 115,
+        "n_stale": 1,
+        "n_failed": 0,
+        "n_none": 0
+      },
+      "det_age_ms": {
+        "n": 116,
+        "mean": 121.29310344827587,
+        "p50": 120.00000000000011,
+        "p95": 160.00000000000014,
+        "p99": 169.99999999999994,
+        "max": 169.99999999999994
+      },
+      "lane_age_ms": {
+        "n": 115,
+        "mean": 121.30434782608695,
+        "p50": 120.00000000000011,
+        "p95": 160.00000000000014,
+        "p99": 169.99999999999994,
+        "max": 169.99999999999994
+      },
+      "det_latency_ms": {
+        "n": 116,
+        "mean": 100.26102241907462,
+        "p50": 99.45710003376007,
+        "p95": 138.80122505361214,
+        "p99": 148.4656099346466,
+        "max": 160.8533998951316
+      },
+      "lane_latency_ms": {
+        "n": 115,
+        "mean": 100.14208522220345,
+        "p50": 99.4522999972105,
+        "p95": 138.8112100539729,
+        "p99": 148.49365593399853,
+        "max": 160.8533998951316
+      },
+      "det_queue_ms": {
+        "n": 118,
+        "mean": 15.99324905629243,
+        "p50": 16.905649858526605,
+        "p95": 28.503520385362123,
+        "p99": 29.788619553762857,
+        "max": 29.813400162383928
+      },
+      "lane_queue_ms": {
+        "n": 118,
+        "mean": 15.99324905629243,
+        "p50": 16.905649858526605,
+        "p95": 28.503520385362123,
+        "p99": 29.788619553762857,
+        "max": 29.813400162383928
+      },
+      "mode_d_ops": {
+        "infer_both": 117,
+        "infer_det": 1,
+        "infer_lane": 0
+      },
+      "control_stack_ms": {
+        "n": 1200,
+        "mean": 0.25943800147312385,
+        "p50": 0.08230004459619522,
+        "p95": 1.8201047787442803,
+        "p99": 2.1549269929528236,
+        "max": 3.620099974796176
+      },
+      "lane_device": "furiosa:1",
+      "dropped_frames": {
+        "both": 281
+      },
+      "collision": false,
+      "collision_with": null,
+      "lat_rmse_m": 0.025489352261972627,
+      "lat_max_m": 0.03227187815900834,
+      "heading_mae_deg": 0.19282790230199076,
+      "lane_departures": 0,
+      "steer_rate_rms": 0.0664335120410654,
+      "lane_est_offset_mae_m": 0.05218729280265273,
+      "lane_est_heading_mae_deg": 0.5541129057078044,
+      "lka_unavailable_frac": 0.020833333333333332,
+      "min_gap_m": null,
+      "first_brake_t": null,
+      "gt_ttc_at_first_brake_s": null,
+      "brake_onsets": 0,
+      "unneeded_brake": false,
+      "stopped": false,
+      "ticks": 1200,
+      "distance_m": 96.72443678855896,
+      "est_samples": 0,
+      "range_mae_m": null,
+      "closing_mae_mps": null,
+      "ttc_mae_s": null,
+      "ttc_median_err_s": null,
+      "radar_fused_frac": null,
+      "memory_before": {
+        "free_gb": 4.5,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.85,
+        "python_rss_gb": 1.32,
+        "vscode_rss_gb": 0.97,
+        "agent_rss_gb": 0.5,
+        "browser_rss_gb": 1.38
+      },
+      "memory_after": {
+        "free_gb": 4.55,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.84,
+        "python_rss_gb": 1.3,
+        "vscode_rss_gb": 0.96,
+        "agent_rss_gb": 0.54,
+        "browser_rss_gb": 1.26
+      },
+      "fault_arg": "",
+      "wall_s": 36.2587526999414,
+      "code_commit": "e9aac5a",
+      "timestamp": "2026-11-25T01:46:57",
+      "npu_server": {
+        "ready": true,
+        "server": "v3",
+        "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+        "dtype": "bf16",
+        "threads": 2,
+        "models": {
+          "det": {
+            "device": "furiosa:0",
+            "load_s": 3.58
+          },
+          "lane": {
+            "device": "furiosa:1",
+            "load_s": 0.63
+          }
+        },
+        "imgsz": 640,
+        "lane_input": [
+          256,
+          512
+        ]
+      }
+    },
+    {
+      "scenario": "lk_rain",
+      "kind": "none",
+      "route": "mild",
+      "map": "Town04",
+      "mode": "C",
+      "ego_kmh": 30.0,
+      "radar": false,
+      "scheduler": "fixed",
+      "fault": null,
+      "weather": "HardRainNoon",
+      "sched_counts": {
+        "det": 400,
+        "lane": 200,
+        "frames": 400
+      },
+      "failover_events": [],
+      "lane_geometry_stats": {
+        "ok": 142,
+        "one_side": 4,
+        "fail": 0
+      },
+      "det_gate": {
+        "n_new": 400,
+        "n_stale": 0,
+        "n_failed": 0,
+        "n_none": 3
+      },
+      "lane_gate": {
+        "n_new": 146,
+        "n_stale": 0,
+        "n_failed": 0,
+        "n_none": 0
+      },
+      "det_age_ms": {
+        "n": 400,
+        "mean": 24.02499999999998,
+        "p50": 20.000000000000462,
+        "p95": 30.00000000000029,
+        "p99": 30.000000000001137,
+        "max": 40.000000000000036
+      },
+      "lane_age_ms": {
+        "n": 146,
+        "mean": 112.53424657534246,
+        "p50": 110.00000000000077,
+        "p95": 167.5,
+        "p99": 185.50000000000017,
+        "max": 189.99999999999994
+      },
+      "det_latency_ms": {
+        "n": 400,
+        "mean": 19.707330497330986,
+        "p50": 19.26410011947155,
+        "p95": 25.251039909198873,
+        "p99": 29.27294296445325,
+        "max": 33.384300069883466
+      },
+      "lane_latency_ms": {
+        "n": 146,
+        "mean": 81.29312397516651,
+        "p50": 72.89579999633133,
+        "p95": 122.91310011642054,
+        "p99": 142.89334001950922,
+        "max": 148.51239998824894
+      },
+      "det_queue_ms": {
+        "n": 400,
+        "mean": 0.015652750292793893,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "max": 3.3843000698841053
+      },
+      "lane_queue_ms": {
+        "n": 147,
+        "mean": 25.84320612486136,
+        "p50": 26.05179985053674,
+        "p95": 55.099490500986,
+        "p99": 57.72727805077942,
+        "max": 58.71679999865442
+      },
+      "mode_d_ops": null,
+      "control_stack_ms": {
+        "n": 1200,
+        "mean": 0.3547650845333313,
+        "p50": 0.09240000508725643,
+        "p95": 2.3278549197129896,
+        "p99": 2.6657168078236277,
+        "max": 3.3946000039577484
+      },
+      "lane_device": null,
+      "dropped_frames": {
+        "det": 0,
+        "lane": 52
+      },
+      "collision": false,
+      "collision_with": null,
+      "lat_rmse_m": 0.020272766162596594,
+      "lat_max_m": 0.0358468416152391,
+      "heading_mae_deg": 0.2029471178528426,
+      "lane_departures": 0,
+      "steer_rate_rms": 0.13577245512497715,
+      "lane_est_offset_mae_m": 0.10360973724553948,
+      "lane_est_heading_mae_deg": 1.119970812262439,
+      "lka_unavailable_frac": 0.010833333333333334,
+      "min_gap_m": null,
+      "first_brake_t": null,
+      "gt_ttc_at_first_brake_s": null,
+      "brake_onsets": 0,
+      "unneeded_brake": false,
+      "stopped": false,
+      "ticks": 1200,
+      "distance_m": 96.9981611251831,
+      "est_samples": 0,
+      "range_mae_m": null,
+      "closing_mae_mps": null,
+      "ttc_mae_s": null,
+      "ttc_median_err_s": null,
+      "radar_fused_frac": null,
+      "memory_before": {
+        "free_gb": 4.55,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.84,
+        "python_rss_gb": 1.3,
+        "vscode_rss_gb": 0.96,
+        "agent_rss_gb": 0.54,
+        "browser_rss_gb": 1.26
+      },
+      "memory_after": {
+        "free_gb": 4.33,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.82,
+        "python_rss_gb": 1.31,
+        "vscode_rss_gb": 0.98,
+        "agent_rss_gb": 0.54,
+        "browser_rss_gb": 1.44
+      },
+      "fault_arg": "",
+      "wall_s": 39.455391300143674,
+      "code_commit": "e9aac5a",
+      "timestamp": "2026-11-25T01:47:37",
+      "npu_server": {
+        "ready": true,
+        "server": "v3",
+        "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+        "dtype": "bf16",
+        "threads": 2,
+        "models": {
+          "det": {
+            "device": "furiosa:0",
+            "load_s": 3.58
+          },
+          "lane": {
+            "device": "furiosa:1",
+            "load_s": 0.63
+          }
+        },
+        "imgsz": 640,
+        "lane_input": [
+          256,
+          512
+        ]
+      }
+    },
+    {
+      "scenario": "lk_rain",
+      "kind": "none",
+      "route": "mild",
+      "map": "Town04",
+      "mode": "D",
+      "ego_kmh": 30.0,
+      "radar": false,
+      "scheduler": "fixed",
+      "fault": null,
+      "weather": "HardRainNoon",
+      "sched_counts": {
+        "det": 400,
+        "lane": 200,
+        "frames": 400
+      },
+      "failover_events": [],
+      "lane_geometry_stats": {
+        "ok": 126,
+        "one_side": 7,
+        "fail": 0
+      },
+      "det_gate": {
+        "n_new": 136,
+        "n_stale": 0,
+        "n_failed": 0,
+        "n_none": 9
+      },
+      "lane_gate": {
+        "n_new": 133,
+        "n_stale": 0,
+        "n_failed": 0,
+        "n_none": 0
+      },
+      "det_age_ms": {
+        "n": 136,
+        "mean": 107.79411764705888,
+        "p50": 109.99999999999987,
+        "p95": 130.00000000000045,
+        "p99": 166.5,
+        "max": 190.0000000000004
+      },
+      "lane_age_ms": {
+        "n": 133,
+        "mean": 108.34586466165419,
+        "p50": 109.99999999999987,
+        "p95": 130.0000000000005,
+        "p99": 166.8,
+        "max": 190.0000000000004
+      },
+      "det_latency_ms": {
+        "n": 136,
+        "mean": 87.9819264758707,
+        "p50": 89.75209994241595,
+        "p95": 101.65594989666715,
+        "p99": 147.37688993336636,
+        "max": 153.9090999867767
+      },
+      "lane_latency_ms": {
+        "n": 133,
+        "mean": 88.49668421754544,
+        "p50": 90.0804998818785,
+        "p95": 101.67703991755843,
+        "p99": 147.4531079269946,
+        "max": 153.9090999867767
+      },
+      "det_queue_ms": {
+        "n": 137,
+        "mean": 14.922694108877078,
+        "p50": 16.2842999491839,
+        "p95": 28.923839438706263,
+        "p99": 29.641335628926484,
+        "max": 29.992100019008205
+      },
+      "lane_queue_ms": {
+        "n": 137,
+        "mean": 14.922694108877078,
+        "p50": 16.2842999491839,
+        "p95": 28.923839438706263,
+        "p99": 29.641335628926484,
+        "max": 29.992100019008205
+      },
+      "mode_d_ops": {
+        "infer_both": 134,
+        "infer_det": 3,
+        "infer_lane": 0
+      },
+      "control_stack_ms": {
+        "n": 1200,
+        "mean": 0.2725056675262749,
+        "p50": 0.07680011913180351,
+        "p95": 1.8187799956649542,
+        "p99": 2.0727170654572546,
+        "max": 2.5152999442070723
+      },
+      "lane_device": "furiosa:1",
+      "dropped_frames": {
+        "both": 262
+      },
+      "collision": false,
+      "collision_with": null,
+      "lat_rmse_m": 0.023029991477106385,
+      "lat_max_m": 0.04867502266642987,
+      "heading_mae_deg": 0.2424780060572266,
+      "lane_departures": 0,
+      "steer_rate_rms": 0.13558499017938994,
+      "lane_est_offset_mae_m": 0.10476567584620758,
+      "lane_est_heading_mae_deg": 1.0345377581110042,
+      "lka_unavailable_frac": 0.014166666666666666,
+      "min_gap_m": null,
+      "first_brake_t": null,
+      "gt_ttc_at_first_brake_s": null,
+      "brake_onsets": 0,
+      "unneeded_brake": false,
+      "stopped": false,
+      "ticks": 1200,
+      "distance_m": 96.89481953620911,
+      "est_samples": 0,
+      "range_mae_m": null,
+      "closing_mae_mps": null,
+      "ttc_mae_s": null,
+      "ttc_median_err_s": null,
+      "radar_fused_frac": null,
+      "memory_before": {
+        "free_gb": 4.32,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.82,
+        "python_rss_gb": 1.31,
+        "vscode_rss_gb": 0.98,
+        "agent_rss_gb": 0.54,
+        "browser_rss_gb": 1.46
+      },
+      "memory_after": {
+        "free_gb": 4.23,
+        "total_gb": 15.93,
+        "carla_rss_gb": 1.83,
+        "python_rss_gb": 1.31,
+        "vscode_rss_gb": 0.98,
+        "agent_rss_gb": 0.54,
+        "browser_rss_gb": 1.47
+      },
+      "fault_arg": "",
+      "wall_s": 31.43879669997841,
+      "code_commit": "e9aac5a",
+      "timestamp": "2026-11-25T01:48:09",
+      "npu_server": {
+        "ready": true,
+        "server": "v3",
+        "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+        "dtype": "bf16",
+        "threads": 2,
+        "models": {
+          "det": {
+            "device": "furiosa:0",
+            "load_s": 3.58
+          },
+          "lane": {
+            "device": "furiosa:1",
+            "load_s": 0.63
+          }
+        },
+        "imgsz": 640,
+        "lane_input": [
+          256,
+          512
+        ]
+      }
+    }
+  ]
+}
