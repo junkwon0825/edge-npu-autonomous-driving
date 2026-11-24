@@ -1,0 +1,99 @@
+{
+  "period_s": 0.03333333333333333,
+  "cases": {
+    "timeout": {
+      "frames": 99,
+      "failed_frames": 0,
+      "gpu_frames": 22,
+      "failover_s": 0.5373021000996232,
+      "frames_lost_before_failover": 0,
+      "recovered_to_npu_s": 1.6148523001465946,
+      "events": [
+        {
+          "t": 1097408.637,
+          "frame_id": 35,
+          "from": "PRIMARY",
+          "to": "FALLBACK",
+          "reason": "primary failed: RemoteTimeout('no response for frame 35 within 0.249 s')"
+        },
+        {
+          "t": 1097409.987,
+          "frame_id": 57,
+          "from": "FALLBACK",
+          "to": "PRIMARY",
+          "reason": "primary ok"
+        }
+      ],
+      "client": {
+        "backend": "rngd",
+        "precision": "bf16",
+        "available": true,
+        "n_ok": 77,
+        "n_err": 0,
+        "n_timeout": 3,
+        "n_stale": 3,
+        "n_busy": 0
+      }
+    },
+    "invalid_shape": {
+      "status": 1,
+      "error": "ValueError('payload 691200 B does not match 648x360x3')",
+      "server_alive_after": true
+    },
+    "stale_answer": {
+      "first_ok": false,
+      "first_error": "RemoteTimeout('no response for frame 5000 within 0.249 s')",
+      "next_ok": true,
+      "next_frame_id": 5001,
+      "n_stale": 4
+    },
+    "worker_crash": {
+      "frames": 115,
+      "failed_frames": 0,
+      "gpu_frames": 71,
+      "failover_s": 0.1074985999148339,
+      "frames_lost_before_failover": 0,
+      "recovered_to_npu_s": 9.619163099909201,
+      "events": [
+        {
+          "t": 1097415.608,
+          "frame_id": 35,
+          "from": "PRIMARY",
+          "to": "FALLBACK",
+          "reason": "primary failed: RuntimeError('NPU server connection closed')"
+        },
+        {
+          "t": 1097425.17,
+          "frame_id": 106,
+          "from": "FALLBACK",
+          "to": "PRIMARY",
+          "reason": "primary ok"
+        }
+      ],
+      "reconnect": {
+        "start": 4.031158600002527,
+        "ready": 11.56772410008125
+      }
+    },
+    "load_failure": {
+      "startup": "failed (expected)",
+      "error": "NPU server did not start: b''",
+      "detect_s": 7.43249940010719,
+      "action": "GPU-only, logged"
+    },
+    "npu_unavailable": {
+      "startup": "failed (expected)",
+      "error": "NPU server did not start: b\"\\x1b[31mERROR\\x1b[0m \\x1b[2mfuriosa_torch::cpp::allocator\\x1b[0m\\x1b[2m:\\x1b[0m Failed to initialize device for index 9: PyErr { type: <class 'RuntimeError'>, value: Runtim",
+      "detect_s": 7.383707199944183,
+      "action": "GPU-only, logged"
+    },
+    "both_down": {
+      "ok": false,
+      "state": "DEGRADED",
+      "events": [
+        "FALLBACK",
+        "DEGRADED"
+      ]
+    }
+  }
+}
