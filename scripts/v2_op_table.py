@@ -65,9 +65,14 @@ V1_ROWS = [
 ]  # fmt: skip
 
 
-
-V3_FILES = ["v3_npu_lane_port_sweep.json", "v3_npu_lane_port_unet.json", "v3_npu_lane_port_unet2.json",
-            "v3_npu_model_lab.json", "v3_npu_model_lab_rerun.json", "v3_npu_split_conv.json"]
+V3_FILES = [
+    "v3_npu_lane_port_sweep.json",
+    "v3_npu_lane_port_unet.json",
+    "v3_npu_lane_port_unet2.json",
+    "v3_npu_model_lab.json",
+    "v3_npu_model_lab_rerun.json",
+    "v3_npu_split_conv.json",
+]
 V3_OPS = {  # case -> (model, operator / variant, workaround or note)
     "mp_16x64x128": ("probe", "max_pool2d 2x2 (16x64x128)", "pooling limit depends on size and channels"),
     "mp_16x128x256": ("probe", "max_pool2d 2x2 (16x128x256)", ""),
@@ -129,7 +134,10 @@ def main() -> int:
     for fname in V3_FILES:
         d = json.loads(resolve(f"reports/evidence/{fname}").read_text(encoding="utf-8"))
         for case, e in d["cases"].items():
-            if case not in V3_OPS or (fname == "v3_npu_model_lab.json" and case in ("layernorm", "gelu", "linear_gelu", "sdpa", "vit_tiny_sdpa")):
+            if case not in V3_OPS or (
+                fname == "v3_npu_model_lab.json"
+                and case in ("layernorm", "gelu", "linear_gelu", "sdpa", "vit_tiny_sdpa")
+            ):
                 continue  # superseded by the corrected re-run
             model, op, work = V3_OPS[case]
             err = " ".join((e.get("error_detail") or "").split())
@@ -138,7 +146,9 @@ def main() -> int:
             if run == "PASS":
                 run = f"PASS (cos {e['cosine_vs_cpu']:.5f}, p50 {e['latency_ms_p50']:.3f} ms)"
             shape = "x".join(str(v) for v in e.get("input_shape", [])) or "-"
-            rows.append((model, op, shape, "bf16", e.get("compile", "?") + (f": {err}" if err else ""), run, work, fname))
+            rows.append(
+                (model, op, shape, "bf16", e.get("compile", "?") + (f": {err}" if err else ""), run, work, fname)
+            )
     head = ["Model", "Operator", "Input shape", "dtype", "Compile", "Runtime (vs CPU)", "Workaround / note", "Evidence"]
     lines = [
         "# NPU operator compatibility database (Furiosa RNGD)",
