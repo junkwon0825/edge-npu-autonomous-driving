@@ -10,12 +10,12 @@ The same weights (``models/lane_unet_s3c32.pt``) on the same frames, through six
 | ``gpu_bf16``          | local CUDA, BF16, NPU-exported graph (BN folded, ConvT rewritten) | direct |
 | ``gpu_bf16_npuprep``  | local CUDA, BF16, NPU-exported graph | NPU-client path |
 | ``rngd_live``         | remote RNGD BF16 via the V3 server (exact closed-loop request: ``content_raw``) | NPU-client path |
-| ``rngd_fullframe``    | remote RNGD BF16, the original 800x450 frame sent unscaled | direct (server-side INTER_AREA) |
+| ``rngd_directprep``    | remote RNGD BF16, frame resized locally 800x450 -> INTER_AREA 512x256 and sent at that size | direct (the server's resize is then the identity; the server rejects frames wider than 640) |
 
 Hypotheses (night/rain lane failure of modes C/D):
-- A numerical precision: ``gpu_bf16`` / ``rngd_fullframe`` vs ``gpu_fp32`` (same preprocessing)
-- C preprocessing: ``gpu_fp32_npuprep`` vs ``gpu_fp32`` (same precision); ``rngd_live`` vs ``rngd_fullframe``
-- RNGD-specific numerics: ``rngd_fullframe`` vs ``gpu_bf16``
+- A numerical precision: ``gpu_bf16`` / ``rngd_directprep`` vs ``gpu_fp32`` (same preprocessing)
+- C preprocessing: ``gpu_fp32_npuprep`` vs ``gpu_fp32`` (same precision); ``rngd_live`` vs ``rngd_directprep``
+- RNGD-specific numerics: ``rngd_directprep`` vs ``gpu_bf16``
 - B transport / frame age is not present here (offline, no time): if offline RNGD masks are good, the
   closed-loop failure is temporal; the closed-loop logs and the lane-delay runs answer B.
 
@@ -48,7 +48,7 @@ from npu_ad.simulation import geometry as geo
 DATASET_GROUPS = [("Town04", "ClearNight"), ("Town10HD_Opt", "ClearNight"), ("Town04", "HardRainNoon"),
                   ("Town03", "HardRainNoon"), ("Town03", "ClearNoon"), ("Town04", "WetCloudySunset"),
                   ("Town04", "ClearSunset"), ("Town10HD_Opt", "ClearNoon")]  # fmt: skip
-PATHS = ["gpu_fp32", "gpu_fp32_npuprep", "gpu_bf16", "gpu_bf16_npuprep", "rngd_live", "rngd_fullframe"]
+PATHS = ["gpu_fp32", "gpu_fp32_npuprep", "gpu_bf16", "gpu_bf16_npuprep", "rngd_live", "rngd_directprep"]
 
 
 def npu_client_input(bgr: np.ndarray) -> np.ndarray:
@@ -64,7 +64,7 @@ def iou(a, b) -> float:
 
 
 class FullFrameClient(RngdMultiModelClient):
-    """Sends the unscaled frame (enc 1, w x h) so the server's resize sees the original 800x450 pixels."""
+    """Sends the frame already resized to the lane input (direct preprocessing); server resize = identity."""
 
     full = False
 
@@ -72,9 +72,9 @@ class FullFrameClient(RngdMultiModelClient):
         if not self.full:
             return super().encode(bgr)
         t0 = time.perf_counter()
-        h, w = bgr.shape[:2]
+        small = cv2.resize(bgr, (LANE_IN_W, LANE_IN_H), interpolation=cv2.INTER_AREA)
         lb = letterbox(bgr, self.imgsz)[1]  # only used for detection boxes, not for the lane mask
-        return 1, w, h, np.ascontiguousarray(bgr).tobytes(), lb, time.perf_counter() - t0
+        return 1, LANE_IN_W, LANE_IN_H, np.ascontiguousarray(small).tobytes(), lb, time.perf_counter() - t0
 
 
 def main() -> int:
@@ -143,7 +143,7 @@ def main() -> int:
             masks["gpu_bf16"], logits["gpu_bf16"] = local(img, True, False)
             masks["gpu_bf16_npuprep"], logits["gpu_bf16_npuprep"] = local(img, True, True)
             masks["rngd_live"], lat["rngd_live"] = remote(1000 + 2 * i, img, False)
-            masks["rngd_fullframe"], lat["rngd_fullframe"] = remote(1001 + 2 * i, img, True)
+            masks["rngd_directprep"], lat["rngd_directprep"] = remote(1001 + 2 * i, img, True)
             ref, ref_lo = masks["gpu_fp32"], logits["gpu_fp32"]
             g = per[grp]
             g["ref_pos_frac"].append(float(ref.mean()))
@@ -173,7 +173,7 @@ def main() -> int:
             for p in PATHS[1:]:  # lane-centre offset difference vs the reference, frames where both are valid
                 if p in offs and "gpu_fp32" in offs:
                     g[f"{p}:offset_diff_vs_gpu_fp32"].append(abs(offs[p] - offs["gpu_fp32"]))
-            for p in ("rngd_live", "rngd_fullframe"):
+            for p in ("rngd_live", "rngd_directprep"):
                 g[f"{p}:latency_ms"].append(lat[p] * 1000)
             if i % 40 == 0:
                 print(
