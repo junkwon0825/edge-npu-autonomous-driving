@@ -6,9 +6,13 @@ including a protocol-compatible fake server, `tests/fake_npu_server.py`).
 ## Unified inference interface
 ```python
 class InferenceBackend(Protocol):
-    name: str; precision: str
+    name: str
+    precision: str
+
     def infer(self, frame_id, capture_t, bgr) -> InferenceResult: ...
+
     def health(self) -> dict: ...
+
     def close(self) -> None: ...
 ```
 `InferenceResult` carries:
