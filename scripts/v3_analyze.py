@@ -79,6 +79,21 @@ def braking_metrics(rows):
     }
 
 
+RERUN: dict = {}
+
+
+def transport_degraded(r) -> bool:
+    """A non-fault run in which the backend requests themselves failed (timeouts), i.e. not a perception result."""
+    return not r.get("fault_arg") and (r["det_gate"]["n_failed"] + r["lane_gate"]["n_failed"]) >= 3
+
+
+def load_rerun() -> dict:
+    p = EV / "v3_closed_loop_rerun_nightrain.json"
+    if not p.exists():
+        return {}
+    return {(r["scenario"], r["mode"], r["ego_kmh"]): r for r in json.loads(p.read_text(encoding="utf-8"))["runs"]}
+
+
 def base(runs):
     """Non-fault, fixed-scheduler, camera-only runs keyed by (scenario, mode, speed)."""
     return {(r["scenario"], r["mode"], r["ego_kmh"]): r for r in runs
@@ -95,12 +110,24 @@ def lane_table(runs, out):
     for sc in LK:
         for kmh in (30.0, 50.0):
             for m in MODES:
-                r = b.get((sc, m, kmh))
-                if r:
+                r0 = b.get((sc, m, kmh))
+                deg = r0 is not None and transport_degraded(r0)
+                rr = RERUN.get((sc, m, kmh)) if deg else None
+                for r, lab in (
+                    (r0, f"{m} **transport degraded**" if deg else m),
+                    (rr, f"{m} (rerun, healthy session)"),
+                ):
+                    if r is None:
+                        continue
                     out.append(
-                        f"| {sc} | {kmh:.0f} | {m} | {f(r['lat_rmse_m'], '.3f', ' m')} | {f(r['lat_max_m'], '.3f', ' m')} | {r['lane_departures']} | {f(r['heading_mae_deg'], '.2f', '°')} | {f(r['steer_rate_rms'], '.2f', ' /s')} | {f(r['lane_est_offset_mae_m'], '.3f', ' m')} | {f(100 * r['lka_unavailable_frac'], '.1f', ' %')} | {f(stat(r, 'lane_age_ms'), '.0f', ' ms')} |"
+                        f"| {sc} | {kmh:.0f} | {lab} | {f(r['lat_rmse_m'], '.3f', ' m')} | {f(r['lat_max_m'], '.3f', ' m')} | {r['lane_departures']} | {f(r['heading_mae_deg'], '.2f', '°')} | {f(r['steer_rate_rms'], '.2f', ' /s')} | {f(r['lane_est_offset_mae_m'], '.3f', ' m')} | {f(100 * r['lka_unavailable_frac'], '.1f', ' %')} | {f(stat(r, 'lane_age_ms'), '.0f', ' ms')} |"
                     )
-    out.append("")
+    out.append(
+        "\n**Transport degraded** = the backend requests themselves timed out (>= 3 failed requests in a run without "
+        "injected faults). These runs were the last ones before the system stopped CARLA for low memory; the same "
+        "configurations re-run in a healthy session are listed under each "
+        "(`reports/evidence/v3_closed_loop_rerun_nightrain.json`).\n"
+    )
 
 
 def aeb_table(runs, out, scen, title):
@@ -163,7 +190,11 @@ def latency_table(runs, out):
         rs = [
             r
             for r in runs
-            if r["mode"] == m and not r.get("fault_arg") and r["scheduler"] == "fixed" and not r["radar"]
+            if r["mode"] == m
+            and not r.get("fault_arg")
+            and r["scheduler"] == "fixed"
+            and not r["radar"]
+            and not transport_degraded(r)
         ]
         if not rs:
             continue
@@ -193,7 +224,7 @@ def latency_table(runs, out):
             f"| {MODE_LABEL[m]} | {a['runs']} | {f(a['det_lat_mean'], '.0f')} / {f(a['det_lat_p95'], '.0f', ' ms')} | {f(a['lane_lat_mean'], '.0f')} / {f(a['lane_lat_p95'], '.0f', ' ms')} | {f(a['det_queue_mean'], '.0f', ' ms')} | {f(a['det_age_p95'], '.0f')} / {f(a['det_age_p99'], '.0f')} / {f(a['det_age_max'], '.0f', ' ms')} | {f(a['lane_age_p95'], '.0f')} / {f(a['lane_age_p99'], '.0f')} / {f(a['lane_age_max'], '.0f', ' ms')} | {dd} | {f(a['ctrl_p95'], '.1f', ' ms')} | {a['collisions']} / {a['hazard_runs']} | {a['departures']} |"
         )
     out.append(
-        "\nAges and latencies are per-run statistics averaged over runs (p95 / p99), the maximum is over all runs. Latency is the measured backend call (GPU in-process, or RNGD round trip incl. transport); frame age = control time − capture time of the result in use.\n"
+        "\nTransport-degraded runs are excluded here (see the lane-keeping table). Ages and latencies are per-run statistics averaged over runs (p95 / p99), the maximum is over all runs. Latency is the measured backend call (GPU in-process, or RNGD round trip incl. transport); frame age = control time − capture time of the result in use.\n"
     )
     return agg
 
@@ -224,8 +255,33 @@ def sched_table(runs, out):
     out.append("")
 
 
+def lane_age_table(runs, out):
+    """Mode A (GPU lane) with injected extra lane latency: how old can lane perception get before LKA fails."""
+    out.append("## Lane frame age vs lane keeping (Mode A, GPU lane + injected lane latency; stale gate 0.3 s)\n")
+    out.append(
+        "| Scenario | Extra lane latency | Lane latency mean | Lane age p95 / max | Lane results used | Stale rejected | Lateral RMSE | Max lateral | Departures | Steer rate RMS | LKA unavailable | Unneeded brake |"
+    )
+    out.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
+    rows = []
+    for sc in ("lk_strong", "lk_mild", "lk_night"):
+        for d in (0, 20, 50, 100, 150, 250):
+            f_ = f"lane_delay{d}" if d else ""
+            r = next((x for x in runs if x["scenario"] == sc and x["mode"] == "A" and x["ego_kmh"] == 30.0 and not x["radar"]
+                      and x["scheduler"] == "fixed" and (x.get("fault_arg") or "") == f_), None)  # fmt: skip
+            if not r:
+                continue
+            g = r["lane_gate"]
+            rows.append({"scenario": sc, "extra_ms": d, "lane_age_p95": stat(r, "lane_age_ms"), "rmse": r["lat_rmse_m"],
+                         "lka_unavailable": r["lka_unavailable_frac"], "departures": r["lane_departures"]})  # fmt: skip
+            out.append(
+                f"| {sc} | {d} ms | {f(stat(r, 'lane_latency_ms', 'mean'), '.0f', ' ms')} | {f(stat(r, 'lane_age_ms'), '.0f')} / {f(stat(r, 'lane_age_ms', 'max'), '.0f', ' ms')} | {g['n_new']} | {g['n_stale']} | {f(r['lat_rmse_m'], '.3f', ' m')} | {f(r['lat_max_m'], '.3f', ' m')} | {r['lane_departures']} | {f(r['steer_rate_rms'], '.2f', ' /s')} | {f(100 * r['lka_unavailable_frac'], '.1f', ' %')} | {f(r['unneeded_brake'])} |"
+            )
+    out.append("")
+    return rows
+
+
 def fault_table(runs, out):
-    rs = [r for r in runs if r.get("fault_arg")]
+    rs = [r for r in runs if r.get("fault_arg") and not r["fault_arg"].startswith("lane_delay")]
     out.append("## Fault injection in the loop\n")
     out.append(
         "| Scenario | Fault | Mode | Collision | Min gap | Lateral max | LKA unavailable | Det gate (new / stale / failed) | Det age max | Lane age max | Backend switches (logged) | Recovered to RNGD |"
@@ -249,18 +305,41 @@ def plots(runs, agg, pairs):
     fig, ax = plt.subplots(figsize=(10, 4.2))
     w = 0.2
     for j, m in enumerate(MODES):
-        ys = [b[(sc, m, 30.0)]["lat_rmse_m"] * 100 if (sc, m, 30.0) in b else np.nan for sc in LK]
+        ys = []
+        for sc in LK:
+            r = b.get((sc, m, 30.0))
+            if r is not None and transport_degraded(r):
+                r = RERUN.get((sc, m, 30.0))  # healthy-session rerun; the original is in v3_nightrain_transport.png
+            ys.append(r["lat_rmse_m"] * 100 if r else np.nan)
         ax.bar(np.arange(len(LK)) + (j - 1.5) * w, ys, w, color=C[j], edgecolor=SURF, linewidth=2, label=MODE_LABEL[m])
     ax.set_xticks(range(len(LK)), [s.replace("lk_", "") for s in LK], fontsize=9)
     ax.set_ylabel("lateral RMSE vs map lane centre (cm)")
-    ax.set_title(
-        "Camera-only lane keeping at 30 km/h, by backend configuration (0 lane departures in all runs shown)"
-        if all(b[k]["lane_departures"] == 0 for k in b if k[0] in LK and k[2] == 30.0)
-        else "Camera-only lane keeping at 30 km/h, by backend configuration"
-    )
-    ax.legend(fontsize=8, ncol=2)
+    ax.set_title("Camera-only lane keeping at 30 km/h, by backend configuration")
+    ax.legend(fontsize=8, ncol=2, loc="upper left")
     ax.grid(axis="y", color=GRID)
+    ax.text(0.99, 0.97, "night / rain, modes C and D: healthy-session reruns;\nthe original runs failed on request timeouts\n(see v3_nightrain_transport.png)",
+            transform=ax.transAxes, ha="right", va="top", fontsize=8, color=INK2)  # fmt: skip
     _save(fig, "v3_lane_keeping_rmse.png")
+    # 1b night/rain: original (transport degraded) vs healthy-session rerun
+    keys = [k for k in sorted(b) if transport_degraded(b[k]) and k in RERUN]
+    if keys:
+        fig, axs = plt.subplots(1, 2, figsize=(10, 3.6))
+        x = np.arange(len(keys))
+        for j, (lab, src) in enumerate((("original run (request timeouts)", b), ("rerun, healthy session", RERUN))):
+            kw = {"color": C[j + 1], "edgecolor": SURF, "linewidth": 2}
+            axs[0].bar(x + (j - 0.5) * 0.36, [src[k]["lat_rmse_m"] * 100 for k in keys], 0.36, label=lab, **kw)
+            fails = [src[k]["det_gate"]["n_failed"] + src[k]["lane_gate"]["n_failed"] for k in keys]
+            axs[1].bar(x + (j - 0.5) * 0.36, fails, 0.36, **kw)
+        axs[0].set_ylabel("lateral RMSE (cm)")
+        axs[1].set_ylabel("failed backend requests")
+        for a_ in axs:
+            a_.set_xticks(x, [f"{k[0].replace('lk_', '')} {k[1]}" for k in keys], fontsize=9)
+            a_.grid(axis="y", color=GRID)
+        axs[0].legend(fontsize=8)
+        fig.suptitle(
+            "RNGD lane modes at night / in rain: the failure followed request timeouts, not the weather", fontsize=10
+        )
+        _save(fig, "v3_nightrain_transport.png")
     # 2 frame age by mode
     if agg:
         fig, ax = plt.subplots(figsize=(8.5, 3.6))
@@ -287,9 +366,9 @@ def plots(runs, agg, pairs):
         ax.set_yticks(range(len(ms)), [MODE_LABEL[m] for m in ms], fontsize=8.5)
         ax.invert_yaxis()
         ax.set_xlabel("frame age at control (ms), mean of per-run p95")
-        ax.set_xlim(0, 160)
+        ax.set_xlim(0, 220)
         ax.set_title("Perception freshness in the closed loop")
-        ax.legend(fontsize=8, loc="lower right")
+        ax.legend(fontsize=8, loc="upper right")
         ax.grid(axis="x", color=GRID)
         _save(fig, "v3_frame_age_by_mode.png")
     # 3 radar closing-speed error
@@ -341,6 +420,7 @@ def plots(runs, agg, pairs):
 
 
 def main() -> int:
+    RERUN.update(load_rerun())
     runs = json.loads((EV / "v3_closed_loop.json").read_text(encoding="utf-8"))["runs"]
     out = ["# V3 closed-loop tables (generated by `scripts/v3_analyze.py` from `reports/evidence/v3_closed_loop.json`)\n",
            f"Runs: **{len(runs)}**. Code commits: {', '.join(sorted({r['code_commit'] for r in runs}))}. CARLA 0.9.16, sync 100 Hz, camera 33 Hz, time-dilated hardware-in-the-loop (measured backend latency applied in simulation time).\n"]  # fmt: skip
@@ -350,6 +430,7 @@ def main() -> int:
     pairs = radar_table(runs, out)
     agg = latency_table(runs, out)
     sched_table(runs, out)
+    age_rows = lane_age_table(runs, out)
     fault_table(runs, out)
     (ROOT / "reports" / "v3_closed_loop_tables.md").write_text("\n".join(out) + "\n", encoding="utf-8", newline="\n")
     hazards = [r for r in runs if r["kind"] != "none"]
@@ -359,18 +440,23 @@ def main() -> int:
         "hazard_runs": len(hazards),
         "hazard_collisions": [(r["scenario"], r["mode"], r["ego_kmh"], r["radar"], r["scheduler"], r.get("fault_arg")) for r in hazards if r["collision"]],
         "lane_departures_total": sum(r["lane_departures"] for r in runs),
+        "transport_degraded_runs": [(r["scenario"], r["mode"]) for r in runs if transport_degraded(r)],
+        "rerun_nightrain": {f"{k[0]} {k[1]}": {"lat_rmse_m": v["lat_rmse_m"], "lane_departures": v["lane_departures"], "collision": v["collision"]} for k, v in RERUN.items()},
         "runs_with_departure": [(r["scenario"], r["mode"], r["ego_kmh"], r.get("fault_arg")) for r in runs if r["lane_departures"]],
         "unneeded_brakes": [(r["scenario"], r["mode"], r["ego_kmh"], r["radar"]) for r in runs if r["unneeded_brake"]],
         "by_mode": agg,
     }  # fmt: skip
     by_cat = defaultdict(int)
     for r in runs:
-        by_cat[
-            "fault"
-            if r.get("fault_arg")
-            else ("sched" if r["scheduler"] != "fixed" else ("radar" if r["radar"] else r["kind"]))
-        ] += 1
+        fa = r.get("fault_arg") or ""
+        if fa:
+            cat = "lane_age" if fa.startswith("lane_delay") else "fault"
+        else:
+            cat = "sched" if r["scheduler"] != "fixed" else ("radar" if r["radar"] else r["kind"])
+        by_cat[cat] += 1
+    summary["collisions_any"] = [(r["scenario"], r["mode"], r["collision_with"]) for r in runs if r["collision"]]
     summary["by_category"] = dict(by_cat)
+    summary["lane_age"] = age_rows
     (EV / "v3_closed_loop_summary.json").write_text(
         json.dumps(summary, indent=2, default=str), encoding="utf-8", newline="\n"
     )

@@ -182,3 +182,11 @@ def test_simulated_pipeline_measured_latency_hil():
     pipe = SimulatedAsyncPipeline(MockBackend(latency_s=0.07, sleep=False), LatencyModel(use_measured=True))
     pipe.on_frame(0.0, Frame(1, 0.0, None))
     assert pipe.poll(0.05) is None and pipe.poll(0.07).frame_id == 1
+
+
+def test_measured_latency_keeps_injected_stale_delay():
+    """use_measured must not erase injected stale results (V3 det_stale20 was ineffective before this fix)."""
+    pipe = SimulatedAsyncPipeline(MockBackend(latency_s=0.02, sleep=False),
+                                  LatencyModel(use_measured=True, stale_p=1.0, stale_extra_s=0.4))  # fmt: skip
+    pipe.on_frame(0.0, Frame(1, 0.0, None))
+    assert pipe.records[0]["latency_s"] >= 0.42 and pipe.records[0]["tag"] == "measured+stale_injected"

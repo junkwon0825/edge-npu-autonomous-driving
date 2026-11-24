@@ -230,7 +230,9 @@ class SimulatedAsyncPipeline:
         res = self.backend.infer(fr.frame_id, fr.capture_t, fr.bgr)
         lat, tag = self.model.draw(t)
         if self.model.use_measured and lat is not None:
-            lat, tag = res.latency_s, "measured"  # simulation time paused during the real call
+            # simulation time paused during the real call; injected stale / burst delay stays on top of it
+            extra = {"stale_injected": self.model.stale_extra_s, "burst": self.model.burst_extra_s}.get(tag, 0.0)
+            lat, tag = res.latency_s + extra, ("measured" if tag == "ok" else f"measured+{tag}")
         res.t_start = t
         compute = max(lat if lat is not None else self.model.base_s, self.min_latency_s)
         self._busy_until = t + compute
