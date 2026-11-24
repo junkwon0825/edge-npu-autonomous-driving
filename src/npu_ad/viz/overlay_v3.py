@@ -111,7 +111,7 @@ class OverlayV3:
             self.shots[f"{pre}lane"] = img
         if st in ("WARNING", "BRAKE") and f"{pre}{st.lower()}" not in self.shots:
             self.shots[f"{pre}{st.lower()}"] = img
-        if info["fallback"] not in ("n/a", "PRIMARY") and f"{pre}fallback" not in self.shots:
+        if "FALLBACK" in info["fallback"] and f"{pre}fallback" not in self.shots:
             self.shots[f"{pre}fallback"] = img
 
     def close(self) -> list[str]:
