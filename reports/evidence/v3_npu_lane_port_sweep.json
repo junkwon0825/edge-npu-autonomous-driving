@@ -1,0 +1,127 @@
+{
+  "started": "2026-11-24T11:24:42+0000",
+  "group": "sweep",
+  "cases": {
+    "mp_16x64x128": {
+      "input_shape": [
+        1,
+        16,
+        64,
+        128
+      ],
+      "params": 2320,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "FAIL",
+      "compile_s": 1.61146737402305,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O203(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O203#prelower:O203 input tensors: 2 input T102: [16, 64, 128], 262144 B, bf16, unknown source: unknown input T103: [], 2 B, bf16, unknown source: unknown total bytes: 262146 output tensors: 1 output T104: [16, 32, 64], 65536 B, bf16, unknown source: unknown total bytes: 65536 +----------+-----------------",
+      "wall_s": 3.8,
+      "loadavg": [
+        5.22607421875,
+        6.08251953125,
+        8.2626953125
+      ]
+    },
+    "mp_16x128x256": {
+      "input_shape": [
+        1,
+        16,
+        128,
+        256
+      ],
+      "params": 2320,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "FAIL",
+      "compile_s": 1.7208210388198495,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O203(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O203#prelower:O203 input tensors: 2 input T102: [16, 128, 256], 1048576 B, bf16, unknown source: unknown input T103: [], 2 B, bf16, unknown source: unknown total bytes: 1048578 output tensors: 1 output T104: [16, 64, 128], 262144 B, bf16, unknown source: unknown total bytes: 262144 +----------+-----------",
+      "wall_s": 4.1,
+      "loadavg": [
+        5.12744140625,
+        6.0478515625,
+        8.23974609375
+      ]
+    },
+    "mp_8x256x512": {
+      "input_shape": [
+        1,
+        8,
+        256,
+        512
+      ],
+      "params": 584,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "FAIL",
+      "compile_s": 0.6912770802155137,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O203(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O203#prelower:O203 input tensors: 2 input T102: [8, 256, 512], 2097152 B, bf16, unknown source: unknown input T103: [], 2 B, bf16, unknown source: unknown total bytes: 2097154 output tensors: 1 output T104: [8, 128, 256], 524288 B, bf16, unknown source: unknown total bytes: 524288 +----------+------------",
+      "wall_s": 2.9,
+      "loadavg": [
+        5.1171875,
+        6.0302734375,
+        8.22216796875
+      ]
+    },
+    "mp_16x256x512": {
+      "input_shape": [
+        1,
+        16,
+        256,
+        512
+      ],
+      "params": 2320,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "FAIL",
+      "compile_s": 1.5922596608288586,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O203(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O203#prelower:O203 input tensors: 2 input T102: [16, 256, 512], 4194304 B, bf16, unknown source: unknown input T103: [], 2 B, bf16, unknown source: unknown total bytes: 4194306 output tensors: 1 output T104: [16, 128, 256], 1048576 B, bf16, unknown source: unknown total bytes: 1048576 +----------+--------",
+      "wall_s": 3.7,
+      "loadavg": [
+        5.1171875,
+        6.0302734375,
+        8.22216796875
+      ]
+    },
+    "mp_32x128x256": {
+      "input_shape": [
+        1,
+        32,
+        128,
+        256
+      ],
+      "params": 9248,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "PASS",
+      "compile_s": 4.811733373906463,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.11594220995903015,
+      "latency_ms_p95": 0.12690294533967972,
+      "max_abs_vs_cpu": 0.010307788848876953,
+      "mean_abs_vs_cpu": 0.0013752839295193553,
+      "cosine_vs_cpu": 0.9999839067459106,
+      "pixel_argmax_agreement": 0.988525390625,
+      "wall_s": 7.3,
+      "loadavg": [
+        6.2265625,
+        6.22900390625,
+        8.2626953125
+      ]
+    },
+    "mp_4x256x512": {
+      "input_shape": [
+        1,
+        4,
+        256,
+        512
+      ],
+      "params": 148,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "FAIL",
+      "compile_s": 0.9432849432341754,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O203(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O203#prelower:O203 input tensors: 2 input T102: [4, 256, 512], 1048576 B, bf16, unknown source: unknown input T103: [], 2 B, bf16, unknown source: unknown total bytes: 1048578 output tensors: 1 output T104: [4, 128, 256], 262144 B, bf16, unknown source: unknown total bytes: 262144 +----------+------------",
+      "wall_s": 3.1,
+      "loadavg": [
+        6.2265625,
+        6.22900390625,
+        8.2626953125
+      ]
+    }
+  },
+  "finished": "2026-11-24T11:25:07+0000"
+}

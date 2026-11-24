@@ -1,0 +1,189 @@
+{
+  "started": "2026-11-24T11:26:19+0000",
+  "group": "unet2",
+  "cases": {
+    "mp_32x256x512": {
+      "input_shape": [
+        1,
+        32,
+        256,
+        512
+      ],
+      "params": 9248,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "FAIL",
+      "compile_s": 0.8282447750680149,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O203(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O203#prelower:O203 input tensors: 2 input T102: [32, 256, 512], 8388608 B, bf16, unknown source: unknown input T103: [], 2 B, bf16, unknown source: unknown total bytes: 8388610 output tensors: 1 output T104: [32, 128, 256], 2097152 B, bf16, unknown source: unknown total bytes: 2097152 +----------+--------",
+      "wall_s": 3.0,
+      "loadavg": [
+        8.71240234375,
+        7.31396484375,
+        8.50244140625
+      ]
+    },
+    "mp_64x256x512": {
+      "input_shape": [
+        1,
+        64,
+        256,
+        512
+      ],
+      "params": 36928,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "FAIL",
+      "compile_s": 0.8529240400530398,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O203(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O203#prelower:O203 input tensors: 2 input T102: [64, 256, 512], 16777216 B, bf16, unknown source: unknown input T103: [], 2 B, bf16, unknown source: unknown total bytes: 16777218 output tensors: 1 output T104: [64, 128, 256], 4194304 B, bf16, unknown source: unknown total bytes: 4194304 +----------+------",
+      "wall_s": 3.2,
+      "loadavg": [
+        9.61669921875,
+        7.52490234375,
+        8.564453125
+      ]
+    },
+    "mp_24x128x256": {
+      "input_shape": [
+        1,
+        24,
+        128,
+        256
+      ],
+      "params": 5208,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "PASS",
+      "compile_s": 8.089276521932334,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.1156022772192955,
+      "latency_ms_p95": 0.12664124369621277,
+      "max_abs_vs_cpu": 0.011737585067749023,
+      "mean_abs_vs_cpu": 0.0014111163327470422,
+      "cosine_vs_cpu": 0.9999881982803345,
+      "pixel_argmax_agreement": 0.9920654296875,
+      "wall_s": 10.4,
+      "loadavg": [
+        10.0341796875,
+        7.6748046875,
+        8.6015625
+      ]
+    },
+    "mp_48x128x256": {
+      "input_shape": [
+        1,
+        48,
+        128,
+        256
+      ],
+      "params": 20784,
+      "rewrite_max_abs_vs_reference_cpu": 0.0,
+      "compile": "PASS",
+      "compile_s": 8.700616451911628,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.19419286400079727,
+      "latency_ms_p95": 0.20787212997674942,
+      "max_abs_vs_cpu": 0.010531902313232422,
+      "mean_abs_vs_cpu": 0.0014178248820826411,
+      "cosine_vs_cpu": 0.9999814033508301,
+      "pixel_argmax_agreement": 0.992431640625,
+      "wall_s": 11.1,
+      "loadavg": [
+        10.29150390625,
+        7.8154296875,
+        8.6376953125
+      ]
+    },
+    "unet_s3_256x512_c16": {
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 530882,
+      "rewrite_max_abs_vs_reference_cpu": 3.725290298461914e-08,
+      "compile": "PASS",
+      "compile_s": 62.118782649282366,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.8223294280469418,
+      "latency_ms_p95": 0.8328198455274105,
+      "max_abs_vs_cpu": 0.0006331801414489746,
+      "mean_abs_vs_cpu": 0.00014722153719048947,
+      "cosine_vs_cpu": 0.999979555606842,
+      "pixel_argmax_agreement": 1.0,
+      "wall_s": 66.2,
+      "loadavg": [
+        14.85009765625,
+        9.7275390625,
+        9.2421875
+      ]
+    },
+    "unet_s3_128x256_c16": {
+      "input_shape": [
+        1,
+        3,
+        128,
+        256
+      ],
+      "params": 530882,
+      "rewrite_max_abs_vs_reference_cpu": 2.9802322387695312e-08,
+      "compile": "PASS",
+      "compile_s": 96.86476714210585,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.5160858854651451,
+      "latency_ms_p95": 0.572477001696825,
+      "max_abs_vs_cpu": 0.0006096437573432922,
+      "mean_abs_vs_cpu": 0.00014779406774323434,
+      "cosine_vs_cpu": 0.9999999403953552,
+      "pixel_argmax_agreement": 1.0,
+      "wall_s": 101.1,
+      "loadavg": [
+        18.93798828125,
+        12.8408203125,
+        10.42431640625
+      ]
+    },
+    "unet_mp_256x512_c32": {
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 1926306,
+      "rewrite_max_abs_vs_reference_cpu": 5.960464477539063e-08,
+      "compile": "FAIL",
+      "compile_s": 17.626573184970766,
+      "error_detail": "Caused by: 0: while lowering TacticKernel 1: failed to lower the operator O2730(no populated tactics): TacticKernel inner: kind: EinsumByDpe name: history: #gm:max_pool2d_with_indices#kernelized:O2730#prelower:O2730 input tensors: 2 input T1410: [32, 256, 512], 8388608 B, bf16, unknown source: unknown input T1411: [], 2 B, bf16, unknown source: unknown total bytes: 8388610 output tensors: 1 output T1412: [32, 128, 256], 2097152 B, bf16, unknown source: unknown total bytes: 2097152 +----------+--",
+      "wall_s": 21.5,
+      "loadavg": [
+        18.7431640625,
+        13.166015625,
+        10.58154296875
+      ]
+    },
+    "unet_s3_256x512_c32": {
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 2120066,
+      "rewrite_max_abs_vs_reference_cpu": 5.960464477539063e-08,
+      "compile": "PASS",
+      "compile_s": 78.65834503713995,
+      "runtime": "PASS",
+      "latency_ms_p50": 2.701684832572937,
+      "latency_ms_p95": 2.7115559205412865,
+      "max_abs_vs_cpu": 0.0011031776666641235,
+      "mean_abs_vs_cpu": 0.000353843264747411,
+      "cosine_vs_cpu": 0.9999598860740662,
+      "pixel_argmax_agreement": 1.0,
+      "wall_s": 83.2,
+      "loadavg": [
+        18.48876953125,
+        14.73291015625,
+        11.3759765625
+      ]
+    }
+  },
+  "finished": "2026-11-24T11:31:18+0000"
+}

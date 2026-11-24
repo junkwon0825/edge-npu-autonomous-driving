@@ -20,6 +20,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+JOBS = "(npu_job|int8_probe|port_lab|multistream|lane_port_v3|model_lab_v3|multimodel_v3|npu_server)"
 SSH_OPTS = ["-o", "BatchMode=yes", "-o", "ConnectTimeout=20", "-o", "StrictHostKeyChecking=yes"]
 SYNC_FILES = [
     ("remote/npu_job.py", "npu_job.py"),
@@ -27,6 +28,9 @@ SYNC_FILES = [
     ("remote/npu_server.py", "npu_server.py"),
     ("remote/port_lab.py", "port_lab.py"),
     ("remote/multistream.py", "multistream.py"),
+    ("remote/lane_port_v3.py", "lane_port_v3.py"),
+    ("remote/model_lab_v3.py", "model_lab_v3.py"),
+    ("remote/multimodel_v3.py", "multimodel_v3.py"),
     ("src/npu_ad/__init__.py", "src/npu_ad/__init__.py"),
     ("src/npu_ad/perception/__init__.py", "src/npu_ad/perception/__init__.py"),
     ("src/npu_ad/perception/yolo_raw.py", "src/npu_ad/perception/yolo_raw.py"),
@@ -63,9 +67,14 @@ def main() -> int:
         return 0
     if a.action == "start":
         cmd, extra = a.args[0], " ".join(shlex.quote(x) for x in a.args[1:])
-        script = {"int8_probe": "int8_probe.py", "port_lab": "port_lab.py", "multistream": "multistream.py"}.get(
-            cmd, f"npu_job.py {cmd}"
-        )
+        script = {
+            "int8_probe": "int8_probe.py",
+            "port_lab": "port_lab.py",
+            "multistream": "multistream.py",
+            "lane_port_v3": "lane_port_v3.py",
+            "model_lab_v3": "model_lab_v3.py",
+            "multimodel_v3": "multimodel_v3.py",
+        }.get(cmd, f"npu_job.py {cmd}")
         # One NPU job at a time: refuse to start while a previous job of this project still runs
         # (two jobs would overwrite each other's status/output files and share the device).
         # Only the nohup command is backgrounded (an `a && b && cmd &` list would background a
@@ -73,7 +82,7 @@ def main() -> int:
         remote = (
             f"cd {d} || exit 1; "
             'if ps -u "$(id -u)" -o args= '
-            "| grep -qE '^python[0-9.]* (npu_job|int8_probe|port_lab|multistream)[.]py'; "
+            f"| grep -qE '^python[0-9.]* {JOBS}[.]py'; "
             "then echo BUSY; exit 3; fi; "
             f"source ~/miniconda3/etc/profile.d/conda.sh; conda activate {a.env} || exit 1; "
             f"nohup nice -n 10 python {script} {extra} > log_{cmd}{a.log_suffix}.txt 2>&1 < /dev/null & echo started $!"

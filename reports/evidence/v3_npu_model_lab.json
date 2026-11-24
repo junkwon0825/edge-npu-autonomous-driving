@@ -1,0 +1,233 @@
+{
+  "started": "2026-11-24T11:37:13+0000",
+  "cases": {
+    "layernorm": {
+      "input_shape": [
+        1,
+        197,
+        192
+      ],
+      "params": 37440,
+      "modules": [
+        "LayerNorm",
+        "Linear"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.3745859880000353,
+      "error": "UnsupportedOpError",
+      "error_detail": "failed to decompose, Input spec name input does not match node name input_1",
+      "wall_s": 2.5,
+      "loadavg": [
+        6.06201171875,
+        8.59423828125,
+        9.638671875
+      ]
+    },
+    "gelu": {
+      "input_shape": [
+        1,
+        197,
+        192
+      ],
+      "params": 37056,
+      "modules": [
+        "GELU",
+        "Linear"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.3546113120391965,
+      "error": "UnsupportedOpError",
+      "error_detail": "failed to decompose, Input spec name input does not match node name input_1",
+      "wall_s": 2.5,
+      "loadavg": [
+        6.29736328125,
+        8.60107421875,
+        9.634765625
+      ]
+    },
+    "bmm": {
+      "input_shape": [
+        1,
+        3,
+        197,
+        64
+      ],
+      "params": 0,
+      "modules": [
+        "B"
+      ],
+      "compile": "PASS",
+      "compile_s": 10.582757699303329,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.07306085899472237,
+      "latency_ms_p95": 0.08822092786431313,
+      "max_abs_vs_cpu": 0.3513031005859375,
+      "mean_abs_vs_cpu": 0.018344510346651077,
+      "cosine_vs_cpu": 0.9999945163726807,
+      "wall_s": 12.9,
+      "loadavg": [
+        7.52685546875,
+        8.78076171875,
+        9.68212890625
+      ]
+    },
+    "sdpa": {
+      "input_shape": [
+        1,
+        197,
+        192
+      ],
+      "params": 148224,
+      "modules": [
+        "Linear"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.3893943368457258,
+      "error": "UnsupportedOpError",
+      "error_detail": "failed to decompose, Cannot view a tensor with shape torch.Size([1, 197, 3, 64]) and strides (37824, 64, 12608, 1) as a tensor with shape (1, 197, 192)!",
+      "wall_s": 2.5,
+      "loadavg": [
+        7.484375,
+        8.7509765625,
+        9.66748046875
+      ]
+    },
+    "linear_gelu": {
+      "input_shape": [
+        1,
+        197,
+        192
+      ],
+      "params": 295872,
+      "modules": [
+        "GELU",
+        "Linear"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.38897703401744366,
+      "error": "UnsupportedOpError",
+      "error_detail": "failed to decompose, Input spec name input does not match node name input_1",
+      "wall_s": 2.6,
+      "loadavg": [
+        7.484375,
+        8.7509765625,
+        9.66748046875
+      ]
+    },
+    "resnet18": {
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "params": 11684712,
+      "modules": [
+        "AdaptiveAvgPool2d",
+        "Conv2d",
+        "Linear",
+        "MaxPool2d",
+        "ReLU"
+      ],
+      "compile": "FAIL",
+      "compile_s": 1044.014781887643,
+      "error": "UnsupportedOpError",
+      "error_detail": "Caused by: 0: O4392 lowering failed: TransposedLower[bf16]([]|[Broadcast=1]|[0_1=512:4608, 1_1=512:9, 2_1=3:3, 3_1=3:1]) -> [] | [] | [0_128=4, 1_16=16] | [1_256=2, 0_1=128, 1_1=16, 2_1=3] | [3_1=3](4) -> (E) [1_256=2]|[]|[]|[0_128=4, 1_16=16]|[0_1=128, 2_1=3, 3_1=3]|[1_1=16](8) @ [0=512, 1=512, 2=3, 3=3] 1: while verifying LowLevelTailCrop 2: verification of operator failed: LowLevelTailCrop broadcast_axes: [AxisIndex(0), AxisIndex(2), AxisIndex(4), AxisIndex(6)] name: input tensors: 1 input T7",
+      "wall_s": 1049.0,
+      "loadavg": [
+        22.6044921875,
+        22.18017578125,
+        18.29638671875
+      ]
+    },
+    "mbv3_small": {
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "params": 2536800,
+      "modules": [
+        "AdaptiveAvgPool2d",
+        "Conv2d",
+        "Dropout",
+        "Hardsigmoid",
+        "Hardswish",
+        "Linear",
+        "ReLU"
+      ],
+      "compile": "PASS",
+      "compile_s": 297.59871115209535,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.5027591250836849,
+      "latency_ms_p95": 0.5127987824380398,
+      "max_abs_vs_cpu": 2.2158275214678724e-11,
+      "mean_abs_vs_cpu": 4.089592380018825e-12,
+      "cosine_vs_cpu": 0.999978244304657,
+      "top1_agreement": 1.0,
+      "wall_s": 301.1,
+      "loadavg": [
+        19.265625,
+        20.81982421875,
+        18.77685546875
+      ]
+    },
+    "vit_tiny": {
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "params": 2158120,
+      "modules": [
+        "Conv2d",
+        "GELU",
+        "LayerNorm",
+        "Linear"
+      ],
+      "compile": "PASS",
+      "compile_s": 180.77696009818465,
+      "runtime": "PASS",
+      "latency_ms_p50": 0.444117933511734,
+      "latency_ms_p95": 0.4567778669297695,
+      "max_abs_vs_cpu": 0.002702265977859497,
+      "mean_abs_vs_cpu": 0.0006350712501443923,
+      "cosine_vs_cpu": 0.9999916553497314,
+      "top1_agreement": 1.0,
+      "wall_s": 184.9,
+      "loadavg": [
+        18.51123046875,
+        20.40283203125,
+        19.00634765625
+      ]
+    },
+    "vit_tiny_sdpa": {
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "params": 2158120,
+      "modules": [
+        "Conv2d",
+        "GELU",
+        "LayerNorm",
+        "Linear"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.755650192964822,
+      "error": "UnsupportedOpError",
+      "error_detail": "failed to decompose, Cannot view a tensor with shape torch.Size([1, 196, 3, 64]) and strides (37632, 64, 12544, 1) as a tensor with shape (1, 196, 192)!",
+      "wall_s": 3.3,
+      "loadavg": [
+        17.66943359375,
+        20.19677734375,
+        18.94677734375
+      ]
+    }
+  },
+  "finished": "2026-11-24T12:03:14+0000"
+}

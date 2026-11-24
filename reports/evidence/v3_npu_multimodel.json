@@ -1,0 +1,347 @@
+{
+  "started": "2026-11-24T11:34:31+0000",
+  "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+  "secs": 6.0,
+  "loadavg_start": [
+    5.40625,
+    10.466796875,
+    10.34228515625
+  ],
+  "runs": {
+    "A_sequential@30Hz": {
+      "yolo": {
+        "served": 180,
+        "dropped": 0,
+        "rate_hz": 30.0,
+        "age_p50_ms": 2.219,
+        "age_p95_ms": 2.353,
+        "age_p99_ms": 2.508,
+        "queue_p95_ms": 0.314,
+        "lat_p50_ms": 2.009,
+        "lat_p95_ms": 2.063
+      },
+      "lane": {
+        "served": 180,
+        "dropped": 0,
+        "rate_hz": 30.0,
+        "age_p50_ms": 4.913,
+        "age_p95_ms": 5.061,
+        "age_p99_ms": 5.247,
+        "queue_p95_ms": 2.355,
+        "lat_p50_ms": 2.694,
+        "lat_p95_ms": 2.707
+      },
+      "device_busy_frac_sum": 0.141,
+      "loadavg": [
+        5.39599609375,
+        10.21533203125,
+        10.26123046875
+      ]
+    },
+    "B_shared_pe@30Hz": {
+      "yolo": {
+        "served": 180,
+        "dropped": 0,
+        "rate_hz": 30.0,
+        "age_p50_ms": 4.551,
+        "age_p95_ms": 4.913,
+        "age_p99_ms": 4.966,
+        "queue_p95_ms": 0.473,
+        "lat_p50_ms": 4.117,
+        "lat_p95_ms": 4.652
+      },
+      "lane": {
+        "served": 180,
+        "dropped": 0,
+        "rate_hz": 30.0,
+        "age_p50_ms": 3.117,
+        "age_p95_ms": 4.934,
+        "age_p99_ms": 5.242,
+        "queue_p95_ms": 0.718,
+        "lat_p50_ms": 2.842,
+        "lat_p95_ms": 4.242
+      },
+      "device_busy_frac_sum": 0.228,
+      "loadavg": [
+        5.2841796875,
+        10.11181640625,
+        10.2275390625
+      ]
+    },
+    "B_separate_pe@30Hz": {
+      "yolo": {
+        "served": 180,
+        "dropped": 0,
+        "rate_hz": 30.0,
+        "age_p50_ms": 2.348,
+        "age_p95_ms": 2.512,
+        "age_p99_ms": 2.568,
+        "queue_p95_ms": 0.437,
+        "lat_p50_ms": 2.034,
+        "lat_p95_ms": 2.137
+      },
+      "lane": {
+        "served": 180,
+        "dropped": 0,
+        "rate_hz": 30.0,
+        "age_p50_ms": 3.02,
+        "age_p95_ms": 3.448,
+        "age_p99_ms": 3.7,
+        "queue_p95_ms": 0.667,
+        "lat_p50_ms": 2.77,
+        "lat_p95_ms": 2.828
+      },
+      "device_busy_frac_sum": 0.145,
+      "loadavg": [
+        5.61572265625,
+        10.02490234375,
+        10.19775390625
+      ]
+    },
+    "C_rate_decoupled@30Hz": {
+      "yolo": {
+        "served": 180,
+        "dropped": 0,
+        "rate_hz": 30.0,
+        "age_p50_ms": 2.175,
+        "age_p95_ms": 2.287,
+        "age_p99_ms": 2.435,
+        "queue_p95_ms": 0.239,
+        "lat_p50_ms": 2.018,
+        "lat_p95_ms": 2.082
+      },
+      "lane": {
+        "served": 90,
+        "dropped": 0,
+        "rate_hz": 15.0,
+        "age_p50_ms": 4.895,
+        "age_p95_ms": 5.026,
+        "age_p99_ms": 5.326,
+        "queue_p95_ms": 2.312,
+        "lat_p50_ms": 2.714,
+        "lat_p95_ms": 2.726
+      },
+      "device_busy_frac_sum": 0.101,
+      "loadavg": [
+        5.64697265625,
+        9.9580078125,
+        10.1748046875
+      ]
+    },
+    "D_priority@30Hz": {
+      "yolo": {
+        "served": 135,
+        "dropped": 0,
+        "rate_hz": 22.5,
+        "age_p50_ms": 2.224,
+        "age_p95_ms": 2.562,
+        "age_p99_ms": 2.772,
+        "queue_p95_ms": 0.238,
+        "lat_p50_ms": 2.021,
+        "lat_p95_ms": 2.45,
+        "age_p95_ms_cruise": 2.687,
+        "age_p95_ms_hazard": 2.263,
+        "rate_hz_cruise": 15.0,
+        "rate_hz_hazard": 30.0
+      },
+      "lane": {
+        "served": 68,
+        "dropped": 0,
+        "rate_hz": 11.3,
+        "age_p50_ms": 4.947,
+        "age_p95_ms": 5.529,
+        "age_p99_ms": 5.635,
+        "queue_p95_ms": 2.682,
+        "lat_p50_ms": 2.715,
+        "lat_p95_ms": 2.831,
+        "age_p95_ms_cruise": 5.609,
+        "age_p95_ms_hazard": 4.992,
+        "rate_hz_cruise": 7.7,
+        "rate_hz_hazard": 15.0
+      },
+      "device_busy_frac_sum": 0.078,
+      "loadavg": [
+        5.5947265625,
+        9.87548828125,
+        10.14697265625
+      ]
+    },
+    "A_sequential@400Hz": {
+      "yolo": {
+        "served": 1300,
+        "dropped": 1100,
+        "rate_hz": 216.7,
+        "age_p50_ms": 3.245,
+        "age_p95_ms": 4.369,
+        "age_p99_ms": 4.516,
+        "queue_p95_ms": 2.425,
+        "lat_p50_ms": 1.89,
+        "lat_p95_ms": 2.04
+      },
+      "lane": {
+        "served": 1299,
+        "dropped": 1101,
+        "rate_hz": 216.5,
+        "age_p50_ms": 4.018,
+        "age_p95_ms": 5.128,
+        "age_p99_ms": 5.233,
+        "queue_p95_ms": 2.438,
+        "lat_p50_ms": 2.677,
+        "lat_p95_ms": 2.727
+      },
+      "device_busy_frac_sum": 1.0,
+      "loadavg": [
+        5.70751953125,
+        9.82763671875,
+        10.1298828125
+      ]
+    },
+    "B_shared_pe@400Hz": {
+      "yolo": {
+        "served": 1506,
+        "dropped": 894,
+        "rate_hz": 251.0,
+        "age_p50_ms": 5.307,
+        "age_p95_ms": 6.428,
+        "age_p99_ms": 6.528,
+        "queue_p95_ms": 2.447,
+        "lat_p50_ms": 3.982,
+        "lat_p95_ms": 3.998
+      },
+      "lane": {
+        "served": 1506,
+        "dropped": 894,
+        "rate_hz": 251.0,
+        "age_p50_ms": 5.28,
+        "age_p95_ms": 6.424,
+        "age_p99_ms": 6.516,
+        "queue_p95_ms": 2.444,
+        "lat_p50_ms": 3.981,
+        "lat_p95_ms": 3.994
+      },
+      "device_busy_frac_sum": 1.999,
+      "loadavg": [
+        5.8330078125,
+        9.7177734375,
+        10.09033203125
+      ]
+    },
+    "B_separate_pe@400Hz": {
+      "yolo": {
+        "served": 2400,
+        "dropped": 0,
+        "rate_hz": 400.0,
+        "age_p50_ms": 2.095,
+        "age_p95_ms": 2.269,
+        "age_p99_ms": 2.318,
+        "queue_p95_ms": 0.31,
+        "lat_p50_ms": 1.879,
+        "lat_p95_ms": 2.011
+      },
+      "lane": {
+        "served": 2203,
+        "dropped": 197,
+        "rate_hz": 367.2,
+        "age_p50_ms": 4.081,
+        "age_p95_ms": 5.167,
+        "age_p99_ms": 5.379,
+        "queue_p95_ms": 2.443,
+        "lat_p50_ms": 2.72,
+        "lat_p95_ms": 2.774
+      },
+      "device_busy_frac_sum": 1.76,
+      "loadavg": [
+        5.9267578125,
+        9.67236328125,
+        10.07373046875
+      ]
+    },
+    "C_rate_decoupled@400Hz": {
+      "yolo": {
+        "served": 1408,
+        "dropped": 992,
+        "rate_hz": 234.7,
+        "age_p50_ms": 3.118,
+        "age_p95_ms": 4.387,
+        "age_p99_ms": 4.499,
+        "queue_p95_ms": 2.45,
+        "lat_p50_ms": 1.936,
+        "lat_p95_ms": 1.957
+      },
+      "lane": {
+        "served": 1200,
+        "dropped": 0,
+        "rate_hz": 200.0,
+        "age_p50_ms": 5.711,
+        "age_p95_ms": 6.566,
+        "age_p99_ms": 6.669,
+        "queue_p95_ms": 3.844,
+        "lat_p50_ms": 2.725,
+        "lat_p95_ms": 2.735
+      },
+      "device_busy_frac_sum": 0.998,
+      "loadavg": [
+        6.73388671875,
+        9.77783203125,
+        10.10595703125
+      ]
+    },
+    "D_priority@400Hz": {
+      "yolo": {
+        "served": 1720,
+        "dropped": 80,
+        "rate_hz": 286.7,
+        "age_p50_ms": 2.57,
+        "age_p95_ms": 4.481,
+        "age_p99_ms": 4.574,
+        "queue_p95_ms": 2.444,
+        "lat_p50_ms": 2.024,
+        "lat_p95_ms": 2.054,
+        "age_p95_ms_cruise": 2.363,
+        "age_p95_ms_hazard": 4.516,
+        "rate_hz_cruise": 200.0,
+        "rate_hz_hazard": 373.3
+      },
+      "lane": {
+        "served": 567,
+        "dropped": 333,
+        "rate_hz": 94.5,
+        "age_p50_ms": 5.036,
+        "age_p95_ms": 7.694,
+        "age_p99_ms": 7.785,
+        "queue_p95_ms": 4.965,
+        "lat_p50_ms": 2.727,
+        "lat_p95_ms": 2.745,
+        "age_p95_ms_cruise": 5.101,
+        "age_p95_ms_hazard": 7.752,
+        "rate_hz_cruise": 100.0,
+        "rate_hz_hazard": 89.0
+      },
+      "device_busy_frac_sum": 0.833,
+      "loadavg": [
+        6.75537109375,
+        9.7314453125,
+        10.0888671875
+      ]
+    }
+  },
+  "load_s": {
+    "yolo@0": 3.57,
+    "lane@0": 0.58,
+    "yolo@1": 3.23,
+    "lane@1": 0.63
+  },
+  "isolated": {
+    "yolo": {
+      "p50_ms": 1.997,
+      "p95_ms": 2.011,
+      "p99_ms": 2.016
+    },
+    "lane": {
+      "p50_ms": 2.721,
+      "p95_ms": 2.732,
+      "p99_ms": 2.736
+    }
+  },
+  "finished": "2026-11-24T11:35:40+0000"
+}
