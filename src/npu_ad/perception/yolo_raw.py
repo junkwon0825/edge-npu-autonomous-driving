@@ -111,10 +111,27 @@ class RawDecoder:
         return torch.cat((dbox, scores.sigmoid()), 1)
 
     @torch.no_grad()
+    def decode_prefiltered(self, boxes: torch.Tensor, scores: torch.Tensor, conf: float) -> torch.Tensor:
+        """Decode only anchors whose best class score exceeds ``conf`` (batch 1).
+
+        NMS discards every anchor below ``conf`` before anything else, so the detections are the same
+        as with ``decode``; only the DFL/box work for the rejected anchors is skipped (V2 runtime).
+        """
+        from ultralytics.utils.tal import dist2bbox
+
+        boxes, scores = boxes.float().cpu(), scores.float().cpu()
+        logit = float(np.log(conf / (1.0 - conf)))
+        keep = (scores[0].amax(0) > logit).nonzero().flatten()
+        b, s = boxes[:, :, keep], scores[:, :, keep]
+        dist = self.head.dfl(b) if self.reg_max > 1 else b
+        dbox = dist2bbox(dist, self.anchors[:, :, keep], xywh=self.xywh, dim=1) * self.strides[:, keep]
+        return torch.cat((dbox, s.sigmoid()), 1)
+
+    @torch.no_grad()
     def __call__(
-        self, boxes: torch.Tensor, scores: torch.Tensor, conf: float, iou: float, max_det: int
+        self, boxes: torch.Tensor, scores: torch.Tensor, conf: float, iou: float, max_det: int, prefilter: bool = False
     ) -> list[torch.Tensor]:
-        y = self.decode(boxes, scores)
+        y = self.decode_prefiltered(boxes, scores, conf) if prefilter else self.decode(boxes, scores)
         if self.end2end:  # NMS-free one-to-one head: top-k selection, then threshold
             out = self.head.postprocess(y.permute(0, 2, 1))
             return [d[d[:, 4] > conf] for d in out]

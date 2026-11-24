@@ -24,6 +24,9 @@ SSH_OPTS = ["-o", "BatchMode=yes", "-o", "ConnectTimeout=20", "-o", "StrictHostK
 SYNC_FILES = [
     ("remote/npu_job.py", "npu_job.py"),
     ("remote/int8_probe.py", "int8_probe.py"),
+    ("remote/npu_server.py", "npu_server.py"),
+    ("remote/port_lab.py", "port_lab.py"),
+    ("remote/multistream.py", "multistream.py"),
     ("src/npu_ad/__init__.py", "src/npu_ad/__init__.py"),
     ("src/npu_ad/perception/__init__.py", "src/npu_ad/perception/__init__.py"),
     ("src/npu_ad/perception/yolo_raw.py", "src/npu_ad/perception/yolo_raw.py"),
@@ -45,6 +48,7 @@ def main() -> int:
     ap.add_argument("--host", default="furiosa-npu")
     ap.add_argument("--dir", default="npu_auto_driving_p2")
     ap.add_argument("--env", default="furiosa-npu", help="conda env on the NPU host")
+    ap.add_argument("--log-suffix", default="", help="suffix for the remote log file name")
     a = ap.parse_args()
     d = a.dir
 
@@ -59,17 +63,20 @@ def main() -> int:
         return 0
     if a.action == "start":
         cmd, extra = a.args[0], " ".join(shlex.quote(x) for x in a.args[1:])
-        script = "int8_probe.py" if cmd == "int8_probe" else f"npu_job.py {cmd}"
+        script = {"int8_probe": "int8_probe.py", "port_lab": "port_lab.py", "multistream": "multistream.py"}.get(
+            cmd, f"npu_job.py {cmd}"
+        )
         # One NPU job at a time: refuse to start while a previous job of this project still runs
         # (two jobs would overwrite each other's status/output files and share the device).
         # Only the nohup command is backgrounded (an `a && b && cmd &` list would background a
         # subshell that keeps ssh's stdout open and blocks this call).
         remote = (
             f"cd {d} || exit 1; "
-            "if ps -u \"$(id -u)\" -o args= | grep -qE '^python[0-9.]* (npu_job|int8_probe)[.]py'; "
+            'if ps -u "$(id -u)" -o args= '
+            "| grep -qE '^python[0-9.]* (npu_job|int8_probe|port_lab|multistream)[.]py'; "
             "then echo BUSY; exit 3; fi; "
             f"source ~/miniconda3/etc/profile.d/conda.sh; conda activate {a.env} || exit 1; "
-            f"nohup nice -n 10 python {script} {extra} > log_{cmd}.txt 2>&1 < /dev/null & echo started $!"
+            f"nohup nice -n 10 python {script} {extra} > log_{cmd}{a.log_suffix}.txt 2>&1 < /dev/null & echo started $!"
         )
         r = ssh(a.host, f"bash -lc {shlex.quote(remote)}")
         print(r.stdout, r.stderr)

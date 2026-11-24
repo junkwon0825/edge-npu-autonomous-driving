@@ -1,0 +1,206 @@
+{
+  "server": {
+    "ready": true,
+    "dtype": "bf16",
+    "imgsz": 640,
+    "device": "furiosa:0",
+    "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+    "load_s": 5.165820703376085,
+    "input_dtype": "torch.bfloat16",
+    "input_shape": [
+      1,
+      3,
+      640,
+      640
+    ],
+    "threads": 2,
+    "prefilter": true
+  },
+  "runs": {
+    "adjacent_vehicle__npu_p95__v2__mono__30kmh__replay": {
+      "frames": 160,
+      "agreement": {
+        "images": 160,
+        "ref_dets": 401,
+        "test_dets": 410,
+        "matched": 385,
+        "recall_vs_ref": 0.9600997506234414,
+        "precision_vs_ref": 0.9390243902439024,
+        "mean_iou_matched": 0.9908988454223427,
+        "mean_abs_conf_delta": 0.008064610957480095,
+        "max_abs_conf_delta": 0.040380124950408935
+      },
+      "state_agreement_frac": 0.8625,
+      "gpu_first_warning_t": null,
+      "npu_first_warning_t": 0.9500000000000001,
+      "gpu_first_brake_t": null,
+      "npu_first_brake_t": null,
+      "ttc_abs_diff_median_s": 0.12100359461467547,
+      "ttc_abs_diff_max_s": 10.184414175320939
+    },
+    "lead_vehicle_braking__npu_p95__v2__mono__30kmh__replay": {
+      "frames": 90,
+      "agreement": {
+        "images": 90,
+        "ref_dets": 315,
+        "test_dets": 305,
+        "matched": 304,
+        "recall_vs_ref": 0.9650793650793651,
+        "precision_vs_ref": 0.9967213114754099,
+        "mean_iou_matched": 0.9891783559466923,
+        "mean_abs_conf_delta": 0.007934648301413183,
+        "max_abs_conf_delta": 0.04041316223144531
+      },
+      "state_agreement_frac": 0.9333333333333333,
+      "gpu_first_warning_t": 3.75,
+      "npu_first_warning_t": 3.75,
+      "gpu_first_brake_t": 4.25,
+      "npu_first_brake_t": 4.25,
+      "ttc_abs_diff_median_s": 0.04161040145380124,
+      "ttc_abs_diff_max_s": 5.24086172980477
+    },
+    "low_light__npu_p95__v2__mono__30kmh__replay": {
+      "frames": 89,
+      "agreement": {
+        "images": 89,
+        "ref_dets": 196,
+        "test_dets": 193,
+        "matched": 191,
+        "recall_vs_ref": 0.9744897959183674,
+        "precision_vs_ref": 0.9896373056994818,
+        "mean_iou_matched": 0.9905678389613711,
+        "mean_abs_conf_delta": 0.006631680597435117,
+        "max_abs_conf_delta": 0.03801856307983398
+      },
+      "state_agreement_frac": 0.9662921348314607,
+      "gpu_first_warning_t": 3.95,
+      "npu_first_warning_t": 3.95,
+      "gpu_first_brake_t": 4.15,
+      "npu_first_brake_t": 4.15,
+      "ttc_abs_diff_median_s": 0.04312582532569342,
+      "ttc_abs_diff_max_s": 0.663987512658375
+    },
+    "pedestrian_crossing__npu_p95__v2__mono__30kmh__replay": {
+      "frames": 68,
+      "agreement": {
+        "images": 68,
+        "ref_dets": 204,
+        "test_dets": 221,
+        "matched": 190,
+        "recall_vs_ref": 0.9313725490196079,
+        "precision_vs_ref": 0.8597285067873304,
+        "mean_iou_matched": 0.9909169508392304,
+        "mean_abs_conf_delta": 0.00784243355876521,
+        "max_abs_conf_delta": 0.04080206303596495
+      },
+      "state_agreement_frac": 0.9411764705882353,
+      "gpu_first_warning_t": 1.55,
+      "npu_first_warning_t": 1.55,
+      "gpu_first_brake_t": 1.55,
+      "npu_first_brake_t": 1.55,
+      "ttc_abs_diff_median_s": 0.010914265682328672,
+      "ttc_abs_diff_max_s": 0.4923210902947863
+    },
+    "pedestrian_roadside__npu_p95__v2__mono__30kmh__replay": {
+      "frames": 160,
+      "agreement": {
+        "images": 160,
+        "ref_dets": 358,
+        "test_dets": 366,
+        "matched": 340,
+        "recall_vs_ref": 0.9497206703910615,
+        "precision_vs_ref": 0.9289617486338798,
+        "mean_iou_matched": 0.9896345007810694,
+        "mean_abs_conf_delta": 0.007892639853954319,
+        "max_abs_conf_delta": 0.03839254660606384
+      },
+      "state_agreement_frac": 0.8625,
+      "gpu_first_warning_t": null,
+      "npu_first_warning_t": null,
+      "gpu_first_brake_t": null,
+      "npu_first_brake_t": null,
+      "ttc_abs_diff_median_s": 0.08342371070895771,
+      "ttc_abs_diff_max_s": 3.9931842618901037
+    },
+    "rain__npu_p95__v2__mono__30kmh__replay": {
+      "frames": 69,
+      "agreement": {
+        "images": 69,
+        "ref_dets": 157,
+        "test_dets": 160,
+        "matched": 147,
+        "recall_vs_ref": 0.9363057324840764,
+        "precision_vs_ref": 0.91875,
+        "mean_iou_matched": 0.9877248476251321,
+        "mean_abs_conf_delta": 0.008710597434011445,
+        "max_abs_conf_delta": 0.028161665821075432
+      },
+      "state_agreement_frac": 0.9420289855072463,
+      "gpu_first_warning_t": 1.55,
+      "npu_first_warning_t": 1.55,
+      "gpu_first_brake_t": 1.55,
+      "npu_first_brake_t": 1.55,
+      "ttc_abs_diff_median_s": 0.006042333564968083,
+      "ttc_abs_diff_max_s": 4.679702434877649
+    },
+    "static_obstacle__npu_p95__v2__mono__30kmh__replay": {
+      "frames": 102,
+      "agreement": {
+        "images": 102,
+        "ref_dets": 393,
+        "test_dets": 385,
+        "matched": 378,
+        "recall_vs_ref": 0.9618320610687023,
+        "precision_vs_ref": 0.9818181818181818,
+        "mean_iou_matched": 0.9906335950483098,
+        "mean_abs_conf_delta": 0.007135429204582536,
+        "max_abs_conf_delta": 0.0316130599498749
+      },
+      "state_agreement_frac": 0.9803921568627451,
+      "gpu_first_warning_t": 4.1,
+      "npu_first_warning_t": 4.05,
+      "gpu_first_brake_t": null,
+      "npu_first_brake_t": null,
+      "ttc_abs_diff_median_s": 0.03567251910155145,
+      "ttc_abs_diff_max_s": 3.642959687235467
+    }
+  },
+  "note": "open loop on frames recorded in v3 (GPU closed loop)",
+  "agreement_all": {
+    "images": 738,
+    "ref_dets": 2024,
+    "test_dets": 2040,
+    "matched": 1935,
+    "recall_vs_ref": 0.9560276679841897,
+    "precision_vs_ref": 0.9485294117647058,
+    "mean_iou_matched": 0.9900825505897629,
+    "mean_abs_conf_delta": 0.007718278700264233,
+    "max_abs_conf_delta": 0.04080206303596495
+  },
+  "npu_e2e_latency_ms": {
+    "n": 738,
+    "mean_ms": 173.6217695099067,
+    "std_ms": 190.21715058098616,
+    "p50_ms": 96.58994991332293,
+    "p95_ms": 526.5822449582625,
+    "p99_ms": 1002.1343889972194,
+    "min_ms": 56.498700054362416,
+    "max_ms": 1545.7324997987598,
+    "fps_from_mean": 5.759646401616365
+  },
+  "remote_health_end": {
+    "smi": {
+      "device": "npu0",
+      "firmware": "2026.4.0, 93d67f3",
+      "temp": "37.33\u00b0C",
+      "power": "39.00 W"
+    },
+    "n_ok": 738,
+    "n_err": 0,
+    "loadavg": [
+      23.3681640625,
+      22.12939453125,
+      18.96484375
+    ]
+  }
+}
