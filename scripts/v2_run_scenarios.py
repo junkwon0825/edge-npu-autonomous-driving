@@ -385,6 +385,13 @@ def main() -> int:
     det = GpuDetector(str(resolve(m["weights"])), m["imgsz"], m["conf"], m["iou"], m["max_det"])
     for _ in range(10):
         det(np.zeros((cfg["camera"]["height"], cfg["camera"]["width"], 3), np.uint8))
+    import subprocess
+
+    git = ["git", "-C", str(resolve(".")), "rev-parse", "--short", "HEAD"]
+    commit = subprocess.run(git, capture_output=True, text=True).stdout.strip()
+    dirty = subprocess.run(["git", "-C", str(resolve(".")), "status", "--porcelain", "src", "scripts"],
+                           capture_output=True, text=True).stdout.strip()  # fmt: skip
+    commit += "+dirty" if dirty else ""
     out = resolve(a.out)
     results = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"runs": []}
     done = {_key(r) for r in results["runs"]}
@@ -403,6 +410,7 @@ def main() -> int:
                     r["wall_s"] = time.perf_counter() - t0
                     r["experiment_id"] = f"v2__{sname}__{ctrl}__{cond}__{int(kmh)}"
                     r["timestamp"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+                    r["code_commit"] = commit
                     results["runs"].append(r)
                     tmp = out.with_suffix(".tmp")
                     tmp.write_text(json.dumps(results, indent=2, default=_np), encoding="utf-8")
