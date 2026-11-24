@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (long Markdown-table / diagram-label literals are kept on one line for readability)
 """Render reports/v2_scenario_tables.md from reports/evidence/v2_scenarios.json (generated; do not hand-edit)."""
 
 from __future__ import annotations

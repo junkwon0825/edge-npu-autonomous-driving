@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (long Markdown-table / diagram-label literals are kept on one line for readability)
 """Generate docs/npu_operator_compatibility.md from recorded RNGD compile/run evidence (no hand-typed results)."""
 
 from __future__ import annotations

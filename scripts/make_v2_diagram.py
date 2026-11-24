@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (long Markdown-table / diagram-label literals are kept on one line for readability)
 """Draw the V2 runtime architecture (assets/diagrams/v2_architecture.png)."""
 
 from __future__ import annotations

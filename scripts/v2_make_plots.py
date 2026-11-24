@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -12,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from make_plots import C, GRID, INK2, SURF, _load, _save, _style  # noqa: E402
+from make_plots import GRID, INK2, SURF, C, _load, _save, _style  # noqa: E402
 
 STAGES = [("network", C[0]), ("pre", C[1]), ("exec", C[2]), ("d2h", C[3]), ("post", C[4])]
 
