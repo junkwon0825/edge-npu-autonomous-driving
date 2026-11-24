@@ -1,0 +1,80 @@
+{
+  "source": "reports/evidence/scenarios_v3.json",
+  "ego_kmh": 30.0,
+  "modes": {
+    "aeb_off": {
+      "hazard_runs": 5,
+      "hazard_collisions": 5,
+      "no_hazard_runs": 3,
+      "no_hazard_collisions": 0,
+      "false_positive_brake_events": 0,
+      "min_gap_m": {
+        "min": -0.1003459561972618,
+        "median": -0.07493320448990026
+      },
+      "gt_ttc_at_first_brake_s_median": null,
+      "conditions": [
+        "aeb_off"
+      ]
+    },
+    "gt_gated": {
+      "hazard_runs": 30,
+      "hazard_collisions": 0,
+      "no_hazard_runs": 15,
+      "no_hazard_collisions": 0,
+      "false_positive_brake_events": 0,
+      "min_gap_m": {
+        "min": 1.5170734141953124,
+        "median": 9.035478449398825
+      },
+      "gt_ttc_at_first_brake_s_median": 2.1641523793118758,
+      "conditions": [
+        "gpu_p95",
+        "ideal_0ms",
+        "npu_p95",
+        "npu_remote_p95",
+        "stress_100ms",
+        "stress_200ms"
+      ]
+    },
+    "gt_oracle": {
+      "hazard_runs": 25,
+      "hazard_collisions": 0,
+      "no_hazard_runs": 15,
+      "no_hazard_collisions": 0,
+      "false_positive_brake_events": 0,
+      "min_gap_m": {
+        "min": 1.5170734141953124,
+        "median": 9.03535693517683
+      },
+      "gt_ttc_at_first_brake_s_median": 2.277733349922285,
+      "conditions": [
+        "gpu_p95",
+        "ideal_0ms",
+        "npu_p95",
+        "stress_100ms",
+        "stress_200ms"
+      ]
+    },
+    "mono": {
+      "hazard_runs": 30,
+      "hazard_collisions": 0,
+      "no_hazard_runs": 15,
+      "no_hazard_collisions": 0,
+      "false_positive_brake_events": 0,
+      "min_gap_m": {
+        "min": 1.1247353943288385,
+        "median": 9.36857073391145
+      },
+      "gt_ttc_at_first_brake_s_median": 2.387925610188859,
+      "conditions": [
+        "gpu_p95",
+        "ideal_0ms",
+        "npu_p95",
+        "npu_remote_p95",
+        "stress_100ms",
+        "stress_200ms"
+      ]
+    }
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "release": "v1.0.0-rc1",
+  "note": "validated evidence referenced in place; nothing copied or overwritten",
+  "files": [
+    {
+      "path": "assets/demo/v1_aeb_active.jpg",
+      "bytes": 70736,
+      "sha256": "ee65f147715d444117c9773363b5c7fcb47ba4ddca3d9b9538bc68bc35ffad68"
+    },
+    {
+      "path": "assets/demo/v1_demo.mp4",
+      "bytes": 3113716,
+      "sha256": "ae0a7b019395467ff51206784e16575c96031b9da308a167f3b2ff7a6accfccd"
+    },
+    {
+      "path": "assets/demo/v1_detection.jpg",
+      "bytes": 70381,
+      "sha256": "a20bc3e9163c48925e3673e8131043c737644ca6dfaac804a387f17784d7a865"
+    },
+    {
+      "path": "assets/demo/v1_final.jpg",
+      "bytes": 75782,
+      "sha256": "41becfbb6202e30533dc5802cd18ebd173153dc2d5a8c50ee830407727df2512"
+    },
+    {
+      "path": "assets/diagrams/v1_architecture.png",
+      "bytes": 132127,
+      "sha256": "60f858e4cfe50ee6272b508c7919b6477b488320d7a2053be79b10f707c9fc11"
+    },
+    {
+      "path": "assets/plots/aeb_response_pedestrian.png",
+      "bytes": 79369,
+      "sha256": "40c712826f8c26a78cf54889b5a9ca4fb4ebe1817c0b9b203c26eb8bef7e39db"
+    },
+    {
+      "path": "assets/plots/detection_agreement.png",
+      "bytes": 51925,
+      "sha256": "a7f64b36a1de26db84900051cf8fde7d7a8c5c8401f498c5c1b6d54eb2238a06"
+    },
+    {
+      "path": "assets/plots/latency_breakdown.png",
+      "bytes": 44464,
+      "sha256": "b1f6f8f0c1bc6a40723b08cfd88a75da8e095a3f194c223ad6886093f4a1a3ee"
+    },
+    {
+      "path": "assets/plots/latency_model_only.png",
+      "bytes": 49313,
+      "sha256": "c58f3df1f3f11f1e0df2ee2af8a76b349b1c9a1bf6a1e88e7270673deb772fa4"
+    },
+    {
+      "path": "assets/plots/latency_vs_min_gap.png",
+      "bytes": 100504,
+      "sha256": "648905a05453d559f6ae8f3d84c752f9512c21d337098ad3c14665d9b3bf56fb"
+    },
+    {
+      "path": "assets/plots/mono_range_error.png",
+      "bytes": 157442,
+      "sha256": "895f2ae406d902794982b02b2f022681228a554ec2b161698ca854d1de2019e4"
+    },
+    {
+      "path": "assets/plots/speed_vs_braking_distance.png",
+      "bytes": 61576,
+      "sha256": "bd0dbacc1ef7d79294f28ef8f3fb84548e3fb67ccfe8704451eaea6746d313b3"
+    },
+    {
+      "path": "assets/plots/speed_vs_min_gap.png",
+      "bytes": 103363,
+      "sha256": "bbc95206cbf3f0aa37f14cf2b8072dace030f826ff05e4761bada831bea745aa"
+    },
+    {
+      "path": "configs/default.json",
+      "bytes": 595,
+      "sha256": "553a4dac1b960a989d1aa801dbcca3566d5dbad636e757125ab6a5db92af4b8e"
+    },
+    {
+      "path": "configs/latency_conditions.json",
+      "bytes": 1082,
+      "sha256": "4f8766b53e0eae889d9ef1c834ab352a3361a44b8047b53e3da6ead13f72db49"
+    },
+    {
+      "path": "reports/evidence/capture_smoke.json",
+      "bytes": 1446,
+      "sha256": "3fc27c02415b8740471f16369e06132b7b81375700457e58bdc3294ab4d5dbea"
+    },
+    {
+      "path": "reports/evidence/gpu_benchmark_ext.json",
+      "bytes": 3191,
+      "sha256": "733339089f4ced01b04d9b97cb2624585a419a60d73dd821166cbb8296b2eeb7"
+    },
+    {
+      "path": "reports/evidence/gpu_benchmark_fp16_clean.json",
+      "bytes": 2462,
+      "sha256": "8d3773bd4ac90947c18c53c8f664404617eb256e84485412214eedc585e63bb1"
+    },
+    {
+      "path": "reports/evidence/gpu_benchmark_fp32_carla_running.json",
+      "bytes": 2454,
+      "sha256": "6b4afd4907e253dba693e5a6fe8b99b27a3d61de613d9d6e3ca125ec132d7c9d"
+    },
+    {
+      "path": "reports/evidence/gpu_benchmark_fp32_clean.json",
+      "bytes": 2453,
+      "sha256": "b2b4bd337c65649556a9de5be266ccff0a524be6a6fe813453d2722c8843278a"
+    },
+    {
+      "path": "reports/evidence/gpu_vs_npu.json",
+      "bytes": 4246,
+      "sha256": "92e97e37c8be2142872387eb425371a259dad799cf8e5d144bcc545f7ea0f0a3"
+    },
+    {
+      "path": "reports/evidence/gpu_vs_npu_bf16.json",
+      "bytes": 4242,
+      "sha256": "85cd3933bea8e353c619641eba161cdd4acc7586be72494f9354bbd4284ec5a7"
+    },
+    {
+      "path": "reports/evidence/gpu_vs_npu_w8.json",
+      "bytes": 4236,
+      "sha256": "533eca988d606658c14c500441cbcdcc49685710d7e8f6cadcc9f9ead9a0393b"
+    },
+    {
+      "path": "reports/evidence/model_size.json",
+      "bytes": 452,
+      "sha256": "b02b0b3aed1d890aece0272b473fac0890099eabd5da52d8e225ab785b51cf44"
+    },
+    {
+      "path": "reports/evidence/mono_closing_speed_error.json",
+      "bytes": 1069,
+      "sha256": "19c5d355623f3a7989f66ef95b4bf8ebe4d6547bd9d1a883cad584762e75a8c8"
+    },
+    {
+      "path": "reports/evidence/npu_bench.json",
+      "bytes": 20952,
+      "sha256": "d1118e78c22b10965a27f775697b55e5bd4dde568d318939ba4ad7e4fca127d6"
+    },
+    {
+      "path": "reports/evidence/npu_bench_bf16.json",
+      "bytes": 20716,
+      "sha256": "23b73dcfe3becb6d6ef23329ce1bbe56a961adb8db625ec31c9bb577b2be42a6"
+    },
+    {
+      "path": "reports/evidence/npu_bench_replay.json",
+      "bytes": 68899,
+      "sha256": "10e5817631b15e3d94db012e94ff8821c853e8d845d2aa7455bd1707eb610f11"
+    },
+    {
+      "path": "reports/evidence/npu_bench_w8.json",
+      "bytes": 20720,
+      "sha256": "1151247dcb4d090916def9062f594fbb8e4ff3f390b6218b0dfa0d5b0e4c164d"
+    },
+    {
+      "path": "reports/evidence/npu_compile.json",
+      "bytes": 681,
+      "sha256": "76a65aa49583340e51f6354f1530e23c54882c7a3554c82f1a5c786aa905aea8"
+    },
+    {
+      "path": "reports/evidence/npu_compile_bf16.json",
+      "bytes": 745,
+      "sha256": "ab2dfdac55d5bf8db733de76740aae9bc4ec8f12ade0edf9320bc3349e782a37"
+    },
+    {
+      "path": "reports/evidence/npu_compile_w8.json",
+      "bytes": 743,
+      "sha256": "42d9ed95f293cada3c9464e2628b1d781c5dbb69400a076c477ad8d0394452f1"
+    },
+    {
+      "path": "reports/evidence/npu_int8_probe.json",
+      "bytes": 2714,
+      "sha256": "053e76bcc558a83f8520642712af0797267507e2ac6a7780f5214c548e37cf43"
+    },
+    {
+      "path": "reports/evidence/npu_int8_probe2.json",
+      "bytes": 1168,
+      "sha256": "7e001adbef62ba09cbfc004bd933fd70bf7abae730ab82564332575ac696fc1f"
+    },
+    {
+      "path": "reports/evidence/npu_link.json",
+      "bytes": 1218,
+      "sha256": "8569c9770fb5d82ce92627be9b9f553ce009a935b41bad9f79c5a38be6652729"
+    },
+    {
+      "path": "reports/evidence/npu_perf.json",
+      "bytes": 1535,
+      "sha256": "3e0ab038709be2115be0bb9e20e17092e9237e509816ee3c7fc788e369f06705"
+    },
+    {
+      "path": "reports/evidence/npu_perf_bf16.json",
+      "bytes": 1546,
+      "sha256": "181674266b9347fa0a89383bd5334113297a6e2b38e0a06973668b85bdc53ef2"
+    },
+    {
+      "path": "reports/evidence/npu_perf_w8.json",
+      "bytes": 1536,
+      "sha256": "b08652486f43572ce351a07196cb79e51ba360bcc51c062ecfce72ef87257018"
+    },
+    {
+      "path": "reports/evidence/raw_split_validation_all_cpu.json",
+      "bytes": 613,
+      "sha256": "8f3345810ad6014ed93d06ba0e329642ebc43decf5504ad6847f347fb3ea8eeb"
+    },
+    {
+      "path": "reports/evidence/raw_split_validation_cpu.json",
+      "bytes": 429,
+      "sha256": "f4b005641b1166149f42150030ec0b154ecc4f9c9debb5b6b5caa66ae0b8ea77"
+    },
+    {
+      "path": "reports/evidence/raw_split_validation_cuda.json",
+      "bytes": 449,
+      "sha256": "3bd3b21c97db7c6a9da453d0fdf14c9dbae920896887c49dbed3876106cb7ecf"
+    },
+    {
+      "path": "reports/evidence/replay_npu_vs_gpu.json",
+      "bytes": 5182,
+      "sha256": "a6898c5700636fda870e14da40fffd1a388c11190c87f31f0b938235cddd9adb"
+    },
+    {
+      "path": "reports/evidence/scenarios_v1.json",
+      "bytes": 25056,
+      "sha256": "bdfe39834f9a6295faa0dce8c59e3d645a9d11747da48619c17d0f28fb3a385f"
+    },
+    {
+      "path": "reports/evidence/scenarios_v2.json",
+      "bytes": 25050,
+      "sha256": "94d010bbc51a0a9d31dff678c47950018e196d708b80d484ae1402ec827e4024"
+    },
+    {
+      "path": "reports/evidence/scenarios_v3.json",
+      "bytes": 250736,
+      "sha256": "6feb71eea1e73616ee391114f70db6514b5a9641a07ade5d45212433496ab698"
+    },
+    {
+      "path": "reports/evidence/scenarios_v3_quarantined.json",
+      "bytes": 9225,
+      "sha256": "b8d3368168b3605dd2c051971b007f99b1bfce654e2652f95f0db6a9c097058d"
+    }
+  ]
+}

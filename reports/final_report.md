@@ -1,5 +1,8 @@
 # Final Report — NPU Auto Driving Project 2
 
+> **V1 release (2026-11-24):** see `reports/v1_final_report.md` and `README.md`. This report covers the
+> sessions before V1 and is kept unchanged below.
+
 Sessions 2026-11-22 (pipeline, first NPU results, branch `feature/npu-pipeline`) and 2026-11-23
 (audit and portfolio hardening, branch `feature/portfolio-hardening`). Local commits only; nothing
 pushed.

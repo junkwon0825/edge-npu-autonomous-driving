@@ -1,5 +1,17 @@
 # Handoff — NPU Auto Driving Project 2 (2026-11-23, Claude Code)
 
+## V1 finalization update (2026-11-24)
+- Release candidate `v1.0.0-rc1` (local tag), report `reports/v1_final_report.md`, README rewritten.
+- New: `scripts/run_v1_demo.py` (one-command demo, overlay, MP4/screenshots), `run_scenarios.run(on_tick=)`
+  read-only observer, `scripts/make_v1_diagram.py`, `scripts/make_v1_manifest.py` (`reports/v1/`),
+  `tests/test_v1_demo_overlay.py`, `assets/demo/`, `assets/diagrams/`, `.gitignore` hardening.
+- Demo (pedestrian_crossing, mono, gpu_p95, 30 km/h) run twice: no collision, min gap 2.68 m = v3 cell.
+- Tests: 33 passed + 1 skipped; 34 passed with `NPU_AD_LIVE_CARLA=1`; ruff clean. Benchmarks not re-run.
+- v3 evidence untouched. Approvals still pending: push, KB handoff publish, remote replay file deletion, TensorRT.
+- Next: V2.1 range-rate filter (see V2 roadmap in the V1 report).
+
+---
+
 Repo `<LOCAL_PROJECT_ROOT>`, branch `feature/portfolio-hardening` (from `feature/npu-pipeline` @ `2fdf039`).
 Local commits only, nothing pushed. Machine-readable state: `task_state.json`, `task_table.md`, `failures.jsonl`.
 

@@ -1,0 +1,63 @@
+{
+  "scenario": "pedestrian_crossing",
+  "kind": "ped_cross",
+  "hazard": true,
+  "condition": "gpu_p95",
+  "mode": "mono",
+  "ego_kmh": 30.0,
+  "tag": "v1_demo",
+  "aeb_version": "v2",
+  "delay_ticks": 3,
+  "dt_s": 0.01,
+  "delay_ms": 30.0,
+  "weather": "ClearNoon",
+  "camera_height_m": 1.6991307735443115,
+  "world": {
+    "map": "Carla/Maps/Town10HD_Opt",
+    "spawn_xyz_yaw": [
+      -24.337,
+      -57.786,
+      0.6,
+      0.597
+    ],
+    "seed": 42,
+    "fixed_delta_s": 0.01,
+    "settle_s": 1.0,
+    "scenario_ticks_max": 1000,
+    "initial_speed_mps": 8.333333333333334
+  },
+  "ticks": 342,
+  "collision": false,
+  "collision_with": null,
+  "min_gap_m": 2.6757743236741236,
+  "first_perceived_t": 0.11,
+  "first_decision_brake_t": 2.67,
+  "first_applied_brake_t": 2.7,
+  "gt_ttc_at_first_brake_s": 0.8338836976481988,
+  "gt_gap_at_first_brake_m": 6.912199284480291,
+  "braking_distance_m": 4.31100723777432,
+  "brake_onsets": 1,
+  "false_positive_brake_events": null,
+  "in_path_visible_ticks": 78,
+  "in_path_missed_ratio": 0.0,
+  "mono_range_err": {
+    "n": 79,
+    "mean_m": 0.09992985989272093,
+    "mae_m": 0.10081826549779702,
+    "p95_abs_m": 0.2611567218992619
+  },
+  "final_speed_mps": 0.005928595084697008,
+  "inloop_gpu_e2e_ms_p50": 22.0670000417158,
+  "inloop_gpu_e2e_ms_p95": 27.786475070752203,
+  "wall_s": 21.785474700154737,
+  "artifacts": {
+    "video": "demo.mp4",
+    "screenshots": [
+      "aeb_active.png",
+      "detection.png",
+      "final.png"
+    ],
+    "per_tick_log": "logs/"
+  },
+  "note": "closed loop on local GPU; NPU not in the loop; GT used for evaluation only"
+}

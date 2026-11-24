@@ -6,7 +6,7 @@ simulation only. Evidence for every number: `reports/evidence/`.
 ## Verified implementation
 - Reproducible CARLA 0.9.16 pipeline: synchronous mode, frame-matched sensor queue, tracked actor
   teardown that restores the server even when start-up or destroy fails, process-level exclusive
-  server lock, resumable atomic result files, structured JSON logs. 31 unit tests pass (+1 opt-in live CARLA test), ruff clean.
+  server lock, resumable atomic result files, structured JSON logs. 33 unit tests pass (+1 opt-in live CARLA test), ruff clean.
 - NPU deployment: diagnosed earlier RNGD compile failures (unfused BatchNorm, head concat lowering),
   redesigned the boundary (fused model split at the raw head, decode/NMS on host), validated against
   the unfused original on 72/72 frames (348/348 detections), AOT-compiled FP32, BF16 and W8 variants

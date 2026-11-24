@@ -6,7 +6,7 @@
 ## 검증된 구현
 - 재현 가능한 CARLA 0.9.16 파이프라인: 동기 모드, 프레임 번호 일치 센서 큐, actor 추적·정리(시작·삭제
   실패 시에도 서버 설정 복원), 프로세스 단위 CARLA 서버 독점 잠금, 원자적·재개 가능한 결과 파일,
-  JSON 구조화 로그. 단위 테스트 31개 통과(+ live CARLA 테스트 1개는 opt-in), ruff 통과.
+  JSON 구조화 로그. 단위 테스트 33개 통과(+ live CARLA 테스트 1개는 opt-in), ruff 통과.
 - NPU 배포: 기존 RNGD 컴파일 실패 원인(BatchNorm 미융합, head concat lowering) 진단 후 배포 경계 재설계
   (fused 모델을 raw head에서 분할, decode/NMS는 host). 융합 전 원본 모델과 72/72 프레임(348/348 검출)
   일치 검증. `furiosa-torch` 2026.4.0으로 FP32·BF16·W8 변형을 AOT 컴파일하고 `furiosa:0`에서 실행.
