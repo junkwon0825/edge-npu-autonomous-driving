@@ -19,7 +19,7 @@ camera_bp.set_attribute("sensor_tick", "0.1")
 
 spawn_points = world.get_map().get_spawn_points()
 
-save_dir = r"<LOCAL_PROJECT_ROOT>\data\rgb"
+save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "rgb")
 os.makedirs(save_dir, exist_ok=True)
 
 #2. model

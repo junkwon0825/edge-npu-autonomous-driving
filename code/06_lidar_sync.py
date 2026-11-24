@@ -38,8 +38,8 @@ lidar_bp.set_attribute("sensor_tick", "0.05")
 
 spawn_points = world.get_map().get_spawn_points()
 
-rgb_dir = r"<LOCAL_PROJECT_ROOT>\data\rgb"
-lidar_dir = r"<LOCAL_PROJECT_ROOT>\data\lidar"
+rgb_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "rgb")
+lidar_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "lidar")
 
 os.makedirs(rgb_dir, exist_ok=True)
 os.makedirs(lidar_dir, exist_ok=True)
