@@ -1,0 +1,291 @@
+{
+  "frames": 72,
+  "reference": "GPU FP32 at 640 (V1 deployment)",
+  "sizes": {
+    "320": {
+      "gpu_fp32": {
+        "agreement_vs_640": {
+          "images": 72,
+          "ref_dets": 348,
+          "test_dets": 198,
+          "matched": 156,
+          "recall_vs_ref": 0.4482758620689655,
+          "precision_vs_ref": 0.7878787878787878,
+          "mean_iou_matched": 0.8377197053684335,
+          "mean_abs_conf_delta": 0.16076515920651266,
+          "max_abs_conf_delta": 0.5173587501049042
+        }
+      },
+      "npu_bf16": {
+        "server": {
+          "ready": true,
+          "dtype": "bf16",
+          "imgsz": 320,
+          "device": "furiosa:0",
+          "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+          "load_s": 3.812414264306426,
+          "input_dtype": "torch.bfloat16",
+          "input_shape": [
+            1,
+            3,
+            320,
+            320
+          ],
+          "threads": 2,
+          "prefilter": true
+        },
+        "ok": 144,
+        "agreement_vs_640": {
+          "images": 72,
+          "ref_dets": 348,
+          "test_dets": 195,
+          "matched": 147,
+          "recall_vs_ref": 0.4224137931034483,
+          "precision_vs_ref": 0.7538461538461538,
+          "mean_iou_matched": 0.8405377914132128,
+          "mean_abs_conf_delta": 0.15988236735013064,
+          "max_abs_conf_delta": 0.5076951312065124
+        },
+        "exec_ms": {
+          "n": 144,
+          "mean_ms": 1.8168982060160488,
+          "std_ms": 0.09981760316509823,
+          "p50_ms": 1.886241603642702,
+          "p95_ms": 1.918830326758325,
+          "p99_ms": 1.9300272362306714,
+          "min_ms": 1.6697621904313564,
+          "max_ms": 1.9321367144584656,
+          "fps_from_mean": 550.3885670032782
+        },
+        "server_total_ms": {
+          "n": 144,
+          "mean_ms": 3.7977989349100323,
+          "std_ms": 0.2755527356498556,
+          "p50_ms": 3.8692299276590347,
+          "p95_ms": 4.19544605538249,
+          "p99_ms": 4.318683929741383,
+          "min_ms": 3.1848112121224403,
+          "max_ms": 4.3915449641644955,
+          "fps_from_mean": 263.3104114090467
+        },
+        "e2e_ms": {
+          "n": 144,
+          "mean_ms": 31.178818755304544,
+          "std_ms": 3.458921623614991,
+          "p50_ms": 30.96765000373125,
+          "p95_ms": 36.33476487593725,
+          "p99_ms": 41.46764298900962,
+          "min_ms": 20.49200003966689,
+          "max_ms": 42.40550007671118,
+          "fps_from_mean": 32.073056001516
+        },
+        "payload_bytes": 172800,
+        "remote_health": {
+          "smi": {
+            "device": "npu0",
+            "firmware": "2026.4.0, 93d67f3",
+            "temp": "36.40\u00b0C",
+            "power": "39.00 W"
+          },
+          "n_ok": 149,
+          "n_err": 0,
+          "loadavg": [
+            6.91650390625,
+            8.40283203125,
+            10.0888671875
+          ]
+        }
+      }
+    },
+    "480": {
+      "gpu_fp32": {
+        "agreement_vs_640": {
+          "images": 72,
+          "ref_dets": 348,
+          "test_dets": 276,
+          "matched": 230,
+          "recall_vs_ref": 0.6609195402298851,
+          "precision_vs_ref": 0.8333333333333334,
+          "mean_iou_matched": 0.8745350147906725,
+          "mean_abs_conf_delta": 0.10679231972798058,
+          "max_abs_conf_delta": 0.3664866089820862
+        }
+      },
+      "npu_bf16": {
+        "server": {
+          "ready": true,
+          "dtype": "bf16",
+          "imgsz": 480,
+          "device": "furiosa:0",
+          "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+          "load_s": 3.7631660290062428,
+          "input_dtype": "torch.bfloat16",
+          "input_shape": [
+            1,
+            3,
+            480,
+            480
+          ],
+          "threads": 2,
+          "prefilter": true
+        },
+        "ok": 144,
+        "agreement_vs_640": {
+          "images": 72,
+          "ref_dets": 348,
+          "test_dets": 275,
+          "matched": 225,
+          "recall_vs_ref": 0.646551724137931,
+          "precision_vs_ref": 0.8181818181818182,
+          "mean_iou_matched": 0.8757019149465206,
+          "mean_abs_conf_delta": 0.10454819427596199,
+          "max_abs_conf_delta": 0.34271256704330444
+        },
+        "exec_ms": {
+          "n": 144,
+          "mean_ms": 1.748385777722837,
+          "std_ms": 0.032393185582607883,
+          "p50_ms": 1.7460337840020657,
+          "p95_ms": 1.7818075604736805,
+          "p99_ms": 1.8985081929713485,
+          "min_ms": 1.6986927948892117,
+          "max_ms": 1.9721179269254208,
+          "fps_from_mean": 571.9561510632037
+        },
+        "server_total_ms": {
+          "n": 144,
+          "mean_ms": 4.17906955570086,
+          "std_ms": 0.38313553464828926,
+          "p50_ms": 4.116090014576912,
+          "p95_ms": 4.704030090942979,
+          "p99_ms": 4.965672665275633,
+          "min_ms": 3.556158859282732,
+          "max_ms": 7.669167593121529,
+          "fps_from_mean": 239.28771384909214
+        },
+        "e2e_ms": {
+          "n": 144,
+          "mean_ms": 46.51387500376182,
+          "std_ms": 5.716971992607014,
+          "p50_ms": 46.61969991866499,
+          "p95_ms": 54.62465001037344,
+          "p99_ms": 61.87479795189573,
+          "min_ms": 32.516200095415115,
+          "max_ms": 73.16699996590614,
+          "fps_from_mean": 21.498961329691944
+        },
+        "payload_bytes": 388800,
+        "remote_health": {
+          "smi": {
+            "device": "npu0",
+            "firmware": "2026.4.0, 93d67f3",
+            "temp": "36.21\u00b0C",
+            "power": "39.00 W"
+          },
+          "n_ok": 149,
+          "n_err": 0,
+          "loadavg": [
+            7.00927734375,
+            8.349609375,
+            10.04443359375
+          ]
+        }
+      }
+    },
+    "640": {
+      "gpu_fp32": {
+        "agreement_vs_640": {
+          "images": 72,
+          "ref_dets": 348,
+          "test_dets": 348,
+          "matched": 348,
+          "recall_vs_ref": 1.0,
+          "precision_vs_ref": 1.0,
+          "mean_iou_matched": 1.0,
+          "mean_abs_conf_delta": 0.0,
+          "max_abs_conf_delta": 0.0
+        }
+      },
+      "npu_bf16": {
+        "server": {
+          "ready": true,
+          "dtype": "bf16",
+          "imgsz": 640,
+          "device": "furiosa:0",
+          "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+          "load_s": 3.7213579141534865,
+          "input_dtype": "torch.bfloat16",
+          "input_shape": [
+            1,
+            3,
+            640,
+            640
+          ],
+          "threads": 2,
+          "prefilter": true
+        },
+        "ok": 144,
+        "agreement_vs_640": {
+          "images": 72,
+          "ref_dets": 348,
+          "test_dets": 343,
+          "matched": 339,
+          "recall_vs_ref": 0.9741379310344828,
+          "precision_vs_ref": 0.9883381924198251,
+          "mean_iou_matched": 0.9881726382037849,
+          "mean_abs_conf_delta": 0.007114701904308128,
+          "max_abs_conf_delta": 0.032347169685363775
+        },
+        "exec_ms": {
+          "n": 144,
+          "mean_ms": 2.0833540927722223,
+          "std_ms": 0.09506923760696886,
+          "p50_ms": 2.0420148503035307,
+          "p95_ms": 2.307717502117157,
+          "p99_ms": 2.3199240025132895,
+          "min_ms": 1.9916393794119358,
+          "max_ms": 2.3397752083837986,
+          "fps_from_mean": 479.9952170729396
+        },
+        "server_total_ms": {
+          "n": 144,
+          "mean_ms": 5.397483075891311,
+          "std_ms": 0.470370976025547,
+          "p50_ms": 5.2673364989459515,
+          "p95_ms": 6.43272683955729,
+          "p99_ms": 6.850994951091706,
+          "min_ms": 4.510446917265654,
+          "max_ms": 7.099876645952463,
+          "fps_from_mean": 185.27153970461785
+        },
+        "e2e_ms": {
+          "n": 144,
+          "mean_ms": 61.826999317013865,
+          "std_ms": 5.502851843493207,
+          "p50_ms": 62.06505000591278,
+          "p95_ms": 70.03519999561831,
+          "p99_ms": 74.58069907268509,
+          "min_ms": 45.2246000058949,
+          "max_ms": 78.3199998550117,
+          "fps_from_mean": 16.17416357007019
+        },
+        "payload_bytes": 691200,
+        "remote_health": {
+          "smi": {
+            "device": "npu0",
+            "firmware": "2026.4.0, 93d67f3",
+            "temp": "36.21\u00b0C",
+            "power": "39.00 W"
+          },
+          "n_ok": 149,
+          "n_err": 0,
+          "loadavg": [
+            7.29150390625,
+            8.326171875,
+            9.99951171875
+          ]
+        }
+      }
+    }
+  }
+}

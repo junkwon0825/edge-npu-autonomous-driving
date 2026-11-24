@@ -69,8 +69,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--sizes", nargs="*", type=int, default=[320, 480, 640])
     ap.add_argument("--skip-npu", action="store_true")
+    ap.add_argument("--npu-only", action="store_true", help="no GPU timing (allowed while CARLA runs)")
+    ap.add_argument("--out", default="reports/evidence/v2_resolution.json")
     a = ap.parse_args()
-    if carla_running():
+    if carla_running() and not a.npu_only:
         raise SystemExit("stop the CARLA server first (it shares the GPU)")
     cfg = load_config()
     m = cfg["model"]
@@ -82,8 +84,7 @@ def main() -> int:
         det = GpuDetector(str(resolve(m["weights"])), sz, m["conf"], m["iou"], m["max_det"])
         g = [det(f)[0] for f in frames]
         agree = aggregate_agreement([match_detections(r, d) for r, d in zip(ref, g, strict=True)])
-        e: dict = {"gpu_fp32": {"agreement_vs_640": agree,
-                                **gpu_timing(det, frames, sz)}}  # fmt: skip
+        e: dict = {"gpu_fp32": {"agreement_vs_640": agree, **({} if a.npu_only else gpu_timing(det, frames, sz))}}
         if not a.skip_npu:
             b = FuriosaRemoteBackend(dtype="bf16", imgsz=sz, encoding="content_raw", threads=2, prefilter=True,
                                      timeout_s=5.0, startup_timeout_s=900,
@@ -113,11 +114,10 @@ def main() -> int:
                 b.close()
         res["sizes"][str(sz)] = e
         gn = e["gpu_fp32"]
-        print(sz, f"gpu recall {gn['agreement_vs_640']['recall_vs_ref']:.3f} eager {gn['eager_ms']['mean_ms']:.2f}"
-              f" graph {gn['cuda_graph_ms']['mean_ms']:.2f}",
+        print(sz, f"gpu recall {gn['agreement_vs_640']['recall_vs_ref']:.3f}", gn.get("eager_ms", {}).get("mean_ms"),
               "npu", {k: (round(v["mean_ms"], 2) if isinstance(v, dict) and "mean_ms" in v else None)
                       for k, v in e.get("npu_bf16", {}).items()}, flush=True)  # fmt: skip
-    out = resolve("reports/evidence/v2_resolution.json")
+    out = resolve(a.out)
     out.write_text(json.dumps(res, indent=2, default=str), encoding="utf-8")
     return 0
 
