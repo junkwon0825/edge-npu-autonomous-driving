@@ -1,0 +1,212 @@
+{
+  "started": "2026-11-24T10:46:47+0000",
+  "group": "fix",
+  "cases": {
+    "fix_bilinear2x": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 144,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 4.76837158203125e-07,
+      "n_dilated_replaced": null,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "cat",
+        "getitem",
+        "interpolate"
+      ],
+      "compile": "PASS",
+      "compile_s": 8.964007900096476,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        80,
+        80
+      ],
+      "latency_ms_p50": 0.08259108290076256,
+      "latency_ms_p95": 0.09356113150715828,
+      "max_abs_vs_cpu_fp32": 0.012776374816894531,
+      "mean_abs_vs_cpu_fp32": 0.0010454569710418582,
+      "ref_abs_mean": 0.5052093267440796,
+      "cosine_vs_cpu": 0.9999975562095642,
+      "pixel_argmax_agreement": 0.9954687356948853,
+      "wall_s": 11.4,
+      "loadavg": [
+        10.61083984375,
+        16.4892578125,
+        18.2822265625
+      ]
+    },
+    "fix_convtranspose_pixelshuffle": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 544,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 3.5762786865234375e-07,
+      "n_dilated_replaced": null,
+      "modules": [
+        "Conv2d",
+        "PixelShuffle"
+      ],
+      "functions": [],
+      "compile": "PASS",
+      "compile_s": 6.711698638740927,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        8,
+        80,
+        80
+      ],
+      "latency_ms_p50": 0.08170213550329208,
+      "latency_ms_p95": 0.09237229824066162,
+      "max_abs_vs_cpu_fp32": 0.006971597671508789,
+      "mean_abs_vs_cpu_fp32": 0.0009329215972684324,
+      "ref_abs_mean": 0.3329830467700958,
+      "cosine_vs_cpu": 0.9999980926513672,
+      "pixel_argmax_agreement": 0.9956250190734863,
+      "wall_s": 9.1,
+      "loadavg": [
+        11.4169921875,
+        16.458984375,
+        18.25244140625
+      ]
+    },
+    "fix_dilated_dense": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 20752,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 0.0,
+      "n_dilated_replaced": null,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [],
+      "compile": "PASS",
+      "compile_s": 13.045303982216865,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.10182196274399757,
+      "latency_ms_p95": 0.12085167691111565,
+      "max_abs_vs_cpu_fp32": 0.00860452651977539,
+      "mean_abs_vs_cpu_fp32": 0.0012302874820306897,
+      "ref_abs_mean": 0.4297432601451874,
+      "cosine_vs_cpu": 0.9999973773956299,
+      "pixel_argmax_agreement": 0.9956250190734863,
+      "wall_s": 15.4,
+      "loadavg": [
+        12.91162109375,
+        16.5234375,
+        18.24365234375
+      ]
+    },
+    "pixel_shuffle": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 272,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 0.0,
+      "n_dilated_replaced": null,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "pixel_shuffle"
+      ],
+      "compile": "PASS",
+      "compile_s": 4.703877003863454,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        4,
+        80,
+        80
+      ],
+      "latency_ms_p50": 0.08168071508407593,
+      "latency_ms_p95": 0.09068101644515991,
+      "max_abs_vs_cpu_fp32": 0.010052919387817383,
+      "mean_abs_vs_cpu_fp32": 0.0012375022051855922,
+      "ref_abs_mean": 0.46219298243522644,
+      "cosine_vs_cpu": 0.9999985098838806,
+      "pixel_argmax_agreement": 0.9985937476158142,
+      "wall_s": 6.9,
+      "loadavg": [
+        13.5595703125,
+        16.59814453125,
+        18.2587890625
+      ]
+    },
+    "slice_cat_pad": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 272,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 0.0,
+      "n_dilated_replaced": null,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "cat",
+        "getitem"
+      ],
+      "compile": "PASS",
+      "compile_s": 4.515307238791138,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        42,
+        42
+      ],
+      "latency_ms_p50": 0.0837906263768673,
+      "latency_ms_p95": 0.09614089503884315,
+      "max_abs_vs_cpu_fp32": 0.010052919387817383,
+      "mean_abs_vs_cpu_fp32": 0.0012386282905936241,
+      "ref_abs_mean": 0.4627029597759247,
+      "cosine_vs_cpu": 0.9999986290931702,
+      "pixel_argmax_agreement": 0.9948979616165161,
+      "wall_s": 6.8,
+      "loadavg": [
+        12.630859375,
+        16.29833984375,
+        18.14306640625
+      ]
+    }
+  },
+  "finished": "2026-11-24T10:47:37+0000"
+}

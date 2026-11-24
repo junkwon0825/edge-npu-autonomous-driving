@@ -1,0 +1,113 @@
+{
+  "started": "2026-11-24T10:48:57+0000",
+  "group": "seg2",
+  "cases": {
+    "unet_convtranspose_ported": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 482386,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 4.470348358154297e-08,
+      "n_dilated_replaced": null,
+      "modules": [
+        "Conv2d",
+        "Identity",
+        "PixelShuffle",
+        "ReLU"
+      ],
+      "functions": [
+        "cat",
+        "max_pool2d"
+      ],
+      "compile": "FAIL",
+      "compile_s": 11.444539420306683,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/cece5b9162f0ecb4)\n\nCaused by:\n   0: while lowering TacticKernel\n   1: failed to lower the operator O2730(no populated tactics):\n      TacticKernel\n      inner: kind: EinsumByDpe\n\n      name: \n      history: #gm:max_pool2d_with_indices#kernelized:O2730#prelower:O2730\n\n      input tensors: 2\n        input T1410: [16, 256, 512], 4194304 B, bf16, unknown\n        source: unknown\n        input T1411: [], 2 B, bf16, unknown\n        source: unknown\n        total bytes: 4194306\n      output tensors: 1\n        output T1412: [16, 128, 256], 1048576 B, bf16, unknown\n        source: unknown\n        total bytes: 1048576\n      +----------+-------------",
+      "wall_s": 15.8,
+      "loadavg": [
+        10.58203125,
+        14.3837890625,
+        17.26708984375
+      ]
+    },
+    "unet_bilinear_ported": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 451810,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 5.960464477539063e-08,
+      "n_dilated_replaced": null,
+      "modules": [
+        "Conv2d",
+        "Identity",
+        "ReLU"
+      ],
+      "functions": [
+        "cat",
+        "getitem",
+        "interpolate",
+        "max_pool2d"
+      ],
+      "compile": "FAIL",
+      "compile_s": 13.87577480636537,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/7b6d817e5d0cf85c)\n\nCaused by:\n   0: while lowering TacticKernel\n   1: failed to lower the operator O3156(no populated tactics):\n      TacticKernel\n      inner: kind: EinsumByDpe\n\n      name: \n      history: #gm:max_pool2d_with_indices#kernelized:O3156#prelower:O3156\n\n      input tensors: 2\n        input T1657: [16, 256, 512], 4194304 B, bf16, unknown\n        source: unknown\n        input T1658: [], 2 B, bf16, unknown\n        source: unknown\n        total bytes: 4194306\n      output tensors: 1\n        output T1659: [16, 128, 256], 1048576 B, bf16, unknown\n        source: unknown\n        total bytes: 1048576\n      +----------+-------------",
+      "wall_s": 18.0,
+      "loadavg": [
+        11.71337890625,
+        14.43359375,
+        17.23681640625
+      ]
+    },
+    "lraspp_mbv3_ported": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 3352338,
+      "reference": "original operator/model on CPU fp32",
+      "rewrite_max_abs_vs_original_cpu": 0.0014251023530960083,
+      "n_dilated_replaced": 3,
+      "modules": [
+        "AdaptiveAvgPool2d",
+        "Conv2d",
+        "Hardsigmoid",
+        "Hardswish",
+        "Identity",
+        "ReLU",
+        "Sigmoid"
+      ],
+      "functions": [
+        "add",
+        "cat",
+        "getitem",
+        "interpolate",
+        "mul"
+      ],
+      "compile": "FAIL",
+      "compile_s": 272.1227063126862,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/1659e6947848f636)\n\nCaused by:\n    Inconsistent tensor group offsets for T8510 and T7679\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "wall_s": 279.7,
+      "loadavg": [
+        21.4521484375,
+        18.67138671875,
+        18.30810546875
+      ]
+    }
+  },
+  "finished": "2026-11-24T10:54:11+0000"
+}

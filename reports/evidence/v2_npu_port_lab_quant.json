@@ -1,0 +1,115 @@
+{
+  "started": "2026-11-24T10:16:32+0000",
+  "group": "quant",
+  "cases": {
+    "fake_quant_per_tensor": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "fake_quantize_per_tensor_affine"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.3835914391092956,
+      "error": "UnsupportedOpError: failed to compile\ngraph():\n    %p_mods_0_weight : [num_users=1] = placeholder[target=p_mods_0_weight]\n    %p_mods_0_bias : [num_users=1] = placeholder[target=p_mods_0_bias]\n    %x : [num_users=1] = placeholder[target=x]\n    %convolution : [num_users=1] = call_function[target=torch.ops.aten.convolution.default](args = (%x, %p_mods_0_weight, %p_mods_0_bias, [1, 1], [1, 1], [1, 1], False, [0, 0], 1),",
+      "wall_s": 2.6,
+      "loadavg": [
+        11.08154296875,
+        10.9287109375,
+        9.1865234375
+      ]
+    },
+    "fake_quant_per_channel": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "fake_quantize_per_channel_affine"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.345929104834795,
+      "error": "UnsupportedOpError: failed to compile\ngraph():\n    %p_mods_0_weight : [num_users=1] = placeholder[target=p_mods_0_weight]\n    %p_mods_0_bias : [num_users=1] = placeholder[target=p_mods_0_bias]\n    %x : [num_users=1] = placeholder[target=x]\n    %convolution : [num_users=1] = call_function[target=torch.ops.aten.convolution.default](args = (%x, %p_mods_0_weight, %p_mods_0_bias, [1, 1], [1, 1], [1, 1], False, [0, 0], 1),",
+      "wall_s": 2.4,
+      "loadavg": [
+        10.67431640625,
+        10.8466796875,
+        9.1689453125
+      ]
+    },
+    "round_clamp_act_q": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "clamp",
+        "mul",
+        "round",
+        "truediv"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.3547770786099136,
+      "error": "UnsupportedOpError: failed to compile\nsource:\n    round_1              port_lab.py:67                           return fn(self.mods, x)\ncompile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/cdaeec38e0e4b786)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f",
+      "wall_s": 2.5,
+      "loadavg": [
+        10.67431640625,
+        10.8466796875,
+        9.1689453125
+      ]
+    },
+    "int8_act_cast_roundtrip": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "clamp",
+        "getattr",
+        "mul",
+        "round",
+        "to",
+        "truediv"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.36592531111091375,
+      "error": "UnsupportedOpError: failed to compile\nsource:\n    round_1              port_lab.py:67                           return fn(self.mods, x)\ncompile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/4b2c8254fa1ba6b3)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f",
+      "wall_s": 2.5,
+      "loadavg": [
+        10.2998046875,
+        10.76611328125,
+        9.15185546875
+      ]
+    }
+  },
+  "finished": "2026-11-24T10:16:42+0000"
+}

@@ -1,0 +1,88 @@
+{
+  "started": "2026-11-24T10:08:32+0000",
+  "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+  "secs": 8.0,
+  "configs": {
+    "pe1_t1": {
+      "devices": [
+        0
+      ],
+      "n": 4297,
+      "wall_s": 8.001990883145481,
+      "throughput_fps": 536.9913641179886,
+      "per_thread_n": [
+        4297
+      ],
+      "lat_ms_p50": 1.8570302054286003,
+      "lat_ms_p95": 1.8824911676347256,
+      "lat_ms_p99": 1.935320906341076,
+      "errors": [],
+      "loadavg": [
+        9.46044921875,
+        8.43994140625,
+        7.931640625
+      ],
+      "smi": "-----------------+---------+---------+--------------+\n| rngd | npu0   | 2026.4.0, 93d67f3 | 38.82\u00b0C | 56.00 W | 0000:03:00.0 |\n+------+--------+-------------------+---------+---------+--------------+\n",
+      "health_after": {
+        "ok": true,
+        "max_abs_vs_cpu": 0.625
+      },
+      "state": "PASS"
+    },
+    "pe1_t2": {
+      "devices": [
+        0,
+        0
+      ],
+      "n": 5441,
+      "wall_s": 8.00212470581755,
+      "throughput_fps": 679.9444147682914,
+      "per_thread_n": [
+        2720,
+        2721
+      ],
+      "lat_ms_p50": 2.9435171745717525,
+      "lat_ms_p95": 2.974217291921377,
+      "lat_ms_p99": 2.983537968248129,
+      "errors": [],
+      "loadavg": [
+        9.30908203125,
+        8.44189453125,
+        7.93798828125
+      ],
+      "smi": "-----------------+---------+---------+--------------+\n| rngd | npu0   | 2026.4.0, 93d67f3 | 39.00\u00b0C | 60.00 W | 0000:03:00.0 |\n+------+--------+-------------------+---------+---------+--------------+\n",
+      "health_after": {
+        "ok": true,
+        "max_abs_vs_cpu": 0.625
+      },
+      "state": "PASS"
+    },
+    "pe2_t2": {
+      "devices": [
+        0,
+        1
+      ],
+      "state": "FAIL",
+      "error": "RuntimeError: peer D2D copy requires source and destination devices in the same mesh: furiosa:0 -> furiosa:1"
+    }
+  },
+  "devices": [
+    "furiosa:0",
+    "furiosa:1",
+    "furiosa:2",
+    "furiosa:3",
+    "furiosa:4",
+    "furiosa:5",
+    "furiosa:6",
+    "furiosa:7"
+  ],
+  "device_configuration": "(Fusion(num_fusion=1, num_pe_per_cluster=1, num_chips=1, num_clusters_per_chip=1), Single, ['furiosa:0', 'furiosa:1', 'furiosa:2', 'furiosa:3', 'furiosa:4', 'furiosa:5', 'furiosa:6', 'furiosa:7'])",
+  "loadavg_start": [
+    9.53662109375,
+    8.4208984375,
+    7.919921875
+  ],
+  "smi_start": "+------+--------+-------------------+---------+---------+--------------+\n| Arch | Device | Firmware          | Temp.   | Power   | PCI-BDF      |\n+------+--------+-------------------+---------+---------+--------------+\n| rngd | npu0   | 2026.4.0, 93d67f3 | 38.45\u00b0C | 39.00 W | 0000:03:00.0 |\n+------+--------+-------------------+---------+---------+--------------+\n",
+  "stopped_after": "pe2_t2",
+  "finished": "2026-11-24T10:08:52+0000"
+}

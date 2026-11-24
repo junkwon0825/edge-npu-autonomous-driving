@@ -1,0 +1,139 @@
+{
+  "started": "2026-11-24T10:45:34+0000",
+  "group": "seg",
+  "cases": {
+    "unet_convtranspose": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 482050,
+      "modules": [
+        "Conv2d",
+        "ConvTranspose2d",
+        "Identity",
+        "ReLU"
+      ],
+      "functions": [
+        "cat",
+        "max_pool2d"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.6460442990064621,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/905ffb79a93e1765)\n\nCaused by:\n    transposed convolution is not implemented yet\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "wall_s": 3.7,
+      "loadavg": [
+        11.5712890625,
+        18.61865234375,
+        19.07666015625
+      ]
+    },
+    "unet_bilinear": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 449794,
+      "modules": [
+        "Conv2d",
+        "Identity",
+        "ReLU"
+      ],
+      "functions": [
+        "cat",
+        "interpolate",
+        "max_pool2d"
+      ],
+      "compile": "FAIL",
+      "compile_s": 1.0697439317591488,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/b03e35d88668fa1c)\n\nCaused by:\n    from_table_lookup expects a 1D table; use from_batched_table_lookup for batched tables\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "wall_s": 4.2,
+      "loadavg": [
+        11.205078125,
+        18.42529296875,
+        19.01171875
+      ]
+    },
+    "lraspp_mbv3_raw": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 3218308,
+      "modules": [
+        "AdaptiveAvgPool2d",
+        "BatchNorm2d",
+        "Conv2d",
+        "Hardsigmoid",
+        "Hardswish",
+        "ReLU",
+        "Sigmoid"
+      ],
+      "functions": [
+        "add",
+        "getattr",
+        "getitem",
+        "interpolate",
+        "mul"
+      ],
+      "compile": "FAIL",
+      "compile_s": 3.9225729280151427,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\nfailed to import dfg: Not importable for all cases, _native_batch_norm_legit_no_training\naten_err: Not importable, Node { origin: Py(0x749d59a41e10), name: \"_native_batch_norm_legit_no_training\", op: CallFunction, target: TorchOp(\"aten::_native_batch_norm_legit_no_training\", Py(0x749d7d3f2c90)), args: [Node(\"convolution\"), Node(\"p_inner_backbone_0_1_weight\"), Node(\"p_inner_backbone_0_1_bias\"), Node(\"b_inner_backbone_0_1_running_mean\"), Node(\"b_inner_backbone_0_1_running_var\"), Float(0.01), Float(0.001)], kwargs: {}, stack_trace: Some(Py(0x64733c68c0d0)), meta: {\"original_aten\": Py(0x749d59e0a550), \"nn_module_stack\": Py(0x749d59e0b380), \"stack_trace\": Py(0x64733c68c0d0), \"tenso",
+      "wall_s": 6.9,
+      "loadavg": [
+        10.7880859375,
+        18.21875,
+        18.94140625
+      ]
+    },
+    "lraspp_mbv3_fused": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        3,
+        256,
+        512
+      ],
+      "params": 3205980,
+      "modules": [
+        "AdaptiveAvgPool2d",
+        "Conv2d",
+        "Hardsigmoid",
+        "Hardswish",
+        "Identity",
+        "ReLU",
+        "Sigmoid"
+      ],
+      "functions": [
+        "add",
+        "getattr",
+        "getitem",
+        "interpolate",
+        "mul"
+      ],
+      "compile": "FAIL",
+      "compile_s": 2.4929150408133864,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/14521600366c8952)\n\nCaused by:\n   0: while verifying Primitive\n   1: verification of operator failed:\n      Primitive\n      Mul\n      name: \n\n      input tensors: 2\n        input T1038: [1, 672, 1, 1, 20, 3, 36, 3], 8709120 B, bf16, unknown\n        source: unknown\n        input T1042: [1, 672, 1, 1, 20, 5, 36, 5], 24192000 B, bf16, unknown\n        source: unknown\n        total bytes: 32901120\n      output tensors: 1\n        output T1043: [1, 672, 1, 1, 20, 3, 36, 3], 17418240 B, f32, unknown\n        source: unknown\n        total bytes: 17418240\n   2: T1038([1, 672, 1, 1, 20, 3, 36, 3]) should have a same dimension with that of T1042([1, 6",
+      "wall_s": 6.8,
+      "loadavg": [
+        11.76611328125,
+        18.29833984375,
+        18.96337890625
+      ]
+    }
+  },
+  "finished": "2026-11-24T10:45:55+0000"
+}

@@ -1,0 +1,132 @@
+{
+  "started": "2026-11-24T10:48:11+0000",
+  "group": "ops",
+  "cases": {
+    "bn_unfused": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2352,
+      "modules": [
+        "BatchNorm2d",
+        "Conv2d"
+      ],
+      "functions": [],
+      "compile": "FAIL",
+      "compile_s": 0.3666456672362983,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\nfailed to import dfg: Not importable for all cases, _native_batch_norm_legit_no_training\naten_err: Not importable, Node { origin: Py(0x7a15c2fee6d0), name: \"_native_batch_norm_legit_no_training\", op: CallFunction, target: TorchOp(\"aten::_native_batch_norm_legit_no_training\", Py(0x7a15d68f6b90)), args: [Node(\"convolution\"), Node(\"p_mods_1_weight\"), Node(\"p_mods_1_bias\"), Node(\"b_mods_1_running_mean\"), Node(\"b_mods_1_running_var\"), Float(0.1), Float(1e-5)], kwargs: {}, stack_trace: Some(Py(0x7a15c2f48160)), meta: {\"stack_trace\": Py(0x7a15c2f48160), \"original_aten\": Py(0x7a15c2e48cd0), \"from_node\": Py(0x7a15c2e4ad00), \"seq_nr\": Py(0x5aa883d18c68), \"val\": Py(0x7a15c2f5c780), \"tens",
+      "wall_s": 2.5,
+      "loadavg": [
+        10.84521484375,
+        15.39208984375,
+        17.76806640625
+      ]
+    },
+    "dilated_conv": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [],
+      "compile": "FAIL",
+      "compile_s": 0.3250821363180876,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/cf73432f80874a2b)\n\nCaused by:\n   0: while verifying Primitive\n   1: verification of operator failed:\n      Primitive\n      Mul\n      name: \n\n      input tensors: 2\n        input T17: [1, 1, 16, 16, 46, 1, 46, 1], 1083392 B, bf16, unknown\n        source: unknown\n        input T21: [1, 1, 16, 16, 46, 3, 46, 3], 9750528 B, bf16, unknown\n        source: unknown\n        total bytes: 10833920\n      output tensors: 1\n        output T22: [1, 1, 16, 16, 46, 1, 46, 1], 2166784 B, f32, unknown\n        source: unknown\n        total bytes: 2166784\n   2: T17([1, 1, 16, 16, 46, 1, 46, 1]) should have a same dimension with that of T21([1, 1, 16, 16, 46,",
+      "wall_s": 2.4,
+      "loadavg": [
+        10.84521484375,
+        15.39208984375,
+        17.76806640625
+      ]
+    },
+    "upsample_bilinear_x2": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "interpolate"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.5465658414177597,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/b0305419c139fc5c)\n\nCaused by:\n    from_table_lookup expects a 1D table; use from_batched_table_lookup for batched tables\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "wall_s": 2.6,
+      "loadavg": [
+        11.41845703125,
+        15.435546875,
+        17.76953125
+      ]
+    },
+    "interpolate_bilinear_size": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "interpolate"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.5505336979404092,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/0d30367f7a333625)\n\nCaused by:\n    from_table_lookup expects a 1D table; use from_batched_table_lookup for batched tables\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "wall_s": 2.7,
+      "loadavg": [
+        11.064453125,
+        15.29541015625,
+        17.71142578125
+      ]
+    },
+    "conv_transpose_s2": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 1040,
+      "modules": [
+        "ConvTranspose2d"
+      ],
+      "functions": [],
+      "compile": "FAIL",
+      "compile_s": 0.3247916540130973,
+      "error": "UnsupportedOpError",
+      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/63776cce48089d48)\n\nCaused by:\n    transposed convolution is not implemented yet\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "wall_s": 2.4,
+      "loadavg": [
+        11.064453125,
+        15.29541015625,
+        17.71142578125
+      ]
+    }
+  },
+  "finished": "2026-11-24T10:48:24+0000"
+}

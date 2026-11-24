@@ -5,7 +5,7 @@
     "imgsz": 640,
     "device": "furiosa:0",
     "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
-    "load_s": 5.165820703376085,
+    "load_s": 3.76080740429461,
     "input_dtype": "torch.bfloat16",
     "input_shape": [
       1,
@@ -35,7 +35,7 @@
       "npu_first_warning_t": 0.9500000000000001,
       "gpu_first_brake_t": null,
       "npu_first_brake_t": null,
-      "ttc_abs_diff_median_s": 0.12100359461467547,
+      "ttc_abs_diff_median_s": 0.12100359461467569,
       "ttc_abs_diff_max_s": 10.184414175320939
     },
     "lead_vehicle_braking__npu_p95__v2__mono__30kmh__replay": {
@@ -51,7 +51,7 @@
         "mean_abs_conf_delta": 0.007934648301413183,
         "max_abs_conf_delta": 0.04041316223144531
       },
-      "state_agreement_frac": 0.9333333333333333,
+      "state_agreement_frac": 0.8888888888888888,
       "gpu_first_warning_t": 3.75,
       "npu_first_warning_t": 3.75,
       "gpu_first_brake_t": 4.25,
@@ -72,12 +72,12 @@
         "mean_abs_conf_delta": 0.006631680597435117,
         "max_abs_conf_delta": 0.03801856307983398
       },
-      "state_agreement_frac": 0.9662921348314607,
+      "state_agreement_frac": 0.9887640449438202,
       "gpu_first_warning_t": 3.95,
       "npu_first_warning_t": 3.95,
       "gpu_first_brake_t": 4.15,
       "npu_first_brake_t": 4.15,
-      "ttc_abs_diff_median_s": 0.04312582532569342,
+      "ttc_abs_diff_median_s": 0.04504191493751364,
       "ttc_abs_diff_max_s": 0.663987512658375
     },
     "pedestrian_crossing__npu_p95__v2__mono__30kmh__replay": {
@@ -114,12 +114,12 @@
         "mean_abs_conf_delta": 0.007892639853954319,
         "max_abs_conf_delta": 0.03839254660606384
       },
-      "state_agreement_frac": 0.8625,
+      "state_agreement_frac": 0.91875,
       "gpu_first_warning_t": null,
       "npu_first_warning_t": null,
       "gpu_first_brake_t": null,
       "npu_first_brake_t": null,
-      "ttc_abs_diff_median_s": 0.08342371070895771,
+      "ttc_abs_diff_median_s": 0.2799265185921509,
       "ttc_abs_diff_max_s": 3.9931842618901037
     },
     "rain__npu_p95__v2__mono__30kmh__replay": {
@@ -156,13 +156,13 @@
         "mean_abs_conf_delta": 0.007135429204582536,
         "max_abs_conf_delta": 0.0316130599498749
       },
-      "state_agreement_frac": 0.9803921568627451,
+      "state_agreement_frac": 0.9705882352941176,
       "gpu_first_warning_t": 4.1,
       "npu_first_warning_t": 4.05,
       "gpu_first_brake_t": null,
       "npu_first_brake_t": null,
-      "ttc_abs_diff_median_s": 0.03567251910155145,
-      "ttc_abs_diff_max_s": 3.642959687235467
+      "ttc_abs_diff_median_s": 0.03211970242319584,
+      "ttc_abs_diff_max_s": 2.0573822019497383
     }
   },
   "note": "open loop on frames recorded in v3 (GPU closed loop)",
@@ -179,28 +179,28 @@
   },
   "npu_e2e_latency_ms": {
     "n": 738,
-    "mean_ms": 173.6217695099067,
-    "std_ms": 190.21715058098616,
-    "p50_ms": 96.58994991332293,
-    "p95_ms": 526.5822449582625,
-    "p99_ms": 1002.1343889972194,
-    "min_ms": 56.498700054362416,
-    "max_ms": 1545.7324997987598,
-    "fps_from_mean": 5.759646401616365
+    "mean_ms": 69.75837398117262,
+    "std_ms": 8.436048178585956,
+    "p50_ms": 68.55665007606149,
+    "p95_ms": 84.91732019465417,
+    "p99_ms": 94.20548394555226,
+    "min_ms": 52.55480017513037,
+    "max_ms": 118.37159981951118,
+    "fps_from_mean": 14.33519652092083
   },
   "remote_health_end": {
     "smi": {
       "device": "npu0",
       "firmware": "2026.4.0, 93d67f3",
-      "temp": "37.33\u00b0C",
+      "temp": "36.40\u00b0C",
       "power": "39.00 W"
     },
     "n_ok": 738,
     "n_err": 0,
     "loadavg": [
-      23.3681640625,
-      22.12939453125,
-      18.96484375
+      9.4970703125,
+      9.17529296875,
+      10.47119140625
     ]
   }
 }

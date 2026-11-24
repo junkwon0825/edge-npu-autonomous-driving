@@ -1,0 +1,507 @@
+{
+  "started": "2026-11-24T10:13:07+0000",
+  "group": "ops",
+  "cases": {
+    "control_conv_relu": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "relu"
+      ],
+      "compile": "PASS",
+      "compile_s": 13.269352312199771,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.08610077202320099,
+      "latency_ms_p95": 0.098442193120718,
+      "max_abs_vs_cpu_fp32": 0.007867097854614258,
+      "mean_abs_vs_cpu_fp32": 0.0006380651029758155,
+      "ref_abs_mean": 0.21841268241405487,
+      "cosine_vs_cpu": 0.9999973177909851,
+      "pixel_argmax_agreement": 0.9931250214576721,
+      "wall_s": 15.6,
+      "loadavg": [
+        10.4111328125,
+        8.93359375,
+        8.212890625
+      ]
+    },
+    "bn_unfused": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2352,
+      "modules": [
+        "BatchNorm2d",
+        "Conv2d"
+      ],
+      "functions": [],
+      "compile": "FAIL",
+      "compile_s": 0.37154614506289363,
+      "error": "UnsupportedOpError: failed to compile\ngraph():\n    %p_mods_0_weight : [num_users=1] = placeholder[target=p_mods_0_weight]\n    %p_mods_0_bias : [num_users=1] = placeholder[target=p_mods_0_bias]\n    %p_mods_1_weight : [num_users=1] = placeholder[target=p_mods_1_weight]\n    %p_mods_1_bias : [num_users=1] = placeholder[target=p_mods_1_bias]\n    %b_mods_1_running_mean : [num_users=1] = placeholder[target=b_mods_1_running_",
+      "wall_s": 2.5,
+      "loadavg": [
+        10.4111328125,
+        8.93359375,
+        8.212890625
+      ]
+    },
+    "hardswish": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "hardswish"
+      ],
+      "compile": "PASS",
+      "compile_s": 13.206393267959356,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.08019106462597847,
+      "latency_ms_p95": 0.09072106331586838,
+      "max_abs_vs_cpu_fp32": 0.009253382682800293,
+      "mean_abs_vs_cpu_fp32": 0.0007303700549528003,
+      "ref_abs_mean": 0.22436702251434326,
+      "cosine_vs_cpu": 0.9999957084655762,
+      "pixel_argmax_agreement": 0.9931250214576721,
+      "wall_s": 15.5,
+      "loadavg": [
+        11.4970703125,
+        9.220703125,
+        8.31640625
+      ]
+    },
+    "hardsigmoid": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "hardsigmoid"
+      ],
+      "compile": "PASS",
+      "compile_s": 15.75896640168503,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.08682115003466606,
+      "latency_ms_p95": 0.09799236431717873,
+      "max_abs_vs_cpu_fp32": 0.0025448203086853027,
+      "mean_abs_vs_cpu_fp32": 0.0007426151423715055,
+      "ref_abs_mean": 0.49721118807792664,
+      "cosine_vs_cpu": 1.0000035762786865,
+      "pixel_argmax_agreement": 0.981249988079071,
+      "wall_s": 18.0,
+      "loadavg": [
+        13.296875,
+        9.7626953125,
+        8.513671875
+      ]
+    },
+    "se_block": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 280,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "adaptive_avg_pool2d",
+        "hardsigmoid",
+        "mul",
+        "relu"
+      ],
+      "compile": "PASS",
+      "compile_s": 1.4199969307519495,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.07415097206830978,
+      "latency_ms_p95": 0.08795130997896194,
+      "max_abs_vs_cpu_fp32": 0.011482715606689453,
+      "mean_abs_vs_cpu_fp32": 0.0009489952935837209,
+      "ref_abs_mean": 0.41188621520996094,
+      "cosine_vs_cpu": 0.9999980330467224,
+      "pixel_argmax_agreement": 0.9950000047683716,
+      "wall_s": 3.6,
+      "loadavg": [
+        13.03271484375,
+        9.76708984375,
+        8.52197265625
+      ]
+    },
+    "depthwise_conv": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 160,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [],
+      "compile": "PASS",
+      "compile_s": 3.430734934285283,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.07739104330539703,
+      "latency_ms_p95": 0.09031174704432487,
+      "max_abs_vs_cpu_fp32": 0.012623786926269531,
+      "mean_abs_vs_cpu_fp32": 0.0013943602098152041,
+      "ref_abs_mean": 0.5060662627220154,
+      "cosine_vs_cpu": 0.9999977350234985,
+      "pixel_argmax_agreement": 0.9950000047683716,
+      "wall_s": 5.7,
+      "loadavg": [
+        13.7509765625,
+        9.97021484375,
+        8.5947265625
+      ]
+    },
+    "dilated_conv": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [],
+      "compile": "FAIL",
+      "compile_s": 0.3294834685511887,
+      "error": "UnsupportedOpError: failed to compile\ngraph():\n    %p_mods_0_weight : [num_users=1] = placeholder[target=p_mods_0_weight]\n    %p_mods_0_bias : [num_users=1] = placeholder[target=p_mods_0_bias]\n    %x : [num_users=1] = placeholder[target=x]\n    %convolution : [num_users=1] = call_function[target=torch.ops.aten.convolution.default](args = (%x, %p_mods_0_weight, %p_mods_0_bias, [1, 1], [4, 4], [4, 4], False, [0, 0], 1),",
+      "wall_s": 2.4,
+      "loadavg": [
+        13.7509765625,
+        9.97021484375,
+        8.5947265625
+      ]
+    },
+    "maxpool": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "max_pool2d"
+      ],
+      "compile": "PASS",
+      "compile_s": 17.660164246801287,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        20,
+        20
+      ],
+      "latency_ms_p50": 0.08556107059121132,
+      "latency_ms_p95": 0.09626196697354317,
+      "max_abs_vs_cpu_fp32": 0.007867097854614258,
+      "mean_abs_vs_cpu_fp32": 0.0014115981757640839,
+      "ref_abs_mean": 0.5892757177352905,
+      "cosine_vs_cpu": 0.9999976754188538,
+      "pixel_argmax_agreement": 0.9950000047683716,
+      "wall_s": 20.0,
+      "loadavg": [
+        14.22119140625,
+        10.28857421875,
+        8.7265625
+      ]
+    },
+    "upsample_nearest_x2": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "interpolate"
+      ],
+      "compile": "PASS",
+      "compile_s": 14.130262891296297,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        80,
+        80
+      ],
+      "latency_ms_p50": 0.07549067959189415,
+      "latency_ms_p95": 0.08556107059121132,
+      "max_abs_vs_cpu_fp32": 0.009678840637207031,
+      "mean_abs_vs_cpu_fp32": 0.0013076883042231202,
+      "ref_abs_mean": 0.4535583555698395,
+      "cosine_vs_cpu": 0.9999948740005493,
+      "pixel_argmax_agreement": 0.9931250214576721,
+      "wall_s": 16.5,
+      "loadavg": [
+        14.52099609375,
+        10.58447265625,
+        8.8564453125
+      ]
+    },
+    "upsample_bilinear_x2": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "interpolate"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.5607773000374436,
+      "error": "UnsupportedOpError: failed to compile\ngraph():\n    %p_mods_0_weight : [num_users=1] = placeholder[target=p_mods_0_weight]\n    %p_mods_0_bias : [num_users=1] = placeholder[target=p_mods_0_bias]\n    %x : [num_users=1] = placeholder[target=x]\n    %convolution : [num_users=1] = call_function[target=torch.ops.aten.convolution.default](args = (%x, %p_mods_0_weight, %p_mods_0_bias, [1, 1], [1, 1], [1, 1], False, [0, 0], 1),",
+      "wall_s": 2.7,
+      "loadavg": [
+        14.52099609375,
+        10.58447265625,
+        8.8564453125
+      ]
+    },
+    "interpolate_bilinear_size": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "interpolate"
+      ],
+      "compile": "FAIL",
+      "compile_s": 0.5597500042058527,
+      "error": "UnsupportedOpError: failed to compile\ngraph():\n    %p_mods_0_weight : [num_users=1] = placeholder[target=p_mods_0_weight]\n    %p_mods_0_bias : [num_users=1] = placeholder[target=p_mods_0_bias]\n    %x : [num_users=1] = placeholder[target=x]\n    %convolution : [num_users=1] = call_function[target=torch.ops.aten.convolution.default](args = (%x, %p_mods_0_weight, %p_mods_0_bias, [1, 1], [1, 1], [1, 1], False, [0, 0], 1),",
+      "wall_s": 2.7,
+      "loadavg": [
+        13.83837890625,
+        10.50830078125,
+        8.8408203125
+      ]
+    },
+    "conv_transpose_s2": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 1040,
+      "modules": [
+        "ConvTranspose2d"
+      ],
+      "functions": [],
+      "compile": "FAIL",
+      "compile_s": 0.3340506502427161,
+      "error": "UnsupportedOpError: failed to compile\ngraph():\n    %p_mods_0_weight : [num_users=1] = placeholder[target=p_mods_0_weight]\n    %p_mods_0_bias : [num_users=1] = placeholder[target=p_mods_0_bias]\n    %x : [num_users=1] = placeholder[target=x]\n    %convolution : [num_users=1] = call_function[target=torch.ops.aten.convolution.default](args = (%x, %p_mods_0_weight, %p_mods_0_bias, [2, 2], [0, 0], [1, 1], True, [0, 0], 1), ",
+      "wall_s": 2.6,
+      "loadavg": [
+        13.83837890625,
+        10.50830078125,
+        8.8408203125
+      ]
+    },
+    "concat_channels": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "cat"
+      ],
+      "compile": "PASS",
+      "compile_s": 43.072262450587004,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        32,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.0828406773507595,
+      "latency_ms_p95": 0.10273093357682228,
+      "max_abs_vs_cpu_fp32": 0.009678840637207031,
+      "mean_abs_vs_cpu_fp32": 0.0012175351148471236,
+      "ref_abs_mean": 0.6262657642364502,
+      "cosine_vs_cpu": 1.0,
+      "pixel_argmax_agreement": 0.9943749904632568,
+      "wall_s": 45.6,
+      "loadavg": [
+        16.19580078125,
+        11.5048828125,
+        9.25146484375
+      ]
+    },
+    "softmax_channels": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "softmax"
+      ],
+      "compile": "PASS",
+      "compile_s": 11.592141674365848,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.07929140701889992,
+      "latency_ms_p95": 0.09030196815729141,
+      "max_abs_vs_cpu_fp32": 0.0017967820167541504,
+      "mean_abs_vs_cpu_fp32": 0.0001181638435809873,
+      "ref_abs_mean": 0.0625,
+      "cosine_vs_cpu": 0.9999992847442627,
+      "pixel_argmax_agreement": 0.9918749928474426,
+      "wall_s": 13.9,
+      "loadavg": [
+        15.13232421875,
+        11.48388671875,
+        9.27978515625
+      ]
+    },
+    "argmax_channels": {
+      "precision": "bf16",
+      "input_shape": [
+        1,
+        16,
+        40,
+        40
+      ],
+      "params": 2320,
+      "modules": [
+        "Conv2d"
+      ],
+      "functions": [
+        "argmax",
+        "to"
+      ],
+      "compile": "PASS",
+      "compile_s": 15.090384711977094,
+      "runtime": "PASS",
+      "out_shape": [
+        1,
+        40,
+        40
+      ],
+      "latency_ms_p50": 0.07858127355575562,
+      "latency_ms_p95": 0.08991081267595291,
+      "max_abs_vs_cpu_fp32": 12.0,
+      "mean_abs_vs_cpu_fp32": 0.04500000178813934,
+      "ref_abs_mean": 7.638124942779541,
+      "cosine_vs_cpu": 0.9976596832275391,
+      "wall_s": 17.4,
+      "loadavg": [
+        13.5888671875,
+        11.35791015625,
+        9.2841796875
+      ]
+    }
+  },
+  "finished": "2026-11-24T10:16:12+0000"
+}

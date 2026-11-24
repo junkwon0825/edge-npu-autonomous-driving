@@ -1,0 +1,62 @@
+{
+  "started": "2026-11-24T10:16:55+0000",
+  "group": "intro",
+  "cases": {},
+  "introspection": {
+    "sdk": "furiosa-torch 2026.4.0 (rev: 5800e2ba24, built_at: 2026-10-12T09:11:18Z)",
+    "modules_with_quant_names": {
+      "furiosa.torch._backend.runnable_sequence": [
+        "_example_tensor"
+      ],
+      "furiosa.torch._backend.torch_compile": [
+        "_example_tensor"
+      ],
+      "furiosa.torch._compile_probe": [
+        "CompileProbeSample",
+        "_current_probe_sample"
+      ],
+      "furiosa.torch._custom_ops.copy_from": [
+        "_cast_source_dtype"
+      ],
+      "furiosa.torch._custom_ops.prng": [
+        "is_dtype_supported_for_float"
+      ],
+      "furiosa.torch._custom_ops.typecast": [
+        "_DTYPE_ETYPE_MAP",
+        "_SUPPORTED_TYPECAST_DTYPES",
+        "_dram_shape_with_dtype"
+      ],
+      "furiosa.torch._custom_ops.typecast_tiled": [
+        "_DTYPE_ETYPE_MAP",
+        "_dram_shape_with_dtype"
+      ],
+      "furiosa.torch._db.local_decomp": [
+        "_to_dtype",
+        "_to_dtype_layout",
+        "_to_prim_dtype"
+      ],
+      "furiosa.torch._module._utils": [
+        "_deserialize_dtypes",
+        "_serialize_dtypes",
+        "dtype_to_int",
+        "int_to_dtype"
+      ],
+      "furiosa.torch._module.dfg": [
+        "_deserialize_dtypes"
+      ],
+      "furiosa.torch.export._meta": [
+        "example_inputs"
+      ],
+      "furiosa.torch.export._validators": [
+        "assert_no_dtype_casting_copy"
+      ],
+      "furiosa.torch.ext.transformers": "import error: ModuleNotFoundError",
+      "furiosa.torch.ir": [
+        "_DTYPE_TO_INT",
+        "_INT_TO_DTYPE"
+      ]
+    },
+    "amp_supported": "[]"
+  },
+  "finished": "2026-11-24T10:16:57+0000"
+}

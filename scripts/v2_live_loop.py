@@ -35,6 +35,7 @@ from npu_ad.runtime.fallback import FailoverBackend, HealthMonitor
 from npu_ad.runtime.pipeline import AsyncInferenceWorker, Frame, LatestFrameQueue, ResultGate
 from npu_ad.simulation import geometry as geo
 from npu_ad.simulation.carla_env import CarlaSession, image_to_bgr
+from npu_ad.viz.overlay_v2 import OverlayV2
 
 
 def classify(age_p95_s: float | None, overrun_frac: float) -> str:
@@ -60,6 +61,7 @@ def main() -> int:
     ap.add_argument("--fault-at", type=float, default=None, help="sim time of the injected NPU stall")
     ap.add_argument("--fault-s", type=float, default=1.5)
     ap.add_argument("--tag", default="")
+    ap.add_argument("--video", default=None, help="write the V2 overlay video/screenshots to this directory")
     a = ap.parse_args()
     setup_logging("v2_live_loop")
     import carla
@@ -121,6 +123,8 @@ def main() -> int:
         worker = AsyncInferenceWorker(backend, q, clock=sim_clock)
         gate, mot, sm = ResultGate(a.stale_s), MultiObjectTracker(ranger, v2.CLASS_GROUPS), AebStateMachine()
         last_ok, triggered, faulted, overruns = -1e9, False, False, 0
+        ov = OverlayV2(resolve(a.video), 1 / a.dt) if a.video else None
+        last_res, shots = None, []
         worker.start()
         clock0[0] = time.perf_counter()
         try:
@@ -133,7 +137,8 @@ def main() -> int:
                     overruns += 1
                 fid = s.tick()
                 img = s.get_image(cam, fid)
-                q.put(Frame(fid, t, image_to_bgr(img), enqueue_t=sim_clock()))
+                bgr = image_to_bgr(img)
+                q.put(Frame(fid, t, bgr, enqueue_t=sim_clock()))
                 if a.fault_at is not None and not faulted and t >= a.fault_at and npu_b is not None:
                     npu_b.stall(a.fault_s)
                     faulted = True
@@ -162,9 +167,21 @@ def main() -> int:
                              "backend": res.backend if res is not None else None,
                              "age_s": (t_ctrl - res.capture_t) if res is not None else None,
                              "collisions": len(collisions)})  # fmt: skip
+                if ov is not None:
+                    last_res = res or last_res
+                    ov.add(bgr, {
+                        "aeb": out, "tracks": mot.confirmed(), "result": last_res, "frame_id": fid,
+                        "backend": (last_res.backend + " " + last_res.precision) if last_res else "n/a",
+                        "fallback": getattr(backend, "state", "n/a"),
+                        "age_ms": (t_ctrl - last_res.capture_t) * 1e3 if last_res else None,
+                        "queue": q.depth(), "dropped": q.n_dropped, "stale": gate.stats.n_stale,
+                        "speed_kmh": v * 3.6, "t": t,
+                    })  # fmt: skip
                 if collisions and t - next(r["t"] for r in rows if r["collisions"]) > 0.5:
                     break
         finally:
+            if ov is not None:
+                shots = ov.close()
             worker.stop()
             for _ in range(3):
                 s.tick()
@@ -204,6 +221,7 @@ def main() -> int:
             (np.percentile(gate.stats.ages_s, 95) if gate.stats.ages_s else None), overruns / max(n_ticks, 1)
         ),
     }  # fmt: skip
+    entry["video"] = {"dir": a.video, "screenshots": shots} if a.video else None
     if npu_b is not None:
         entry["npu_client"] = npu_b.health()
         npu_b.close()
