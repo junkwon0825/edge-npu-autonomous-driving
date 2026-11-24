@@ -31,6 +31,10 @@ SYNC_FILES = [
     ("remote/lane_port_v3.py", "lane_port_v3.py"),
     ("remote/model_lab_v3.py", "model_lab_v3.py"),
     ("remote/multimodel_v3.py", "multimodel_v3.py"),
+    ("remote/npu_server_v3.py", "npu_server_v3.py"),
+    ("src/npu_ad/npu/__init__.py", "src/npu_ad/npu/__init__.py"),
+    ("src/npu_ad/npu/rewrites.py", "src/npu_ad/npu/rewrites.py"),
+    ("src/npu_ad/perception/lane_net.py", "src/npu_ad/perception/lane_net.py"),
     ("src/npu_ad/__init__.py", "src/npu_ad/__init__.py"),
     ("src/npu_ad/perception/__init__.py", "src/npu_ad/perception/__init__.py"),
     ("src/npu_ad/perception/yolo_raw.py", "src/npu_ad/perception/yolo_raw.py"),
@@ -57,7 +61,10 @@ def main() -> int:
     d = a.dir
 
     if a.action == "sync":
-        r = ssh(a.host, f"mkdir -p {d}/src/npu_ad/perception && test -f {d}/yolo26n.pt || cp -n yolo26n.pt {d}/")
+        r = ssh(
+            a.host,
+            f"mkdir -p {d}/src/npu_ad/npu {d}/src/npu_ad/perception && test -f {d}/yolo26n.pt || cp -n yolo26n.pt {d}/",
+        )
         if r.returncode:
             print(r.stderr, file=sys.stderr)
             return r.returncode

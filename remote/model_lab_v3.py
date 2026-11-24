@@ -19,7 +19,7 @@ import sys
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, HERE)
+sys.path[:0] = [HERE, os.path.join(HERE, "src")]
 CASES = ["layernorm", "gelu", "bmm", "sdpa", "linear_gelu", "resnet18", "mbv3_small", "vit_tiny", "vit_tiny_sdpa"]
 
 
@@ -96,6 +96,28 @@ def build(case: str):
                 return self.head(self.norm(self.blocks(x)).mean(1))
 
         return ViT().eval(), torch.randn(1, 3, 224, 224)
+    if case in ("conv_256_512", "conv_256_512_split"):
+        from npu_ad.npu.rewrites import SplitConv
+
+        conv = nn.Conv2d(256, 512, 3, padding=1)
+        m = Wrap(SplitConv(conv) if case.endswith("split") else conv)
+        return m.eval(), torch.randn(1, 256, 20, 20)
+    if case in ("yolo26s_split", "resnet18_split"):
+        from npu_ad.npu.rewrites import split_large_convs
+
+        if case == "yolo26s_split":
+            from npu_job import _build
+
+            raw, _ = _build(os.path.join(HERE, "yolo26s.pt"), 640, "fp32")
+            n = split_large_convs(raw)
+            raw.n_split = n
+            return raw.eval(), torch.randn(1, 3, 640, 640)
+        import torch.fx.experimental.optimization as opt
+        import torchvision.models as tvm
+
+        m = opt.fuse(tvm.resnet18(weights=None).eval())
+        m.n_split = split_large_convs(m)
+        return m, torch.randn(1, 3, 224, 224)
     import torch.fx.experimental.optimization as opt
     import torchvision.models as tvm
 
@@ -109,9 +131,11 @@ def run_case(case: str) -> dict:
 
     m, x = build(case)
     with torch.no_grad():
-        ref = m(x).float()
+        ref = m(x)
+        ref = (ref[1] if isinstance(ref, (tuple, list)) else ref).float()  # YOLO raw: compare the scores
     m, xq = m.to(torch.bfloat16), x.to(torch.bfloat16)
     res: dict = {"input_shape": list(x.shape), "params": sum(p.numel() for p in m.parameters()),
+                 "n_split_convs": getattr(m, "n_split", None),
                  "modules": sorted({type(s).__name__ for s in m.modules() if not list(s.children())})}  # fmt: skip
     t0 = time.perf_counter()
     try:
@@ -131,7 +155,6 @@ def run_case(case: str) -> dict:
         run, xd = compiled.to(dev), xq.to(dev)
         with torch.no_grad():
             out = run(xd)
-            out = out[0] if isinstance(out, (tuple, list)) else out
             stream.synchronize()
             ts = []
             for _ in range(50):
@@ -139,7 +162,7 @@ def run_case(case: str) -> dict:
                 run(xd)
                 stream.synchronize()
                 ts.append(time.perf_counter() - t)
-        o = out.cpu().float()
+        o = (out[1] if isinstance(out, (tuple, list)) and len(out) > 1 else out).cpu().float()
     except Exception as e:
         return res | {"runtime": "FAIL", "error_detail": f"{type(e).__name__}: {str(e)[:400]}"}
     ts.sort()

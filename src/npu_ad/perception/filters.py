@@ -173,5 +173,30 @@ class RangeKalman:
         self._consec_rej = 0
 
 
+def kalman_measure(kf: RangeKalman, t: float, z: float, idx: int, std: float) -> bool:
+    """Scalar update of a ``RangeKalman`` with a direct measurement of state ``idx`` (0 range, 1 rate).
+
+    Used for sensor fusion (radar range / closing speed). Predicts to ``t`` first; returns False if the
+    filter is not initialised (the camera initialises tracks) or the update fails the NIS gate.
+    """
+    if kf.x is None or kf._t is None:
+        return False
+    dt = t - kf._t
+    if dt > 0:
+        f = np.array([[1.0, dt], [0.0, 1.0]])
+        q = kf.sigma_a**2 * np.array([[dt**4 / 4, dt**3 / 2], [dt**3 / 2, dt**2]])
+        kf.x, kf.P = f @ kf.x, f @ kf.P @ f.T + q
+        kf._t = t
+    s = kf.P[idx, idx] + std * std
+    innov = z - kf.x[idx]
+    if innov * innov / s > kf.gate_nis:
+        kf.n_rejected += 1
+        return False
+    k = kf.P[:, idx] / s
+    kf.x = kf.x + k * innov
+    kf.P = kf.P - np.outer(k, kf.P[idx, :])
+    return True
+
+
 def make_filter(kind: str, **kw):
     return {"fd": FiniteDifference, "lsq": WindowLsq, "ab": AlphaBeta, "kf": RangeKalman}[kind](**kw)

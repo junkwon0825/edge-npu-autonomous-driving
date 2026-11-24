@@ -71,6 +71,7 @@ class Track:
     truncated: bool = False
     side_truncated: bool = False  # box touches the left/right image border: lateral estimate biased
     updated: bool = True  # matched a detection in the latest update
+    radar_hits: int = 0
 
     @property
     def age_s(self) -> float:
@@ -183,6 +184,28 @@ class MultiObjectTracker:
             self._update_range(tr, t, d)
             self.tracks.append(tr)
         return self.confirmed()
+
+    def update_radar(self, t: float, pts, ego_front_m: float, cfg) -> int:
+        """Fuse radar points into the confirmed tracks updated by the camera in this cycle (V3)."""
+        from npu_ad.perception.filters import kalman_measure
+        from npu_ad.perception.radar_fusion import associate
+
+        fx, cx = float(self.ranger.k[0, 0]), float(self.ranger.k[0, 2])
+        n = 0
+        for tr in self.confirmed():
+            cam_rng = tr.rng.range
+            a = associate(tr.box, fx, cx, cam_rng, pts, ego_front_m, cfg)
+            if a is None:
+                continue
+            gap, closing, _ = a
+            if tr.rng.x is None:
+                continue
+            ok_r = kalman_measure(tr.rng, t, gap, 0, cfg.range_std_m)
+            ok_v = kalman_measure(tr.rng, t, -closing, 1, cfg.rate_std_mps)
+            if ok_r or ok_v:
+                tr.radar_hits += 1
+                n += 1
+        return n
 
     def confirmed(self) -> list[Track]:
         return [tr for tr in self.tracks if tr.hits >= self.min_hits]

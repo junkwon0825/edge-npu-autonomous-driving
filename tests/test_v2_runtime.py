@@ -162,3 +162,9 @@ def test_encodings_payload_sizes():
         assert sizes["content_jpeg"] < sizes["content_raw"]
     finally:
         b.close()
+
+
+def test_simulated_pipeline_measured_latency_hil():
+    pipe = SimulatedAsyncPipeline(MockBackend(latency_s=0.07, sleep=False), LatencyModel(use_measured=True))
+    pipe.on_frame(0.0, Frame(1, 0.0, None))
+    assert pipe.poll(0.05) is None and pipe.poll(0.07).frame_id == 1

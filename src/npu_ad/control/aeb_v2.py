@@ -273,8 +273,30 @@ class AebStateMachine:
         )  # fmt: skip
 
 
-def view_of(tr, t: float) -> TrackView:
-    """``Track`` (npu_ad.perception.tracker) -> ``TrackView`` at control time ``t``."""
+def path_relative(tv: TrackView, path_coef: tuple[float, float] | None) -> TrackView:
+    """V3: express a track relative to the predicted ego path y_p(x) = a*x^2 + b*x (ego frame).
+
+    With a curved road, an in-lane object ahead has a large lateral offset in the ego frame; subtracting the
+    predicted path (perceived lane centre line, or yaw-rate / speed) keeps the straight-corridor logic valid.
+    Lateral velocity is left as the yaw-compensated ego-frame value (``view_of``): for an ego following the
+    path, a static object on the path then has ~0 lateral velocity (adding a geometric path term on top
+    double-counts the motion - caught by a unit test).
+    """
+    if path_coef is None or tv.range_m is None or tv.lateral_m is None:
+        return tv
+    a, b = path_coef
+    x = tv.range_m
+    lat = tv.lateral_m - (a * x * x + b * x)
+    return TrackView(tv.track_id, tv.kind, tv.conf, tv.hits, tv.age_s, tv.range_m, tv.rate_mps, tv.rate_valid, lat,
+                     tv.lat_rate_mps, tv.lat_valid)  # fmt: skip
+
+
+def view_of(tr, t: float, ego_yaw_rate: float = 0.0) -> TrackView:
+    """``Track`` (npu_ad.perception.tracker) -> ``TrackView`` at control time ``t``.
+
+    ``ego_yaw_rate`` (rad/s, > 0 turning right; V3 ego-motion compensation): a static object x metres
+    ahead appears to move laterally by -x * yaw_rate in the ego frame; this is added back.
+    """
     r = tr.rng
     rng = None
     if r.x is not None:
@@ -284,5 +306,7 @@ def view_of(tr, t: float) -> TrackView:
         lat, vlat = float(tr.lat.x[0]), 0.0
     else:
         lat, vlat = tr.lat.predict(t), (None if tr.lat.x is None else float(tr.lat.x[1]))
+        if vlat is not None and rng is not None:
+            vlat += rng * ego_yaw_rate
     return TrackView(tr.track_id, tr.kind, tr.conf, tr.hits, tr.age_s, rng, r.rate, r.valid, lat, vlat,
                      tr.lat.n >= 3)  # fmt: skip

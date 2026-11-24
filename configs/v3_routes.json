@@ -1,0 +1,138 @@
+{
+  "classes": {
+    "straight": [
+      0.0,
+      0.002
+    ],
+    "mild": [
+      0.005,
+      0.012
+    ],
+    "strong": [
+      0.015,
+      0.045
+    ]
+  },
+  "routes": [
+    {
+      "map": "Town04",
+      "spawn_index": 298,
+      "class": "straight",
+      "kappa_max": 0.0,
+      "kappa_mean": 0.0,
+      "radius_min_m": null
+    },
+    {
+      "map": "Town04",
+      "spawn_index": 300,
+      "class": "straight",
+      "kappa_max": 0.0,
+      "kappa_mean": 0.0,
+      "radius_min_m": null
+    },
+    {
+      "map": "Town04",
+      "spawn_index": 299,
+      "class": "straight",
+      "kappa_max": 1.331580543606492e-07,
+      "kappa_mean": 3.32895135901623e-09,
+      "radius_min_m": 7509872.420421302
+    },
+    {
+      "map": "Town04",
+      "spawn_index": 208,
+      "class": "mild",
+      "kappa_max": 0.006793108084790056,
+      "kappa_mean": 0.006638655034006879,
+      "radius_min_m": 147.2080213531455
+    },
+    {
+      "map": "Town04",
+      "spawn_index": 210,
+      "class": "mild",
+      "kappa_max": 0.006793108084790056,
+      "kappa_mean": 0.006638655034006879,
+      "radius_min_m": 147.2080213531455
+    },
+    {
+      "map": "Town04",
+      "spawn_index": 209,
+      "class": "mild",
+      "kappa_max": 0.006793091440033261,
+      "kappa_mean": 0.006431005867099879,
+      "radius_min_m": 147.20838204926383
+    },
+    {
+      "map": "Town03",
+      "spawn_index": 58,
+      "class": "straight",
+      "kappa_max": 0.0,
+      "kappa_mean": 0.0,
+      "radius_min_m": null
+    },
+    {
+      "map": "Town03",
+      "spawn_index": 65,
+      "class": "straight",
+      "kappa_max": 0.0,
+      "kappa_mean": 0.0,
+      "radius_min_m": null
+    },
+    {
+      "map": "Town03",
+      "spawn_index": 126,
+      "class": "straight",
+      "kappa_max": 0.0,
+      "kappa_mean": 0.0,
+      "radius_min_m": null
+    },
+    {
+      "map": "Town03",
+      "spawn_index": 263,
+      "class": "strong",
+      "kappa_max": 0.02253606861841395,
+      "kappa_mean": 0.019896190214164805,
+      "radius_min_m": 44.373311819920175
+    },
+    {
+      "map": "Town03",
+      "spawn_index": 128,
+      "class": "strong",
+      "kappa_max": 0.036711276152578964,
+      "kappa_mean": 0.01938009955546971,
+      "radius_min_m": 27.239586982588456
+    },
+    {
+      "map": "Town03",
+      "spawn_index": 130,
+      "class": "strong",
+      "kappa_max": 0.036711276152578964,
+      "kappa_mean": 0.019235576461013832,
+      "radius_min_m": 27.239586982588456
+    },
+    {
+      "map": "Town10HD_Opt",
+      "spawn_index": 154,
+      "class": "strong",
+      "kappa_max": 0.025372801232539155,
+      "kappa_mean": 0.02005978819992837,
+      "radius_min_m": 39.412282106145916
+    },
+    {
+      "map": "Town10HD_Opt",
+      "spawn_index": 131,
+      "class": "strong",
+      "kappa_max": 0.025372734653511975,
+      "kappa_mean": 0.020051978480031724,
+      "radius_min_m": 39.412385525483145
+    },
+    {
+      "map": "Town10HD_Opt",
+      "spawn_index": 65,
+      "class": "strong",
+      "kappa_max": 0.025372734653511975,
+      "kappa_mean": 0.019918038121957544,
+      "radius_min_m": 39.412385525483145
+    }
+  ]
+}

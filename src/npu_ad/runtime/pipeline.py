@@ -186,6 +186,7 @@ class LatencyModel:
     stale_p: float = 0.0
     stale_extra_s: float = 0.0
     seed: int = 0
+    use_measured: bool = False  # V3 hardware-in-the-loop: use the real call's measured latency
     _rng: random.Random = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -228,6 +229,8 @@ class SimulatedAsyncPipeline:
     def _start(self, t: float, fr: Frame) -> None:
         res = self.backend.infer(fr.frame_id, fr.capture_t, fr.bgr)
         lat, tag = self.model.draw(t)
+        if self.model.use_measured and lat is not None:
+            lat, tag = res.latency_s, "measured"  # simulation time paused during the real call
         res.t_start = t
         compute = max(lat if lat is not None else self.model.base_s, self.min_latency_s)
         self._busy_until = t + compute
