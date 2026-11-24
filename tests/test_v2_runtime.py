@@ -115,6 +115,20 @@ def test_failover_switches_logs_and_recovers():
     assert any(e["to"] == PRIMARY for e in fb.events)
 
 
+def test_failover_latency_includes_failed_primary_attempt():
+    clock = [0.0]
+
+    class Slow(MockBackend):
+        def infer(self, fid, cap, bgr):
+            clock[0] += 1.0  # e.g. a 1 s remote timeout
+            return super().infer(fid, cap, bgr)
+
+    fb = FailoverBackend(Slow(name="rngd", fail_ids={1}, sleep=False), MockBackend(name="gpu", sleep=False),
+                         clock=lambda: clock[0])  # fmt: skip
+    r = fb.infer(1, 0.0, None)
+    assert r.backend == "gpu" and r.latency_s >= 1.0  # time-dilated HIL must see the timeout
+
+
 def test_failover_degraded_when_both_fail():
     fb = FailoverBackend(MockBackend(fail_ids={1}, sleep=False), MockBackend(fail_ids={1}, sleep=False))
     r = fb.infer(1, 0.0, None)

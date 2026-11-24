@@ -70,7 +70,10 @@ class FailoverBackend:
                 return res  # below threshold: report the failure, do not switch yet
             self._transition(FALLBACK, f"primary failed: {res.error}", frame_id)
         res2 = self.secondary.infer(frame_id, capture_t, bgr)
-        res2.stages = dict(res2.stages) | {"failover_total_s": self.clock() - t0}
+        total = self.clock() - t0
+        res2.stages = dict(res2.stages) | {"failover_total_s": total, "secondary_latency_s": res2.latency_s}
+        if use_primary:  # the result is available only after the failed primary attempt (e.g. its timeout)
+            res2.latency_s = max(res2.latency_s, total)
         if not res2.ok:
             self._transition(DEGRADED, f"secondary failed: {res2.error}", frame_id)
         elif self.state == DEGRADED:

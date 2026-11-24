@@ -235,7 +235,7 @@ class SimulatedAsyncPipeline:
         compute = max(lat if lat is not None else self.model.base_s, self.min_latency_s)
         self._busy_until = t + compute
         rec = {"frame_id": fr.frame_id, "capture_t": fr.capture_t, "t_start": t, "queue_delay_s": t - fr.enqueue_t}
-        rec |= {"latency_s": lat, "tag": tag, "ok": res.ok}
+        rec |= {"latency_s": lat, "tag": tag, "ok": res.ok, "backend": getattr(res, "backend", None)}
         self.records.append(rec)
         if lat is not None:
             res.t_end = t + max(lat, self.min_latency_s)

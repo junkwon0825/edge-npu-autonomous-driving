@@ -329,6 +329,9 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
     with (out_logs / f"{stem}.jsonl").open("w", encoding="utf-8") as fh:
         for r in rows:
             fh.write(json.dumps(r, default=lambda o: o.item() if hasattr(o, "item") else str(o)) + "\n")
+    pipes = {"both": both} if mode == "D" else {"det": det_pipe, "lane": lane_pipe}
+    recs = {k: pp.records for k, pp in pipes.items()} | {"failover_events": events}
+    (out_logs / f"{stem}.records.json").write_text(json.dumps(recs, default=str), encoding="utf-8")
     meta = {"scenario": name, "kind": sc["kind"], "route": sc["route"], "map": town, "mode": mode, "ego_kmh": kmh,
             "radar": radar_on, "scheduler": sched_mode, "fault": fault or (sc.get("fault") or [None])[0],
             "weather": sc["weather"], "sched_counts": sched.counts, "failover_events": [
