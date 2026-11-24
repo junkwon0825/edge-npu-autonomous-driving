@@ -164,7 +164,10 @@ def run(
     ego_kmh: float = DEFAULT_EGO_KMH,
     tag: str = "",
     dump_every: int = 0,
+    on_tick=None,
 ) -> dict:
+    """Run one scenario. ``on_tick(info)`` is an optional read-only observer (demo overlay); it
+    receives the per-tick perception/decision state and must not influence the control loop."""
     import carla
 
     groups = {"vehicle": set(cfg["classes"]["vehicle"]), "pedestrian": set(cfg["classes"]["pedestrian"])}
@@ -284,6 +287,23 @@ def run(
             if brake > 0:
                 throttle = 0.0
             ego.apply_control(carla.VehicleControl(throttle=throttle, steer=steer, brake=brake))
+            if on_tick is not None:
+                on_tick(
+                    {
+                        "step": step,
+                        "t_sim": t_sim,
+                        "bgr": bgr,
+                        "dets": dets,
+                        "times": times,
+                        "cipo": cipo,
+                        "range": rng,
+                        "decision": decision,
+                        "applied_brake": brake,
+                        "ego_mps": v,
+                        "gt": ts,
+                        "collisions": len(collisions),
+                    }
+                )
             # mono range error is evaluated only when the CIPO box is the GT target (GT centre inside it)
             mono_matches_gt = bool(
                 rng is not None

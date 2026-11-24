@@ -11,3 +11,20 @@ data/
 outputs/
 # Raw per-run logs can be large; summaries live in reports/
 reports/agent_runs/raw/
+# V1 hardening: weights, compiler caches, logs, replay data, credentials, temp files
+*.onnx
+*.engine
+*.npz
+*.npy
+*.safetensors
+.cache/
+**/furiosa_cache/
+*.log
+*.jsonl.tmp
+*.tmp
+.env
+.env.*
+*.pem
+*.key
+id_rsa*
+*.ppk
