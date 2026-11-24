@@ -1,5 +1,7 @@
 # 포트폴리오 요약 (한국어)
 
+> **V1 snapshot (2026-11-23).** Numbers here describe V1 only. Current summary: `resume_project_summary_ko.md`.
+
 **CARLA → YOLO26n → RTX 3060 / Furiosa RNGD NPU → 인지 기반 AEB** — 개인 프로젝트, 시뮬레이션 한정.
 모든 수치의 근거: `reports/evidence/`.
 

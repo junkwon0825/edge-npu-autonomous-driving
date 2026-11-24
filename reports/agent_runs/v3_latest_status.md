@@ -38,11 +38,16 @@
 4. Radar fusion makes closing speed worse for a pedestrian and on a curve.
 5. RNGD lane modes have no default lane fallback.
 
+## Public-release preparation (2026-11-25)
+- **History rewrite (option B):** done in a separate clone; the sanitization log is
+  `reports/github_sanitization_report.md`.
+- **Commits and tags:** 59 commits rewritten; the author e-mail is now the GitHub no-reply address; V1/V2
+  tags were rewritten in place.
+- **Docs:** README restructured as the portfolio landing page; resume summaries (EN/KO) and the
+  interview Q&A expanded; BF16 vs preprocessing wording made consistent.
+- **Checks:** tests, lint, imports, links, the manifest verifier and a full-history privacy scan.
+
 ## Awaiting user approval
-- History sanitization: option A, B (recommended) or C. Also whether to map the commit e-mail to the
-  GitHub no-reply address.
-- Installing `git-filter-repo` in the project venv (if B).
-- Push to GitHub (after sanitization).
+- Push to GitHub: remote, main branch, tags.
 - Publishing the KB handoff to `jun-ai-knowledge`.
-- Deleting the ~3 GB of replay files on the shared RNGD host. V3 no longer needs them: the V3
-  correctness test uses local frames.
+- Deleting the ~3 GB of replay files on the shared RNGD host.

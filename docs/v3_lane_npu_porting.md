@@ -50,8 +50,10 @@ correctness vs CPU → task accuracy.
 
 - **Weather.** The Town03 test set contains no night frames, so night generalisation is not measured.
   Held-out IoU per weather ranges from 0.69 (ClearNoon) to 0.76 (WetCloudySunset).
-- **BF16 cost.** BF16 lowers lane IoU by about 0.025 against GT. The NPU and GPU masks differ mostly
-  at marking edges.
+- **RNGD cost.** The deployed RNGD path lowers lane IoU by about 0.025 against GT. The NPU and GPU
+  masks differ mostly at marking edges.
+  - *Correction:* the same-frame test below shows that this gap comes from the NPU client's double
+    resize, not from BF16.
 
 ## Deployment on RNGD (`remote/npu_server_v3.py`)
 | Request (remote, V2 lossless transport, n = 144) | e2e mean / p95 | NPU exec p50 |

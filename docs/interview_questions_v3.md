@@ -14,7 +14,15 @@ behind transport, because it sits on a remote host.
 - It was the fastest variant (1.85–2.0 ms).
 - It keeps detection agreement high (recall 0.972–0.974).
 - The SDK path offered no usable INT8 compute.
-- BF16 cost about 0.025 IoU on the lane model.
+- BF16 itself barely changes the lane masks: on the same input, BF16 masks agree with FP32 at IoU
+  0.991–0.998. The first held-out measurement (GT IoU 0.688 GPU FP32 vs 0.664 RNGD) also included a
+  preprocessing difference (double resize), so that 0.025 gap should not be read as the cost of BF16.
+
+**What does CUDA Graph change, and why use it as the baseline?**
+Eager PyTorch at batch 1 is dominated by kernel-launch overhead: 13.54 ms mean for YOLO26n on the RTX
+3060. Capturing the forward pass once as a CUDA Graph and replaying it removes most of that overhead:
+2.60 ms mean, with outputs bit-identical to eager. Comparing the NPU against eager would have claimed a
+6× advantage. Against the optimised GPU path the honest figure is 1.2–1.4×.
 
 **Why did W8 not improve latency?**
 W8 stores int8 weights and casts them to BF16 inside the graph, so the compute stays BF16 and the cast
@@ -125,6 +133,77 @@ Without hardware counters these statements are qualitative.
 
 Most have exact rewrites. Pooling needed an architecture change (3×3 stride-2 conv), and ResNet18
 still needs an input-channel split.
+
+**What graph rewrites did you use, and how did you know they were safe?**
+Six exact rewrites, each compared against the original op on CPU before compiling:
+- BatchNorm folding into the preceding convolution
+- bilinear ×2 upsampling → nearest + a fixed [1, 2, 1] filter
+- ConvTranspose → 1×1 conv + PixelShuffle
+- dilated conv → a dense kernel with inserted zeros
+- SplitConv: a large conv split by output channels and concatenated (this made YOLO26s compile)
+- contiguous q/k/v before attention
+
+For YOLO26n the deployment boundary also moved: the fused model is cut at the raw head, and decode/NMS
+run on the host. The split model matched the unfused original on 72/72 frames.
+
+**How did you port the lane-segmentation model?**
+The compiler constraints were measured first, then the network was designed around them:
+- **Probing:** small probe models showed that ConvTranspose, bilinear and dilated conv were
+  unsupported, and that pooling compiled at small sizes but failed at 256×512.
+- **Design and training:** a 2.12 M-parameter U-Net was built from supported pieces only (3×3 stride-2
+  downsampling, exact upsampling rewrites) and trained on CARLA data.
+- **Result on RNGD:** 2.8 ms in BF16, and the same output as GPU BF16 on the same input.
+
+The lesson: "supported" is not the same as "supported at your shape".
+
+**What is the difference between model latency, end-to-end latency and data age?**
+- **Model latency:** accelerator execution. 2.0 ms for YOLO26n BF16 on RNGD.
+- **End-to-end request latency:** the client round trip, including transport. 63–65 ms (mean) for the
+  remote RNGD in the loop.
+- **Data age:** how old the result is when control uses it. 121–126 ms (p95) for remote detection,
+  vs 30 ms on the local GPU.
+
+Control quality depends on data age, so a 2 ms model can still give a 2.1 m braking margin.
+
+**What happens when perception results are stale?**
+Every result carries its capture time. Two gates use it:
+- **Result gate:** rejects anything older than 0.3 s.
+- **LKA:** becomes unavailable if no lane result arrives for 0.5 s, so it never steers on stale geometry.
+
+Stale results that pass the gate are still dangerous. With 20 % stale detections and RNGD latency, the
+car stopped 0.33 m from a pedestrian. The first version of that test was ineffective: the
+measured-latency simulation silently replaced the injected delay. It was found because the result looked
+too good, then fixed and unit-tested.
+
+**How does runtime failover work?**
+`FailoverBackend` has three states: PRIMARY (RNGD), FALLBACK (GPU) and DEGRADED.
+- **Switching:** a timeout or an error moves it to FALLBACK, and every switch is logged.
+- **Offline:** stall → GPU in 0.54 s, crash → GPU in 0.11 s, 0 frames lost.
+- **In CARLA:** after a stall it returned to RNGD. After a server crash it did not return within the
+  12 s run.
+- **Latency:** the fallback result carries the time spent waiting for the failed NPU request. An earlier
+  version hid that wait, which made failover look free.
+
+**How are AEB and LKA arbitrated?**
+A fixed precedence in `Arbiter`:
+1. **AEB braking:** throttle 0, AEB brake, and steering = LKA clamped to ±0.1. There is no evasive
+   steering.
+2. **LKA unavailable:** steering decays to 0 and the car coasts.
+3. **Normal:** LKA steering plus the speed controller.
+
+In 29,618 logged braking ticks the arbiter was always in an AEB mode with |steer| ≤ 0.10. Lateral
+error while braking stayed ≤ 12 cm on curves.
+
+**What safety limitations remain?**
+- **Margin:** remote NPU data age cuts the 50 km/h curve braking margin from 13.7 m to 2.1 m.
+- **Stale detections** can bring the car within 0.33 m of a pedestrian.
+- **Unneeded braking:** on a 39 m-radius curve in 4 of 10 runs, and early braking for a kerbside
+  pedestrian. The root cause is open because the target state was not logged.
+- **Radar fusion** worsens closing speed for a pedestrian and on a curve.
+- **No lane fallback:** RNGD lane modes have none by default.
+- **Evaluation:** one run per cell; developed and evaluated on the same scenario family; simulation only.
+
+Zero collisions in 36 hazard runs does not show general safety.
 
 **What would you change for production?**
 - co-locate the NPU with the camera; drop SSH and use zero-copy capture into device memory

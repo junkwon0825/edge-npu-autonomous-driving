@@ -1,5 +1,7 @@
 # Portfolio summary (English)
 
+> **V1 snapshot (2026-11-23).** Numbers here describe V1 only. Current summary: `resume_project_summary_en.md`.
+
 **CARLA → YOLO26n → RTX 3060 / Furiosa RNGD NPU → perception-driven AEB** — personal project,
 simulation only. Evidence for every number: `reports/evidence/`.
 

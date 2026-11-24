@@ -36,7 +36,7 @@ from the knowledge base were re-checked, not copied.
 
 ### Changes made to the environment
 - Installed `pytest` into `carla_project\.venv` (test runner). No other package, driver or system change.
-- Ruff is used from the existing lab venv (`<AGENT_LAB_ROOT>\.venv`), not installed here.
+- Ruff is used from an existing separate venv, not installed here.
 - Copied `yolo26n.pt` (5.5 MB) from the user's own NPU host home directory to `models/`
   (SHA-256 `9b09cc8b…a8ad4fef`, identical on both machines). No internet download.
 

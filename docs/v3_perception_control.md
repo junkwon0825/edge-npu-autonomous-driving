@@ -64,7 +64,7 @@ from camera lane perception.**
     speed (radial velocity / cos azimuth).
 - **Fusion.** Scalar Kalman updates of the same track filter: range σ 0.25 m, rate σ 0.3 m/s, NIS-gated
   (`kalman_measure`). Radar refines tracks the camera created; it does not create tracks.
-- **Camera-only vs camera + radar** in closed loop: § Results (pending).
+- **Camera-only vs camera + radar** in closed loop: see § Results below (mixed).
 
 ## Scene state
 `SceneState`: the control layer reads only this:
