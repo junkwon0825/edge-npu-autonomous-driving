@@ -1,0 +1,137 @@
+{
+  "clips": [
+    {
+      "clip": "ped_cornering",
+      "wall_s": 34.380196100100875,
+      "scenario": "ped_cornering",
+      "mode": "D",
+      "ego_kmh": 30.0,
+      "collision": false,
+      "min_gap_m": 15.30095129875294,
+      "first_brake_t": 1.19,
+      "lat_rmse_m": 0.10267180994718361,
+      "lat_max_m": 0.15215362050594194,
+      "lane_departures": 0,
+      "lka_unavailable_frac": 0.014,
+      "det_age_ms": {
+        "n": 172,
+        "mean": 78.8953488372093,
+        "p50": 80.00000000000007,
+        "p95": 90.00000000000074,
+        "p99": 100.00000000000054,
+        "max": 110.00000000000031
+      },
+      "lane_age_ms": {
+        "n": 163,
+        "mean": 78.95705521472392,
+        "p50": 80.00000000000007,
+        "p95": 90.00000000000074,
+        "p99": 100.00000000000054,
+        "max": 110.00000000000031
+      },
+      "failover_events": []
+    },
+    {
+      "clip": "curve_lead_brake",
+      "wall_s": 35.43845849996433,
+      "scenario": "curve_lead_brake",
+      "mode": "D",
+      "ego_kmh": 30.0,
+      "collision": false,
+      "min_gap_m": 6.973425818966868,
+      "first_brake_t": 3.69,
+      "lat_rmse_m": 0.015986001599347613,
+      "lat_max_m": 0.031730521378221965,
+      "lane_departures": 0,
+      "lka_unavailable_frac": 0.01,
+      "det_age_ms": {
+        "n": 223,
+        "mean": 74.48430493273545,
+        "p50": 79.99999999999918,
+        "p95": 90.0,
+        "p99": 99.99999999999964,
+        "max": 100.00000000000142
+      },
+      "lane_age_ms": {
+        "n": 198,
+        "mean": 74.74747474747478,
+        "p50": 79.99999999999918,
+        "p95": 90.00000000000001,
+        "p99": 99.99999999999964,
+        "max": 100.00000000000142
+      },
+      "failover_events": []
+    },
+    {
+      "clip": "npu_failover",
+      "wall_s": 51.62959129991941,
+      "scenario": "lead_vehicle_braking",
+      "mode": "B+C failover",
+      "ego_kmh": 30.0,
+      "collision": false,
+      "min_gap_m": 9.692642598850759,
+      "first_brake_t": 3.9,
+      "lat_rmse_m": 0.011850095812767985,
+      "lat_max_m": 0.03796973449502694,
+      "lane_departures": 0,
+      "lka_unavailable_frac": 0.07166666666666667,
+      "det_age_ms": {
+        "n": 318,
+        "mean": 31.666666666666654,
+        "p50": 29.99999999999936,
+        "p95": 70.00000000000001,
+        "p99": 90.00000000000007,
+        "max": 130.0
+      },
+      "lane_age_ms": {
+        "n": 181,
+        "mean": 27.8453038674033,
+        "p50": 20.000000000000018,
+        "p95": 79.99999999999996,
+        "p99": 90.00000000000009,
+        "max": 100.00000000000009
+      },
+      "failover_events": [
+        {
+          "t": 1107947.8330818,
+          "frame_id": 142643,
+          "from": "PRIMARY",
+          "to": "FALLBACK",
+          "reason": "primary failed: RuntimeError('NPU server connection closed')"
+        },
+        {
+          "t": 1107949.4483936,
+          "frame_id": 142643,
+          "from": "PRIMARY",
+          "to": "FALLBACK",
+          "reason": "primary failed: RemoteTimeout('no response for frame 142643 within 0.999 s')"
+        }
+      ]
+    }
+  ],
+  "note": "overlay values are the controller's inputs; ground truth only in the summary",
+  "screenshots": [
+    "curve_lead_brake_brake",
+    "curve_lead_brake_lane",
+    "curve_lead_brake_warning",
+    "npu_failover_brake",
+    "npu_failover_fallback",
+    "npu_failover_lane",
+    "npu_failover_warning",
+    "ped_cornering_brake",
+    "ped_cornering_lane",
+    "ped_cornering_warning"
+  ],
+  "video": {
+    "repository": "assets/demo/v3/demo_v3.mp4",
+    "full_size_local": "outputs/v3/demo_v3_full.mp4",
+    "frames_in": 1134,
+    "frames_out": 567,
+    "size": [
+      640,
+      360
+    ],
+    "fps": 16.65,
+    "note": "compressed with run_v3_demo.py --compress-only after recording"
+  }
+}

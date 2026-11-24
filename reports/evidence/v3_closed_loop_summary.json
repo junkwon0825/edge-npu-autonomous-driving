@@ -1,0 +1,297 @@
+{
+  "runs": 74,
+  "collisions": 2,
+  "hazard_runs": 36,
+  "hazard_collisions": [],
+  "lane_departures_total": 13,
+  "transport_degraded_runs": [
+    [
+      "lk_night",
+      "C"
+    ],
+    [
+      "lk_night",
+      "D"
+    ],
+    [
+      "lk_rain",
+      "B"
+    ],
+    [
+      "lk_rain",
+      "C"
+    ],
+    [
+      "lk_rain",
+      "D"
+    ]
+  ],
+  "rerun_nightrain": {
+    "lk_night C": {
+      "lat_rmse_m": 0.026233869961590675,
+      "lane_departures": 0,
+      "collision": false
+    },
+    "lk_night D": {
+      "lat_rmse_m": 0.025489352261972627,
+      "lane_departures": 0,
+      "collision": false
+    },
+    "lk_rain C": {
+      "lat_rmse_m": 0.020272766162596594,
+      "lane_departures": 0,
+      "collision": false
+    },
+    "lk_rain D": {
+      "lat_rmse_m": 0.023029991477106385,
+      "lane_departures": 0,
+      "collision": false
+    }
+  },
+  "runs_with_departure": [
+    [
+      "lk_night",
+      "C",
+      30.0,
+      ""
+    ],
+    [
+      "lk_night",
+      "D",
+      30.0,
+      ""
+    ],
+    [
+      "lk_rain",
+      "C",
+      30.0,
+      ""
+    ],
+    [
+      "lk_rain",
+      "D",
+      30.0,
+      ""
+    ]
+  ],
+  "unneeded_brakes": [
+    [
+      "lk_strong",
+      "C",
+      30.0,
+      false
+    ],
+    [
+      "lk_strong",
+      "A",
+      30.0,
+      false
+    ],
+    [
+      "lk_strong",
+      "A",
+      30.0,
+      false
+    ],
+    [
+      "lk_strong",
+      "A",
+      30.0,
+      false
+    ]
+  ],
+  "by_mode": {
+    "A": {
+      "runs": 16,
+      "det_lat_mean": 20.05398895338653,
+      "det_lat_p95": 24.587235950457394,
+      "lane_lat_mean": 11.295262761041489,
+      "lane_lat_p95": 12.274178472580388,
+      "det_queue_mean": 0.030277667575592186,
+      "det_age_p95": 30.00000000000044,
+      "det_age_p99": 31.743750000001,
+      "det_age_max": 280.0,
+      "lane_age_p95": 20.000000000001187,
+      "lane_age_p99": 21.30000000000122,
+      "lane_age_max": 120.0,
+      "ctrl_p95": 3.284180311311502,
+      "collisions": 0,
+      "hazard_runs": 9,
+      "departures": 0
+    },
+    "B": {
+      "runs": 9,
+      "det_lat_mean": 65.35764476923173,
+      "det_lat_p95": 102.77793831450657,
+      "lane_lat_mean": 15.543528752960501,
+      "lane_lat_p95": 18.507442227564752,
+      "det_queue_mean": 14.669682924841766,
+      "det_age_p95": 125.5555555555555,
+      "det_age_p99": 143.60000000000002,
+      "det_age_max": 190.00000000000003,
+      "lane_age_p95": 23.333333333334416,
+      "lane_age_p99": 23.333333333334515,
+      "lane_age_max": 30.000000000001137,
+      "ctrl_p95": 2.5991938141588538,
+      "collisions": 0,
+      "hazard_runs": 3,
+      "departures": 0
+    },
+    "C": {
+      "runs": 8,
+      "det_lat_mean": 19.60464739454507,
+      "det_lat_p95": 24.16205938206985,
+      "lane_lat_mean": 62.76077469634302,
+      "lane_lat_p95": 96.52536121866433,
+      "det_queue_mean": 0.011296815799347618,
+      "det_age_p95": 30.00000000000047,
+      "det_age_p99": 30.000000000001137,
+      "det_age_max": 280.0,
+      "lane_age_p95": 110.5000000000002,
+      "lane_age_p99": 127.36250000000017,
+      "lane_age_max": 220.00000000000063,
+      "ctrl_p95": 2.5014462327817455,
+      "collisions": 0,
+      "hazard_runs": 3,
+      "departures": 0
+    },
+    "D": {
+      "runs": 11,
+      "det_lat_mean": 63.004559943182315,
+      "det_lat_p95": 92.41219455566765,
+      "lane_lat_mean": 63.62198169660305,
+      "lane_lat_p95": 92.73024862102994,
+      "det_queue_mean": 15.135966216533866,
+      "det_age_p95": 120.90909090909076,
+      "det_age_p99": 127.84545454545493,
+      "det_age_max": 250.0,
+      "lane_age_p95": 120.90909090909076,
+      "lane_age_p99": 128.07272727272763,
+      "lane_age_max": 250.0,
+      "ctrl_p95": 1.9768391037359834,
+      "collisions": 0,
+      "hazard_runs": 6,
+      "departures": 0
+    }
+  },
+  "collisions_any": [
+    [
+      "lk_night",
+      "D",
+      "static.guardrail"
+    ],
+    [
+      "lk_rain",
+      "C",
+      "static.guardrail"
+    ]
+  ],
+  "by_category": {
+    "none": 28,
+    "lane_age": 9,
+    "static_vehicle": 6,
+    "lead_brake": 8,
+    "ped_cross": 7,
+    "radar": 5,
+    "sched": 6,
+    "fault": 5
+  },
+  "lane_age": [
+    {
+      "scenario": "lk_strong",
+      "extra_ms": 0,
+      "lane_age_p95": 20.00000000000135,
+      "rmse": 0.09712124651074508,
+      "lka_unavailable": 0.006666666666666667,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_strong",
+      "extra_ms": 20,
+      "lane_age_p95": 40.000000000000924,
+      "rmse": 0.10090774164589976,
+      "lka_unavailable": 0.008333333333333333,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_strong",
+      "extra_ms": 50,
+      "lane_age_p95": 129.9999999999999,
+      "rmse": 0.09739405040985064,
+      "lka_unavailable": 0.008333333333333333,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_strong",
+      "extra_ms": 100,
+      "lane_age_p95": 179.99999999999972,
+      "rmse": 0.08293763058600064,
+      "lka_unavailable": 0.0125,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_strong",
+      "extra_ms": 150,
+      "lane_age_p95": 225.50000000000023,
+      "rmse": 0.10085406777769408,
+      "lka_unavailable": 0.016666666666666666,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_strong",
+      "extra_ms": 250,
+      "lane_age_p95": 290.0000000000009,
+      "rmse": 0.1652727234451511,
+      "lka_unavailable": 0.6058333333333333,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_mild",
+      "extra_ms": 0,
+      "lane_age_p95": 20.00000000000135,
+      "rmse": 0.014253704813038056,
+      "lka_unavailable": 0.004166666666666667,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_mild",
+      "extra_ms": 150,
+      "lane_age_p95": 220.00000000000063,
+      "rmse": 0.03975280113894557,
+      "lka_unavailable": 0.0225,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_mild",
+      "extra_ms": 250,
+      "lane_age_p95": 298.9999999999991,
+      "rmse": 0.10050950905125285,
+      "lka_unavailable": 0.5658333333333333,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_night",
+      "extra_ms": 0,
+      "lane_age_p95": 20.00000000000135,
+      "rmse": 0.016087727431817984,
+      "lka_unavailable": 0.004166666666666667,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_night",
+      "extra_ms": 150,
+      "lane_age_p95": 225.5,
+      "rmse": 0.040965312928812746,
+      "lka_unavailable": 0.016666666666666666,
+      "departures": 0
+    },
+    {
+      "scenario": "lk_night",
+      "extra_ms": 250,
+      "lane_age_p95": 299.99999999999983,
+      "rmse": 0.142498932006754,
+      "lka_unavailable": 0.645,
+      "departures": 0
+    }
+  ]
+}
