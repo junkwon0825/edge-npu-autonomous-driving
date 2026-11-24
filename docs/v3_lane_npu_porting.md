@@ -68,3 +68,15 @@ correctness vs CPU → task accuracy.
 3. **Supported is not the same as supported at your shape.** Max-pool compiles small and fails large.
 4. **Change the architecture once you know the constraints, then train.** The model was trained for
    the hardware rather than patched after training.
+
+## Update after the V3 closed loop: where the RNGD vs GPU difference comes from
+`scripts/v3_lane_correctness.py` runs the same frames through six paths (`v3_lane_correctness_*.json`).
+It used 240 lane-set frames and 200 real 800×450 closed-loop frames, covering night, rain, sunset and day.
+
+| Comparison | Mask IoU vs GPU FP32 | What it isolates |
+|---|---|---|
+| RNGD BF16, same preprocessing as the GPU path | 0.991–0.998 | NPU numerics: identical to GPU BF16 |
+| Deployed RNGD path | 0.937–0.980 | preprocessing: a double resize, letterbox content 640×360 → 512×256 |
+
+The mask agreement of 0.906 / 0.932 reported above therefore reflects the preprocessing difference,
+not BF16. Making both paths use the same preprocessing is the fix (roadmap).

@@ -92,6 +92,19 @@ Raw boxes and masks never reach the controllers.
 On the strong curve the geometry often sees only one boundary (65 of 200 frames), and the offset
 estimate error grows to 0.30 m.
 
-**The full V3 matrix is pending.** It covers modes A–D, AEB, combined, fault and scheduler scenarios,
-and camera-only vs camera + radar. The CARLA server was stopped by the system because memory was low,
-and it is restarted only on request.
+**Closed-loop results** (V3 matrix, all tables in `reports/v3_closed_loop_tables.md`, report §7–§10):
+- **Lane keeping at 30 km/h:**
+  - 0.8–2.6 cm RMSE on straight, mild, night and rain routes
+  - 10–13 cm on the 39 m-radius curve
+  - 0 departures in healthy runs
+- **Lane-age tolerance:** about 0.25 s, set by the 0.3 s stale gate.
+- **AEB + LKA:**
+  - 0 collisions in 36 hazard runs
+  - all 29,618 braking ticks in an AEB arbitration mode, with |steer| ≤ 0.10
+  - lateral error while braking ≤ 0.12 m
+- **Camera-only vs camera + radar:** mixed.
+  - Better for a lead vehicle at 50 km/h.
+  - Worse closing-speed error for a pedestrian at 30 km/h and an obstacle on a curve.
+- **Open issues:**
+  - unneeded braking on the tight curve (4/10 runs) from path-entry prediction
+  - early braking for a kerbside pedestrian while cornering

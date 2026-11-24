@@ -80,9 +80,27 @@ ego_passes. Thresholds: 1.6 s full brake, 2.6 s partial.
 It is a research prototype for studying perception latency.
 
 **How did sensor fusion improve robustness?**
-Radar gives a direct range and radial velocity measurement, fused into the same track filter. The
-closed-loop comparison (camera-only vs camera + radar) is part of the pending V3 matrix. No number is
-claimed until it has run.
+In general it did not, and the measurements say where it helps and where it hurts.
+- **Helps:** a lead vehicle braking at 50 km/h. Closing-speed MAE fell from 0.40 to 0.24 m/s and the
+  minimum gap grew from 5.5 to 10.4 m.
+- **Hurts:** a pedestrian at 30 km/h (0.55 → 1.14 m/s) and a static obstacle on a curve (0.34 → 2.85 m/s).
+- **Likely cause:** association picks returns from other surfaces inside the gate. Not proven yet.
+- **Next step:** log the radar clusters behind each fused update.
+
+**Your NPU lane mode failed at night and in rain. Was it the NPU?**
+No.
+- **Same frames:** RNGD output equals GPU BF16 (IoU 0.991–0.998 against FP32).
+- **Logs:** the failing runs had RNGD requests (detection too) timing out at 1 s. They were the last
+  runs before the machine ran out of memory.
+- **Rerun in a healthy session:** the same cases had 0 departures.
+- **Real defects:** a missing lane fallback in those modes, and a double resize in the NPU client's
+  preprocessing (2–6 % IoU).
+
+**How old can perception be before control fails?**
+- **Lane keeping:** about 0.25 s. Up to +150 ms of injected lane latency still kept the lane. At +250 ms
+  the 0.3 s stale gate rejects about half the results and LKA is unavailable 57–65 % of the time.
+- **Braking:** the remote NPU's extra ~90 ms of detection age cut the margin at 50 km/h on a curve from
+  13.7 m to 2.1 m.
 
 **How are multiple models scheduled on the NPU?**
 One model per PE (`furiosa:0` detection, `furiosa:1` lane), each with its own worker, fed by one upload

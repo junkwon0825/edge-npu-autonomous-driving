@@ -45,18 +45,35 @@ paths; the scan was repeated with `MSYS_NO_PATHCONV=1`.
 
 Since V2, new evidence records `"host": "<redacted>"` (`scripts/v2_fetch_npu_status.py`).
 
+## Re-scan after V3 (2026-11-25, HEAD after the V3 evidence commits, 56 commits)
+- **Unchanged:**
+  - `<REMOTE_HOSTNAME>` in the same 15 files
+  - `<REMOTE_HOME>/` in `reports/evidence/npu_int8_probe2.json`
+- **Intended occurrences:** `<REMOTE_HOME>/` also appears in this report and in the redaction pattern of
+  `scripts/v2_fetch_npu_status.py`.
+- **New V3 evidence** (`v3_*.json`, closed-loop logs, memory trace): no hostname, no remote path, no
+  personal data.
+- **Key / token / password patterns:** none found. The only matches are this report's own list of
+  search patterns.
+
 ## Options
-**A. Fix only the current files (new commit, no rewrite).**
-- Simple and safe.
-- The values stay readable in history, so it is not sufficient for a public repository.
+| | A: minimal (current files only) | B: rewrite history | C: clean portfolio repository |
+|---|---|---|---|
+| What | one new commit replacing the two strings in the 16 current files | `git filter-repo --replace-text` over all commits (+ optional mailmap) | new repository from the validated final tree, with a few curated milestone commits/tags (V1, V2, V3) |
+| Hostname / path still public? | **yes, in history** | no | no |
+| Personal e-mail in metadata | stays (fixable only with a rewrite) | can be mapped to the GitHub no-reply address | new commits made with the no-reply address |
+| Development history | kept | kept (new hashes) | lost; only milestones |
+| `code_commit` hashes inside evidence | still resolve | **no longer resolve**: needs the published old → new commit map | do not resolve; needs a note that evidence was produced in a private repository |
+| Risk | low; insufficient for a public repo | medium: irreversible without the backup bundle; tags move | low; credibility depends on the reports instead of the commit trail |
+| Suitable for | a private repository only | **a public portfolio** | a public portfolio when history is not needed |
 
-**B. Rewrite history (recommended before a public push).**
-- Replace the two strings in every commit.
-- Optionally map the commit e-mail to the GitHub no-reply address.
-
-**C. Publish a fresh repository.**
-- One squashed commit of a sanitized tree.
-- Loses the development history, which is part of the portfolio evidence.
+**Recommendation: B.**
+- The commit trail is part of the engineering evidence: quarantined runs, fixes driven by failed tests,
+  evidence committed separately from code. B keeps that trail and removes the two strings.
+- Publish the `filter-repo` commit map next to the sanitization log, so `code_commit` fields in the
+  evidence can be translated.
+- Choose **C** if a smaller, curated history is preferred over the full trail.
+- **A** is not enough for a public push.
 
 ## Recommended procedure for B (after approval only)
 1. Back up: `git bundle create ../carla_project_backup.bundle --all`, then verify it with
