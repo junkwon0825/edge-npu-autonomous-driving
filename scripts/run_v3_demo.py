@@ -39,18 +39,44 @@ CLIPS = {  # name -> (scenario, mode, km/h, radar, scheduler, fault)
 }
 
 
+def compress(src: Path, dst: Path, scale: float = 0.8, keep_every: int = 2) -> dict:
+    """Smaller copy for the repository: 640x360, every 2nd frame at half the frame rate (real-time playback)."""
+    import cv2
+
+    cap = cv2.VideoCapture(str(src))
+    fps, w, h = cap.get(cv2.CAP_PROP_FPS), int(cap.get(3) * scale), int(cap.get(4) * scale)
+    out = cv2.VideoWriter(str(dst), cv2.VideoWriter_fourcc(*"mp4v"), fps / keep_every, (w, h))
+    i = n = 0
+    while True:
+        ok, fr = cap.read()
+        if not ok:
+            break
+        if i % keep_every == 0:
+            out.write(cv2.resize(fr, (w, h), interpolation=cv2.INTER_AREA))
+            n += 1
+        i += 1
+    cap.release()
+    out.release()
+    return {"frames_in": i, "frames_out": n, "size": [w, h], "fps": fps / keep_every}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="assets/demo/v3")
     ap.add_argument("--clips", nargs="*", default=list(CLIPS), choices=list(CLIPS))
+    ap.add_argument("--compress-only", action="store_true", help="only re-encode an existing full-size video")
     a = ap.parse_args()
+    out = resolve(a.out)
+    full = resolve("outputs/v3/demo_v3_full.mp4")  # full-size original stays out of the repository
+    if a.compress_only:
+        print(compress(full, out / "demo_v3.mp4"))
+        return 0
     setup_logging("run_v3_demo")
     cfg = load_config()
     m = cfg["model"]
     det = GpuDetector(str(resolve(m["weights"])), m["imgsz"], m["conf"], m["iou"], m["max_det"])
     lane_model = load_lane_model(str(resolve("models/lane_unet_s3c32.pt")), "cuda:0")
-    out = resolve(a.out)
-    ov = OverlayV3(out, fps=33.3, name="demo_v3.mp4")
+    ov = OverlayV3(out, fps=33.3, name="demo_v3_full.mp4")
     summary = {"clips": [], "note": "overlay values are the controller's inputs; ground truth only in the summary"}
     for clip in a.clips:
         sc, mode, kmh, radar, sched, fault = CLIPS[clip]
@@ -66,6 +92,9 @@ def main() -> int:
         summary["clips"].append({"clip": clip, "wall_s": time.perf_counter() - t0} | {k: r.get(k) for k in keys})
         print(clip, {k: r.get(k) for k in ("collision", "min_gap_m", "lat_rmse_m", "lane_departures")}, flush=True)
     shots = ov.close()
+    (out / "demo_v3_full.mp4").replace(full)
+    summary["video"] = {"repository": "assets/demo/v3/demo_v3.mp4", "full_size_local": "outputs/v3/demo_v3_full.mp4"}
+    summary["video"] |= compress(full, out / "demo_v3.mp4")
     summary["screenshots"] = shots
     (out / "demo_v3_summary.json").write_text(json.dumps(summary, indent=2, default=str), encoding="utf-8")
     print("screenshots:", shots)
