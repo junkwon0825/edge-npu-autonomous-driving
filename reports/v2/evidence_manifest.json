@@ -1,0 +1,250 @@
+{
+  "release": "v2.0.0-rc1",
+  "files": [
+    {
+      "path": "assets/demo/v2_demo_npu_failover.mp4",
+      "bytes": 3434951,
+      "sha256": "94ce3fb54cc61693c8228b9029e905b0d70b96d05892cfc27484372797e7dafc"
+    },
+    {
+      "path": "assets/demo/v2_demo_npu_live.mp4",
+      "bytes": 3373892,
+      "sha256": "9cbb25688d0eee7bd50a6882072eb80fd4e544f2d592616f601c8bff0022e356"
+    },
+    {
+      "path": "assets/demo/v2_failover_brake.jpg",
+      "bytes": 68001,
+      "sha256": "3b088f68b135a8353236a86f44c289df8e28bf83479b0c73fedfbaebffec4bae"
+    },
+    {
+      "path": "assets/demo/v2_failover_fallback.jpg",
+      "bytes": 69774,
+      "sha256": "178b246f01eb44130ca2f337e4602c009fb61ca4e2ac92c34ef35579df0c54da"
+    },
+    {
+      "path": "assets/demo/v2_gpu_warning.jpg",
+      "bytes": 72198,
+      "sha256": "933ff895a29f8e19110afd79d10d0a3410c528ef2faef4aed2d5a7474bedfe47"
+    },
+    {
+      "path": "assets/demo/v2_npu_brake.jpg",
+      "bytes": 66910,
+      "sha256": "b53d232c56922a59c9c5d180d31502a766176f9102f27d779192fa46fd6b0c59"
+    },
+    {
+      "path": "assets/diagrams/v2_architecture.png",
+      "bytes": 132852,
+      "sha256": "961e2fbf07280dd498947a8a23d9fbfa61dde98de1711e4c962452b189b27f92"
+    },
+    {
+      "path": "assets/plots/v2_filter_comparison.png",
+      "bytes": 49055,
+      "sha256": "e9106ba6bee28262ebb84968ad28c057a6023d9494c3f03e01d3e5853c9bf07b"
+    },
+    {
+      "path": "assets/plots/v2_multipe_scaling.png",
+      "bytes": 61757,
+      "sha256": "e755621eb1a03e9ceeddf97ad436f76ad8980770016ef0253aa9f08e939cc95e"
+    },
+    {
+      "path": "assets/plots/v2_resolution.png",
+      "bytes": 47843,
+      "sha256": "a91f1d49d65b87517328215e755a2918385874f39093ec6cd3adb99fe0168f72"
+    },
+    {
+      "path": "assets/plots/v2_stress_lead_vehicle_braking.png",
+      "bytes": 44206,
+      "sha256": "c0ab4d5ba78f8058788ede4548f4fd369b63c634737febb309354586b1d50028"
+    },
+    {
+      "path": "assets/plots/v2_stress_pedestrian_crossing.png",
+      "bytes": 46286,
+      "sha256": "838ac144a738f2ecdf03d21f73ce0bf6e87abfb749d3e261a03a31669fdc07bb"
+    },
+    {
+      "path": "assets/plots/v2_transport_breakdown.png",
+      "bytes": 74459,
+      "sha256": "e9a84b8123b73892e20d49573dc80532a8df213b2d05af0436f7784ce1f1534f"
+    },
+    {
+      "path": "configs/default.json",
+      "bytes": 595,
+      "sha256": "553a4dac1b960a989d1aa801dbcca3566d5dbad636e757125ab6a5db92af4b8e"
+    },
+    {
+      "path": "configs/latency_conditions.json",
+      "bytes": 1082,
+      "sha256": "4f8766b53e0eae889d9ef1c834ab352a3361a44b8047b53e3da6ead13f72db49"
+    },
+    {
+      "path": "docs/npu_operator_compatibility.md",
+      "bytes": 7919,
+      "sha256": "57b1c99a7e10c9e43b37c2844dd6c5c184280f9dfac5beaa7dc9795bad35accd"
+    },
+    {
+      "path": "docs/v2_aeb_controller.md",
+      "bytes": 6282,
+      "sha256": "2e4f322e1bc2479b5d7ff30ac5144f16eb8f37b46d6979988d8c169ac9cd0881"
+    },
+    {
+      "path": "docs/v2_architecture.md",
+      "bytes": 3031,
+      "sha256": "9969e6682f5f4ec8c98847c4ac129cb3aafb36f7db2f8af8a41e253cac0c373d"
+    },
+    {
+      "path": "docs/v2_async_pipeline.md",
+      "bytes": 4030,
+      "sha256": "d4cc31e9ed831b2c9fc612745936d10dee994fef6558aba890815b286bda307b"
+    },
+    {
+      "path": "docs/v2_benchmark.md",
+      "bytes": 9842,
+      "sha256": "338e8f160224e17b4f3e1adc45f3703cdd73f79eaf4457e872523cf410aa46a5"
+    },
+    {
+      "path": "docs/v2_npu_runtime.md",
+      "bytes": 4139,
+      "sha256": "1aff8e5ffcc76a2789a55edc64efd3155f1492af84518bf8c9538b74f9aa1d87"
+    },
+    {
+      "path": "docs/v2_npu_transport.md",
+      "bytes": 8377,
+      "sha256": "686735bc58f02e276af256a27c1ebd20518e8fcb2496773f61472c04c0790c08"
+    },
+    {
+      "path": "docs/v2_operator_compatibility.md",
+      "bytes": 7781,
+      "sha256": "36fdfc49efaadf3d61578f22b10407475b3cd0fec9240bef4853885050fc3ff2"
+    },
+    {
+      "path": "docs/v2_range_rate_filtering.md",
+      "bytes": 4714,
+      "sha256": "1761ccfced855a75d2e094b48c8191e01cad92b60fdb0b0c193aba13fcad69b1"
+    },
+    {
+      "path": "docs/v2_tracking.md",
+      "bytes": 1841,
+      "sha256": "134ac96a4738974c5d6563c13b09390714fb82e3cfbfacc90340b52729e32fb6"
+    },
+    {
+      "path": "reports/evidence/v2_filter_eval.json",
+      "bytes": 22021,
+      "sha256": "4ff7e6eb2eac4f753a8b3fcbeb7cd30553a9f079e860f34836ea54ed97671373"
+    },
+    {
+      "path": "reports/evidence/v2_latency_samples.json",
+      "bytes": 36989,
+      "sha256": "c2e1c085cd43c01d09a11cdc12c8b000516e26f705b63ba12510aa3649f37373"
+    },
+    {
+      "path": "reports/evidence/v2_live_loop.json",
+      "bytes": 22729,
+      "sha256": "36eb6f66d6be7f6969cd068fd856bb10a93af0f7a87b04c52e18f01631b22045"
+    },
+    {
+      "path": "reports/evidence/v2_npu_compile_bf16_320.json",
+      "bytes": 773,
+      "sha256": "e12e8853d0d3ec3cc2da477d32a77ccad4fc49c72aefed74dc13f47b7ac6dfc2"
+    },
+    {
+      "path": "reports/evidence/v2_npu_compile_bf16_480.json",
+      "bytes": 772,
+      "sha256": "c0938a26195028e5a8a0dc71fff56c8f020d23adba46a13d2212ee9b4d0983ff"
+    },
+    {
+      "path": "reports/evidence/v2_npu_multistream.json",
+      "bytes": 2954,
+      "sha256": "51b74fc280d39612c668d8cff7cedd6499221ea99bf4bdd02e2782bb76e1449c"
+    },
+    {
+      "path": "reports/evidence/v2_npu_multistream2.json",
+      "bytes": 4006,
+      "sha256": "ad027349c58c9f23797788394c973c5102270ca0b401713869251a34a875ca64"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_fix.json",
+      "bytes": 5416,
+      "sha256": "c2353f898753b798a90f08bfb5571031e12e107fb46a26554ae1beb744d5726d"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_intro.json",
+      "bytes": 1776,
+      "sha256": "dc17d7378e924c52e5590ac6d9597165eb55d31864181bfcf5c38866ddd96bf9"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_ops.json",
+      "bytes": 13541,
+      "sha256": "6b031252b88e1bd87a60a4dfa72528a6206622aa25676c6d32ee7c09bd234316"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_ops_rerun.json",
+      "bytes": 5008,
+      "sha256": "267475400b77a1e237adfff4e8fb9036f610323d68b70515509b2e755012c36a"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_quant.json",
+      "bytes": 3948,
+      "sha256": "38f4a70e701a1aba9b65916963b2b00afcc18769e0cdaafbfc49012b09213684"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_quant_rerun.json",
+      "bytes": 4543,
+      "sha256": "df0ea02ceb79b8dd5bc1d2536ab226a2b6906e4b52055cf4c459c269a0215037"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_seg.json",
+      "bytes": 4810,
+      "sha256": "22426114fdfdcf50e5f97670f0b74e4d2da5d02ea187a83d67f837656580460a"
+    },
+    {
+      "path": "reports/evidence/v2_npu_port_lab_seg2.json",
+      "bytes": 4287,
+      "sha256": "115105cd6038e3578042e1cb97ccb1ea9ef8402f2c8c4e99bce1cd6685e7e1bd"
+    },
+    {
+      "path": "reports/evidence/v2_npu_replay.json",
+      "bytes": 6767,
+      "sha256": "95efc48b45d6d6d012b32890e6421427fe361438adb213fd35578941830faf57"
+    },
+    {
+      "path": "reports/evidence/v2_resolution_gpu.json",
+      "bytes": 3734,
+      "sha256": "c1f87574cdcc3c720e4217e4a5537a4679c06aca214eed23c146907735cf841b"
+    },
+    {
+      "path": "reports/evidence/v2_resolution_npu.json",
+      "bytes": 8984,
+      "sha256": "78edf4b5b446486999b9e3a7ea0c5e625841219268e43c72e5a5eaac20eaa863"
+    },
+    {
+      "path": "reports/evidence/v2_scenarios.json",
+      "bytes": 418387,
+      "sha256": "0616b690d9573d9d94994ca59ccb09b76d9ed12f4ff1172fe1ccd7bc1c70203e"
+    },
+    {
+      "path": "reports/evidence/v2_transport_profile.json",
+      "bytes": 47899,
+      "sha256": "e21329d53a1813767a2e2bfb5028ea51a3ba3f671fbab3a484c0efddfe5192f4"
+    },
+    {
+      "path": "reports/evidence/v2_transport_profile_r2.json",
+      "bytes": 26969,
+      "sha256": "92e782fbc0cfac081c03cb1322d5db68e46ff15b1887c8f169bc683d453a6c24"
+    },
+    {
+      "path": "reports/v2_baseline_report.md",
+      "bytes": 1675,
+      "sha256": "0006034e61a30c3dc2eb15ab5fb6751ddb0869d309f86dcf9e253c10122d06bc"
+    },
+    {
+      "path": "reports/v2_final_report.md",
+      "bytes": 9627,
+      "sha256": "a79c8f5b971a55440cbc510bc2e884fa8ce34283197f7697034ce2e3f037b637"
+    },
+    {
+      "path": "reports/v2_scenario_tables.md",
+      "bytes": 7322,
+      "sha256": "eecee4af105ee978dae273b6a917df5cdab85c3b8bf65790e0c96387d9dbe6f4"
+    }
+  ]
+}

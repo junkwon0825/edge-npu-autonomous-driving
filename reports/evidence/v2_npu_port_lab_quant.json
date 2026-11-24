@@ -72,7 +72,7 @@
       ],
       "compile": "FAIL",
       "compile_s": 0.3547770786099136,
-      "error": "UnsupportedOpError: failed to compile\nsource:\n    round_1              port_lab.py:67                           return fn(self.mods, x)\ncompile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/cdaeec38e0e4b786)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f",
+      "error": "UnsupportedOpError: failed to compile\nsource:\n    round_1              port_lab.py:67                           return fn(self.mods, x)\ncompile error:\n(cache at ~/.cache/furiosa/compiler/cdaeec38e0e4b786)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f",
       "wall_s": 2.5,
       "loadavg": [
         10.67431640625,
@@ -102,7 +102,7 @@
       ],
       "compile": "FAIL",
       "compile_s": 0.36592531111091375,
-      "error": "UnsupportedOpError: failed to compile\nsource:\n    round_1              port_lab.py:67                           return fn(self.mods, x)\ncompile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/4b2c8254fa1ba6b3)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f",
+      "error": "UnsupportedOpError: failed to compile\nsource:\n    round_1              port_lab.py:67                           return fn(self.mods, x)\ncompile error:\n(cache at ~/.cache/furiosa/compiler/4b2c8254fa1ba6b3)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f",
       "wall_s": 2.5,
       "loadavg": [
         10.2998046875,

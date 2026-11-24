@@ -75,7 +75,7 @@
       "compile": "FAIL",
       "compile_s": 0.3481025258079171,
       "error": "UnsupportedOpError",
-      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/cdaeec38e0e4b786)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:65:30",
+      "error_detail": "compile error:\n(cache at ~/.cache/furiosa/compiler/cdaeec38e0e4b786)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:65:30",
       "wall_s": 2.5,
       "loadavg": [
         10.08984375,
@@ -106,7 +106,7 @@
       "compile": "FAIL",
       "compile_s": 0.36207105312496424,
       "error": "UnsupportedOpError",
-      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/4b2c8254fa1ba6b3)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:65:30",
+      "error_detail": "compile error:\n(cache at ~/.cache/furiosa/compiler/4b2c8254fa1ba6b3)\n\nCaused by:\n   0: while verifying round_1\n   1: Lowering Deadline Violation: Aten(round_1) is allowed up to dfg, found in primitive.\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:65:30",
       "wall_s": 2.5,
       "loadavg": [
         9.84228515625,

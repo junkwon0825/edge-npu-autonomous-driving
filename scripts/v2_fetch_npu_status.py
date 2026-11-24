@@ -16,6 +16,8 @@ def scrub(o):
         return {k: ("<redacted>" if k in REDACT else scrub(v)) for k, v in o.items()}
     if isinstance(o, list):
         return [scrub(v) for v in o]
+    if isinstance(o, str):
+        return o.replace("/root/", "~/")  # remote home directory in compiler cache paths
     return o
 
 

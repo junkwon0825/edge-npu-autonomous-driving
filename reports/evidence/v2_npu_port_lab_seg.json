@@ -24,7 +24,7 @@
       "compile": "FAIL",
       "compile_s": 0.6460442990064621,
       "error": "UnsupportedOpError",
-      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/905ffb79a93e1765)\n\nCaused by:\n    transposed convolution is not implemented yet\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "error_detail": "compile error:\n(cache at ~/.cache/furiosa/compiler/905ffb79a93e1765)\n\nCaused by:\n    transposed convolution is not implemented yet\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
       "wall_s": 3.7,
       "loadavg": [
         11.5712890625,
@@ -54,7 +54,7 @@
       "compile": "FAIL",
       "compile_s": 1.0697439317591488,
       "error": "UnsupportedOpError",
-      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/b03e35d88668fa1c)\n\nCaused by:\n    from_table_lookup expects a 1D table; use from_batched_table_lookup for batched tables\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
+      "error_detail": "compile error:\n(cache at ~/.cache/furiosa/compiler/b03e35d88668fa1c)\n\nCaused by:\n    from_table_lookup expects a 1D table; use from_batched_table_lookup for batched tables\n\nLocation:\n    /usr/local/cargo/git/checkouts/npu-tools-dec42ebd45bb55cf/fc43f6a7/crates/global-compiler/src/lib.rs:60:26",
       "wall_s": 4.2,
       "loadavg": [
         11.205078125,
@@ -126,7 +126,7 @@
       "compile": "FAIL",
       "compile_s": 2.4929150408133864,
       "error": "UnsupportedOpError",
-      "error_detail": "compile error:\n(cache at <REMOTE_HOME>/.cache/furiosa/compiler/14521600366c8952)\n\nCaused by:\n   0: while verifying Primitive\n   1: verification of operator failed:\n      Primitive\n      Mul\n      name: \n\n      input tensors: 2\n        input T1038: [1, 672, 1, 1, 20, 3, 36, 3], 8709120 B, bf16, unknown\n        source: unknown\n        input T1042: [1, 672, 1, 1, 20, 5, 36, 5], 24192000 B, bf16, unknown\n        source: unknown\n        total bytes: 32901120\n      output tensors: 1\n        output T1043: [1, 672, 1, 1, 20, 3, 36, 3], 17418240 B, f32, unknown\n        source: unknown\n        total bytes: 17418240\n   2: T1038([1, 672, 1, 1, 20, 3, 36, 3]) should have a same dimension with that of T1042([1, 6",
+      "error_detail": "compile error:\n(cache at ~/.cache/furiosa/compiler/14521600366c8952)\n\nCaused by:\n   0: while verifying Primitive\n   1: verification of operator failed:\n      Primitive\n      Mul\n      name: \n\n      input tensors: 2\n        input T1038: [1, 672, 1, 1, 20, 3, 36, 3], 8709120 B, bf16, unknown\n        source: unknown\n        input T1042: [1, 672, 1, 1, 20, 5, 36, 5], 24192000 B, bf16, unknown\n        source: unknown\n        total bytes: 32901120\n      output tensors: 1\n        output T1043: [1, 672, 1, 1, 20, 3, 36, 3], 17418240 B, f32, unknown\n        source: unknown\n        total bytes: 17418240\n   2: T1038([1, 672, 1, 1, 20, 3, 36, 3]) should have a same dimension with that of T1042([1, 6",
       "wall_s": 6.8,
       "loadavg": [
         11.76611328125,

@@ -1,0 +1,804 @@
+{
+  "runs": [
+    {
+      "experiment_id": "v2_live__pedestrian_crossing__gpu__20261124T211012",
+      "scenario": "pedestrian_crossing",
+      "backend": "gpu",
+      "speed_kmh": 30.0,
+      "dt_s": 0.05,
+      "fault_at_s": null,
+      "fault_s": null,
+      "collision": false,
+      "min_gap_m": 11.342170183499471,
+      "first_brake_t": 1.6500000000000001,
+      "ticks": 180,
+      "overruns": 1,
+      "overrun_frac": 0.005555555555555556,
+      "frames": 180,
+      "dropped_frames": 1,
+      "inferences": 179,
+      "inference_ok": 179,
+      "gate": {
+        "n_new": 177,
+        "n_stale": 0,
+        "n_failed": 0,
+        "n_none": 1
+      },
+      "frame_age_at_use_ms": {
+        "n": 177,
+        "mean_ms": 65.88543160965823,
+        "std_ms": 7.868431295444745,
+        "p50_ms": 64.96349987573868,
+        "p95_ms": 66.76615990698332,
+        "p99_ms": 86.16373598948154,
+        "min_ms": 63.14489995129402,
+        "max_ms": 141.5195998735726,
+        "fps_from_mean": 15.177862170267831
+      },
+      "age_at_control_ms": {
+        "n": 177,
+        "mean_ms": 65.88543160965823,
+        "std_ms": 7.868431295444745,
+        "p50_ms": 64.96349987573868,
+        "p95_ms": 66.76615990698332,
+        "p99_ms": 86.16373598948154,
+        "min_ms": 63.14489995129402,
+        "max_ms": 141.5195998735726,
+        "fps_from_mean": 15.177862170267831
+      },
+      "backend_latency_ms": {
+        "n": 179,
+        "mean_ms": 22.235020111944504,
+        "std_ms": 2.9805297449499815,
+        "p50_ms": 21.525300107896328,
+        "p95_ms": 25.420340010896325,
+        "p99_ms": 39.23342997208237,
+        "min_ms": 19.286299822852015,
+        "max_ms": 43.18829998373985,
+        "fps_from_mean": 44.974099189719496
+      },
+      "queue_delay_ms": {
+        "n": 179,
+        "mean_ms": 1.3641022268016745,
+        "std_ms": 1.2328714955790592,
+        "p50_ms": 1.2894000392407179,
+        "p95_ms": 1.8184701912105083,
+        "p99_ms": 2.063572062179446,
+        "min_ms": 0.29559992253780365,
+        "max_ms": 17.222699942067266,
+        "fps_from_mean": 733.0828880359192
+      },
+      "perception_rate_hz": 19.88888888888889,
+      "degraded_ticks": 1,
+      "backend_share": {
+        "gpu": 179
+      },
+      "failover_events": [],
+      "health_samples": [
+        {
+          "t": 0.1365477000363171,
+          "queue_depth": 1,
+          "client": {
+            "backend": "gpu",
+            "n_ok": 1,
+            "n_err": 0,
+            "available": true
+          },
+          "mean_latency_ms": 38.52359997108579
+        },
+        {
+          "t": 3.1651443999726325,
+          "queue_depth": 1,
+          "client": {
+            "backend": "gpu",
+            "n_ok": 62,
+            "n_err": 0,
+            "available": true
+          },
+          "mean_latency_ms": 22.84055901309628
+        },
+        {
+          "t": 6.1661143999081105,
+          "queue_depth": 1,
+          "client": {
+            "backend": "gpu",
+            "n_ok": 122,
+            "n_err": 0,
+            "available": true
+          },
+          "mean_latency_ms": 21.95546700619161
+        }
+      ],
+      "classification": "real-time",
+      "video": {
+        "dir": "outputs/v2/demo_gpu",
+        "screenshots": [
+          "brake",
+          "final",
+          "tracking",
+          "warning"
+        ]
+      }
+    },
+    {
+      "experiment_id": "v2_live__pedestrian_crossing__npu__20261124T211045",
+      "scenario": "pedestrian_crossing",
+      "backend": "npu",
+      "speed_kmh": 30.0,
+      "dt_s": 0.05,
+      "fault_at_s": null,
+      "fault_s": null,
+      "collision": false,
+      "min_gap_m": 1.478212159535272,
+      "first_brake_t": 2.85,
+      "ticks": 180,
+      "overruns": 5,
+      "overrun_frac": 0.027777777777777776,
+      "frames": 180,
+      "dropped_frames": 62,
+      "inferences": 117,
+      "inference_ok": 95,
+      "gate": {
+        "n_new": 94,
+        "n_stale": 0,
+        "n_failed": 19,
+        "n_none": 6
+      },
+      "frame_age_at_use_ms": {
+        "n": 94,
+        "mean_ms": 136.30312658063642,
+        "std_ms": 34.97928792534497,
+        "p50_ms": 113.92919991631078,
+        "p95_ms": 195.22618999937487,
+        "p99_ms": 264.6734940609893,
+        "min_ms": 112.65419996343518,
+        "max_ms": 275.6327999290078,
+        "fps_from_mean": 7.336588859598931
+      },
+      "age_at_control_ms": {
+        "n": 94,
+        "mean_ms": 136.30312658063642,
+        "std_ms": 34.97928792534497,
+        "p50_ms": 113.92919991631078,
+        "p95_ms": 195.22618999937487,
+        "p99_ms": 264.6734940609893,
+        "min_ms": 112.65419996343518,
+        "max_ms": 275.6327999290078,
+        "fps_from_mean": 7.336588859598931
+      },
+      "backend_latency_ms": {
+        "n": 95,
+        "mean_ms": 69.81257051474562,
+        "std_ms": 25.514656845080534,
+        "p50_ms": 62.64219991862774,
+        "p95_ms": 109.72833000123497,
+        "p99_ms": 192.55865607410678,
+        "min_ms": 54.26980019547045,
+        "max_ms": 233.545099850744,
+        "fps_from_mean": 14.324067895319551
+      },
+      "queue_delay_ms": {
+        "n": 117,
+        "mean_ms": 20.862707691107932,
+        "std_ms": 16.194834315657157,
+        "p50_ms": 19.76749999448657,
+        "p95_ms": 47.90336000733077,
+        "p99_ms": 50.30233200639486,
+        "min_ms": 0.5629998631775379,
+        "max_ms": 56.632099905982614,
+        "fps_from_mean": 47.93241676995831
+      },
+      "perception_rate_hz": 13.0,
+      "degraded_ticks": 52,
+      "backend_share": {
+        "rngd": 117
+      },
+      "failover_events": [],
+      "health_samples": [
+        {
+          "t": 2.6140958999749273,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 1,
+            "n_err": 0,
+            "n_timeout": 6,
+            "n_stale": 6,
+            "n_busy": 16
+          },
+          "mean_latency_ms": 233.545099850744,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.26\u00b0C",
+              "power": "39.00 W"
+            },
+            "n_ok": 8,
+            "n_err": 0,
+            "loadavg": [
+              21.53173828125,
+              20.17138671875,
+              19.14501953125
+            ]
+          }
+        },
+        {
+          "t": 5.6638634998817,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 43,
+            "n_err": 0,
+            "n_timeout": 6,
+            "n_stale": 6,
+            "n_busy": 16
+          },
+          "mean_latency_ms": 75.70128837535374,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.07\u00b0C",
+              "power": "40.00 W"
+            },
+            "n_ok": 50,
+            "n_err": 0,
+            "loadavg": [
+              21.53173828125,
+              20.17138671875,
+              19.14501953125
+            ]
+          }
+        },
+        {
+          "t": 8.664626700105146,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 90,
+            "n_err": 0,
+            "n_timeout": 6,
+            "n_stale": 6,
+            "n_busy": 16
+          },
+          "mean_latency_ms": 69.35900665767905,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.26\u00b0C",
+              "power": "40.00 W"
+            },
+            "n_ok": 97,
+            "n_err": 0,
+            "loadavg": [
+              20.92822265625,
+              20.06884765625,
+              19.1171875
+            ]
+          }
+        }
+      ],
+      "classification": "near-real-time",
+      "video": {
+        "dir": "outputs/v2/demo_npu",
+        "screenshots": [
+          "brake",
+          "final",
+          "tracking"
+        ]
+      },
+      "npu_client": {
+        "backend": "rngd",
+        "precision": "bf16",
+        "available": true,
+        "n_ok": 95,
+        "n_err": 0,
+        "n_timeout": 6,
+        "n_stale": 6,
+        "n_busy": 16
+      }
+    },
+    {
+      "experiment_id": "v2_live__lead_vehicle_braking__npu__20261124T211115",
+      "scenario": "lead_vehicle_braking",
+      "backend": "npu",
+      "speed_kmh": 30.0,
+      "dt_s": 0.05,
+      "fault_at_s": null,
+      "fault_s": null,
+      "collision": false,
+      "min_gap_m": 8.868461044284414,
+      "first_brake_t": 3.75,
+      "ticks": 180,
+      "overruns": 6,
+      "overrun_frac": 0.03333333333333333,
+      "frames": 180,
+      "dropped_frames": 42,
+      "inferences": 137,
+      "inference_ok": 137,
+      "gate": {
+        "n_new": 136,
+        "n_stale": 0,
+        "n_failed": 0,
+        "n_none": 3
+      },
+      "frame_age_at_use_ms": {
+        "n": 136,
+        "mean_ms": 130.9871470158479,
+        "std_ms": 29.13475343699829,
+        "p50_ms": 113.8114999281239,
+        "p95_ms": 164.7999249398706,
+        "p99_ms": 224.7752398997545,
+        "min_ms": 112.39809989929128,
+        "max_ms": 262.9339000210166,
+        "fps_from_mean": 7.634336824505474
+      },
+      "age_at_control_ms": {
+        "n": 136,
+        "mean_ms": 130.9871470158479,
+        "std_ms": 29.13475343699829,
+        "p50_ms": 113.8114999281239,
+        "p95_ms": 164.7999249398706,
+        "p99_ms": 224.7752398997545,
+        "min_ms": 112.39809989929128,
+        "max_ms": 262.9339000210166,
+        "fps_from_mean": 7.634336824505474
+      },
+      "backend_latency_ms": {
+        "n": 137,
+        "mean_ms": 65.41644234081092,
+        "std_ms": 14.627232214827439,
+        "p50_ms": 61.7257000412792,
+        "p95_ms": 80.7989200111478,
+        "p99_ms": 137.3941200785338,
+        "min_ms": 53.95710002630949,
+        "max_ms": 165.06500006653368,
+        "fps_from_mean": 15.286676624664693
+      },
+      "queue_delay_ms": {
+        "n": 137,
+        "mean_ms": 24.625944525995937,
+        "std_ms": 14.918532600437757,
+        "p50_ms": 23.80329999141395,
+        "p95_ms": 47.66093995422124,
+        "p99_ms": 49.94156404398382,
+        "min_ms": 0.5437000654637814,
+        "max_ms": 76.1635999660939,
+        "fps_from_mean": 40.607579495859255
+      },
+      "perception_rate_hz": 15.222222222222221,
+      "degraded_ticks": 3,
+      "backend_share": {
+        "rngd": 137
+      },
+      "failover_events": [],
+      "health_samples": [
+        {
+          "t": 0.16303549986332655,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 1,
+            "n_err": 0,
+            "n_timeout": 0,
+            "n_stale": 0,
+            "n_busy": 0
+          },
+          "mean_latency_ms": 111.09300004318357,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.26\u00b0C",
+              "power": "39.00 W"
+            },
+            "n_ok": 2,
+            "n_err": 0,
+            "loadavg": [
+              18.53515625,
+              19.59130859375,
+              18.98046875
+            ]
+          }
+        },
+        {
+          "t": 3.1631765000056475,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 45,
+            "n_err": 0,
+            "n_timeout": 0,
+            "n_stale": 0,
+            "n_busy": 0
+          },
+          "mean_latency_ms": 68.79145332819058,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.26\u00b0C",
+              "power": "39.00 W"
+            },
+            "n_ok": 46,
+            "n_err": 0,
+            "loadavg": [
+              17.8515625,
+              19.431640625,
+              18.93212890625
+            ]
+          }
+        },
+        {
+          "t": 6.163832699880004,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 92,
+            "n_err": 0,
+            "n_timeout": 0,
+            "n_stale": 0,
+            "n_busy": 0
+          },
+          "mean_latency_ms": 66.16571304924867,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.45\u00b0C",
+              "power": "40.00 W"
+            },
+            "n_ok": 93,
+            "n_err": 0,
+            "loadavg": [
+              17.8515625,
+              19.431640625,
+              18.93212890625
+            ]
+          }
+        }
+      ],
+      "classification": "near-real-time",
+      "video": null,
+      "npu_client": {
+        "backend": "rngd",
+        "precision": "bf16",
+        "available": true,
+        "n_ok": 137,
+        "n_err": 0,
+        "n_timeout": 0,
+        "n_stale": 0,
+        "n_busy": 0
+      }
+    },
+    {
+      "experiment_id": "v2_live__lead_vehicle_braking__gpu__20261124T211135",
+      "scenario": "lead_vehicle_braking",
+      "backend": "gpu",
+      "speed_kmh": 30.0,
+      "dt_s": 0.05,
+      "fault_at_s": null,
+      "fault_s": null,
+      "collision": false,
+      "min_gap_m": 9.28321375467088,
+      "first_brake_t": 3.7,
+      "ticks": 180,
+      "overruns": 0,
+      "overrun_frac": 0.0,
+      "frames": 180,
+      "dropped_frames": 0,
+      "inferences": 180,
+      "inference_ok": 180,
+      "gate": {
+        "n_new": 178,
+        "n_stale": 0,
+        "n_failed": 0,
+        "n_none": 2
+      },
+      "frame_age_at_use_ms": {
+        "n": 178,
+        "mean_ms": 64.73883483428067,
+        "std_ms": 0.7145952992561494,
+        "p50_ms": 64.7006500046694,
+        "p95_ms": 65.90193498413979,
+        "p99_ms": 66.91367195500034,
+        "min_ms": 63.34450007416237,
+        "max_ms": 66.94719996303311,
+        "fps_from_mean": 15.44667899198083
+      },
+      "age_at_control_ms": {
+        "n": 178,
+        "mean_ms": 64.73883483428067,
+        "std_ms": 0.7145952992561494,
+        "p50_ms": 64.7006500046694,
+        "p95_ms": 65.90193498413979,
+        "p99_ms": 66.91367195500034,
+        "min_ms": 63.34450007416237,
+        "max_ms": 66.94719996303311,
+        "fps_from_mean": 15.44667899198083
+      },
+      "backend_latency_ms": {
+        "n": 180,
+        "mean_ms": 21.829387220916235,
+        "std_ms": 2.4186123956577124,
+        "p50_ms": 21.532549988478422,
+        "p95_ms": 25.86257994407788,
+        "p99_ms": 28.95817714510489,
+        "min_ms": 18.44780007377267,
+        "max_ms": 38.08730002492666,
+        "fps_from_mean": 45.809806289103314
+      },
+      "queue_delay_ms": {
+        "n": 180,
+        "mean_ms": 1.7309511119189362,
+        "std_ms": 0.8577239633603243,
+        "p50_ms": 1.6651999903842807,
+        "p95_ms": 2.997320110443979,
+        "p99_ms": 3.5399959795177023,
+        "min_ms": 0.26199989952147007,
+        "max_ms": 8.686400018632412,
+        "fps_from_mean": 577.7170672899003
+      },
+      "perception_rate_hz": 20.0,
+      "degraded_ticks": 2,
+      "backend_share": {
+        "gpu": 180
+      },
+      "failover_events": [],
+      "health_samples": [
+        {
+          "t": 0.11475949990563095,
+          "queue_depth": 1,
+          "client": {
+            "backend": "gpu",
+            "n_ok": 2,
+            "n_err": 0,
+            "available": true
+          },
+          "mean_latency_ms": 20.814900053665042
+        },
+        {
+          "t": 3.115328599931672,
+          "queue_depth": 1,
+          "client": {
+            "backend": "gpu",
+            "n_ok": 62,
+            "n_err": 0,
+            "available": true
+          },
+          "mean_latency_ms": 22.355665574919005
+        },
+        {
+          "t": 6.165533700026572,
+          "queue_depth": 1,
+          "client": {
+            "backend": "gpu",
+            "n_ok": 123,
+            "n_err": 0,
+            "available": true
+          },
+          "mean_latency_ms": 21.886429991573095
+        }
+      ],
+      "classification": "real-time",
+      "video": null
+    },
+    {
+      "experiment_id": "v2_live__pedestrian_crossing__npu_failover_fault__20261124T211205",
+      "scenario": "pedestrian_crossing",
+      "backend": "npu_failover",
+      "speed_kmh": 30.0,
+      "dt_s": 0.05,
+      "fault_at_s": 1.5,
+      "fault_s": 1.5,
+      "collision": false,
+      "min_gap_m": 3.081604347548615,
+      "first_brake_t": 2.6500000000000004,
+      "ticks": 180,
+      "overruns": 7,
+      "overrun_frac": 0.03888888888888889,
+      "frames": 180,
+      "dropped_frames": 71,
+      "inferences": 108,
+      "inference_ok": 108,
+      "gate": {
+        "n_new": 102,
+        "n_stale": 1,
+        "n_failed": 0,
+        "n_none": 4
+      },
+      "frame_age_at_use_ms": {
+        "n": 102,
+        "mean_ms": 136.93419609392296,
+        "std_ms": 40.641400400485345,
+        "p50_ms": 150.3508999478067,
+        "p95_ms": 212.0265401154755,
+        "p99_ms": 250.26962091820292,
+        "min_ms": 63.544899923726916,
+        "max_ms": 257.3596999980509,
+        "fps_from_mean": 7.3027777467222394
+      },
+      "age_at_control_ms": {
+        "n": 102,
+        "mean_ms": 136.93419609392296,
+        "std_ms": 40.641400400485345,
+        "p50_ms": 150.3508999478067,
+        "p95_ms": 212.0265401154755,
+        "p99_ms": 250.26962091820292,
+        "min_ms": 63.544899923726916,
+        "max_ms": 257.3596999980509,
+        "fps_from_mean": 7.3027777467222394
+      },
+      "backend_latency_ms": {
+        "n": 108,
+        "mean_ms": 70.06925277420561,
+        "std_ms": 28.127506405588875,
+        "p50_ms": 71.95665000472218,
+        "p95_ms": 107.35908999340606,
+        "p99_ms": 156.07987400144322,
+        "min_ms": 18.144699977710843,
+        "max_ms": 175.2900001592934,
+        "fps_from_mean": 14.271595035021226
+      },
+      "queue_delay_ms": {
+        "n": 108,
+        "mean_ms": 20.18670647844879,
+        "std_ms": 15.717034700339713,
+        "p50_ms": 17.76065002195537,
+        "p95_ms": 43.95506995497271,
+        "p99_ms": 62.014945968985444,
+        "min_ms": 0.5636999849230051,
+        "max_ms": 65.27399993501604,
+        "fps_from_mean": 49.537550915875954
+      },
+      "perception_rate_hz": 12.0,
+      "degraded_ticks": 8,
+      "backend_share": {
+        "gpu": 19,
+        "rngd": 89
+      },
+      "failover_events": [
+        {
+          "t": 1.8276154999621212,
+          "frame_id": 258588,
+          "from": "PRIMARY",
+          "to": "FALLBACK",
+          "reason": "primary failed: RemoteTimeout('no response for frame 258588 within 0.249 s')"
+        },
+        {
+          "t": 3.5043848999775946,
+          "frame_id": 258625,
+          "from": "FALLBACK",
+          "to": "PRIMARY",
+          "reason": "primary ok"
+        }
+      ],
+      "health_samples": [
+        {
+          "t": 0.21341690002009273,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 1,
+            "n_err": 0,
+            "n_timeout": 0,
+            "n_stale": 0,
+            "n_busy": 0
+          },
+          "mean_latency_ms": 136.12969988025725,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.07\u00b0C",
+              "power": "39.00 W"
+            },
+            "n_ok": 2,
+            "n_err": 0,
+            "loadavg": [
+              18.90869140625,
+              19.3857421875,
+              18.9345703125
+            ]
+          }
+        },
+        {
+          "t": 3.218353500124067,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 16,
+            "n_err": 0,
+            "n_timeout": 4,
+            "n_stale": 0,
+            "n_busy": 0
+          },
+          "mean_latency_ms": 63.42607406312945,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.07\u00b0C",
+              "power": "39.00 W"
+            },
+            "n_ok": 20,
+            "n_err": 0,
+            "loadavg": [
+              19.31640625,
+              19.46240234375,
+              18.9619140625
+            ]
+          }
+        },
+        {
+          "t": 6.312815299956128,
+          "queue_depth": 1,
+          "client": {
+            "backend": "rngd",
+            "precision": "bf16",
+            "available": true,
+            "n_ok": 55,
+            "n_err": 0,
+            "n_timeout": 4,
+            "n_stale": 4,
+            "n_busy": 0
+          },
+          "mean_latency_ms": 67.12457970243649,
+          "remote": {
+            "smi": {
+              "device": "npu0",
+              "firmware": "2026.4.0, 93d67f3",
+              "temp": "38.07\u00b0C",
+              "power": "40.00 W"
+            },
+            "n_ok": 60,
+            "n_err": 0,
+            "loadavg": [
+              19.85205078125,
+              19.5712890625,
+              19.0
+            ]
+          }
+        }
+      ],
+      "classification": "near-real-time",
+      "video": {
+        "dir": "outputs/v2/demo_failover",
+        "screenshots": [
+          "brake",
+          "fallback",
+          "final",
+          "tracking"
+        ]
+      },
+      "npu_client": {
+        "backend": "rngd",
+        "precision": "bf16",
+        "available": true,
+        "n_ok": 89,
+        "n_err": 0,
+        "n_timeout": 4,
+        "n_stale": 4,
+        "n_busy": 0
+      }
+    }
+  ]
+}

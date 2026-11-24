@@ -9,6 +9,10 @@ Every number on this page comes from a recorded run. Each one can be traced thro
 `reports/evidence/`, and `reports/v1/evidence_manifest.json` lists SHA-256 hashes for them. The full
 V1 report is `reports/v1_final_report.md`.
 
+> **V2 (2026-11-24):** asynchronous, frame-age-aware NPU runtime, tracking, Kalman range rate and a new AEB
+> state machine; remote RNGD now in the live loop (near-real-time). See `reports/v2_final_report.md`.
+> This page describes V1 and is otherwise unchanged.
+
 ## Overview
 | What V1 has | Status |
 |---|---|
