@@ -60,3 +60,45 @@ def test_multimodel_client_protocol_det_lane_both():
         assert not r.ok
     finally:
         c.close()
+
+
+def test_coalescing_dispatcher_prevents_lane_starvation():
+    """53 ms requests, 30 ms frames, lane every 2nd frame: capture-time op selection starves the lane
+    model through aliasing; coalescing the wanted models until dispatch serves it."""
+    from npu_ad.runtime.multimodel import CoalescingDispatcher
+    from npu_ad.runtime.pipeline import Frame, LatencyModel, SimulatedAsyncPipeline
+
+    class FakeView:
+        name, precision, method = "rngd", "bf16", "infer_both"
+
+        def infer(self, fid, cap, bgr):
+            lane = self.method in ("infer_both", "infer_lane")
+            det = self.method in ("infer_both", "infer_det")
+            return MultiResult(fid, cap, "rngd", "bf16", True, det, lane, 0.053)
+
+        def health(self):
+            return {}
+
+    def run(coalesce: bool) -> int:
+        view = FakeView()
+        disp = CoalescingDispatcher(view)
+        pipe = SimulatedAsyncPipeline(disp if coalesce else view, LatencyModel(use_measured=True))
+        sched, lanes = RateScheduler(mode="fixed", lane_every=2), set()
+        for step in range(900):  # 9 s at 10 ms
+            t = step * 0.01
+            if step % 3 == 0:
+                d, ln = sched.plan(step // 3 + 1, None, None, None)
+                if coalesce:
+                    if disp.request(d, ln):
+                        pipe.on_frame(t, Frame(step, t, None))
+                else:
+                    view.method = "infer_both" if (d and ln) else ("infer_det" if d else "infer_lane")
+                    pipe.on_frame(t, Frame(step, t, None))
+            r = pipe.poll(t)
+            if r is not None and r.lane:
+                lanes.add(r.frame_id)
+        return len(lanes)
+
+    aliased, coalesced = run(False), run(True)
+    assert coalesced > 120  # ~every request carries the lane model (9 s / 53 ms = 170 requests)
+    assert aliased < 0.7 * coalesced  # measured in this model: 85 vs 149

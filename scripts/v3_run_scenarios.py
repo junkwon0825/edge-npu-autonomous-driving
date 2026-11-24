@@ -11,7 +11,7 @@ ego-yaw compensated) + LKA -> Arbiter -> CARLA control.
 Modes: A = GPU detection + GPU lane, B = RNGD detection + GPU lane, C = GPU detection + RNGD lane,
 D = RNGD detection + RNGD lane (one request per frame carries both models, separate PEs).
 Ground truth (lane centre from map waypoints, target gaps) is logged for evaluation only.
-Output: reports/evidence/v3_scenarios.json (resumable), per-tick logs outputs/v3/scenario_logs.
+Output: reports/evidence/v3_closed_loop.json (resumable), per-tick logs outputs/v3/scenario_logs.
 """
 
 from __future__ import annotations
@@ -40,7 +40,13 @@ from npu_ad.perception.radar_fusion import RadarConfig, radar_points
 from npu_ad.perception.tracker import MultiObjectTracker
 from npu_ad.runtime.backends import GpuInferenceBackend
 from npu_ad.runtime.fallback import FailoverBackend
-from npu_ad.runtime.multimodel import GpuLaneBackend, LaneResult, RateScheduler, RngdMultiModelClient
+from npu_ad.runtime.multimodel import (
+    CoalescingDispatcher,
+    GpuLaneBackend,
+    LaneResult,
+    RateScheduler,
+    RngdMultiModelClient,
+)
 from npu_ad.runtime.pipeline import Frame, LatencyModel, ResultGate, SimulatedAsyncPipeline
 from npu_ad.scene import SceneState
 from npu_ad.simulation import geometry as geo
@@ -74,7 +80,13 @@ FAULTS = {  # applied to the detection path unless stated
     "det_timeout": ("det_delay", 1.5, 2.5, 0.6),
     "seg_failure": ("lane_fail", 1.5, 3.5),
     "npu_failure": ("npu_crash", 1.5),
+    "npu_stall": ("npu_stall", 1.5, 1.5),  # server sleeps 1.5 s from t = 1.5 s
 }
+FAILOVER_FAULTS = ("npu_failure", "npu_stall")
+# scheduler name -> (RateScheduler mode, lane_every, lane device on the server)
+SCHEDS = {"fixed": ("fixed", 2, "furiosa:1"), "adaptive": ("adaptive", 2, "furiosa:1"),
+          "every": ("fixed", 1, "furiosa:1"), "every_samepe": ("fixed", 1, "furiosa:0")}  # fmt: skip
+PRIMARY_LAT_M = 2.0  # primary track for estimation metrics: nearest confirmed track within this path offset
 YAW_HIST_MAX = 400
 
 
@@ -128,7 +140,7 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
     det_b = {"A": gpu_det, "B": client.detection() if client else None, "C": gpu_det}.get(mode)
     lane_b = {"A": gpu_lane, "B": gpu_lane, "C": client.lane() if client else None}.get(mode)
     events = []
-    if fault == "npu_failure":  # explicit failover on both paths
+    if fault in FAILOVER_FAULTS:  # explicit failover on both paths
         det_b = FailoverBackend(client.detection(), gpu_det, probe_interval_s=0.5)
         lane_b = FailoverBackend(client.lane(), gpu_lane, probe_interval_s=0.5)
         mode = "B+C failover"
@@ -183,12 +195,14 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
         if isinstance(fa, tuple) and fa[0] == "lane_fail":
             lane_b = FaultWindow(lane_b, fa[1], fa[2], "fail")
         if mode == "D":
-            both = SimulatedAsyncPipeline(client.both(), LatencyModel(use_measured=True, seed=7))
+            disp = CoalescingDispatcher(client.both())
+            both = SimulatedAsyncPipeline(disp, LatencyModel(use_measured=True, seed=7))
             det_pipe = lane_pipe = None
         else:
             det_pipe = SimulatedAsyncPipeline(det_b, lm_det)
             lane_pipe = SimulatedAsyncPipeline(lane_b, LatencyModel(use_measured=True, seed=8))
-        sched = RateScheduler(mode=sched_mode, lane_every=2)
+        sched = RateScheduler(mode=SCHEDS[sched_mode][0], lane_every=SCHEDS[sched_mode][1])
+        lat = {"det": [], "lane": [], "ctrl": []}
         gate, lane_gate = ResultGate(0.3), ResultGate(0.3)
         mot = MultiObjectTracker(ranger, v2.CLASS_GROUPS)
         sm, lka, arb = AebStateMachine(), LaneKeeping(), Arbiter()
@@ -203,8 +217,11 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
             yaw = math.radians(tf.rotation.yaw)
             yaw_rate = math.radians(ego.get_angular_velocity().z)
             v = ego.get_velocity().length()
-            if fault == "npu_failure" and not crashed and t >= FAULTS["npu_failure"][1]:
-                client.crash()
+            if fault in FAILOVER_FAULTS and not crashed and t >= FAULTS[fault][1]:
+                if fault == "npu_failure":
+                    client.crash()
+                else:
+                    client.stall(FAULTS[fault][2])
                 crashed = True
             if step % 3 == 0:
                 n_cam += 1
@@ -217,9 +234,7 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
                                           lane_est.offset_m if lane_est else None)  # fmt: skip
                 fr = Frame(fid, t, bgr)
                 if mode == "D":
-                    if d_run or l_run:
-                        op = "infer_both" if (d_run and l_run) else ("infer_det" if d_run else "infer_lane")
-                        both.backend.method = op
+                    if disp.request(d_run, l_run):  # operation chosen when the request starts
                         both.on_frame(t, fr)
                 else:
                     if d_run:
@@ -231,8 +246,10 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
                 dres, lres = split_result(both.poll(t))
             else:
                 dres, lres = det_pipe.poll(t), lane_pipe.poll(t)
+            tc0 = time.perf_counter()
             res, why = gate.accept(dres, t)
             if res is not None:
+                lat["det"].append(res.latency_s)
                 mot.update(res.capture_t, res.dets)
                 last_det_cap = res.capture_t
             if radar_on:
@@ -242,6 +259,8 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
                 if pts is not None:
                     mot.update_radar(t, pts, half, rc)
             lr, lwhy = lane_gate.accept(lres, t) if lres is not None else (None, "none")
+            if lr is not None:
+                lat["lane"].append(lr.latency_s)
             if lr is not None and lr.mask is not None:
                 est = geom.estimate(lr.mask)
                 if est.valid:
@@ -253,7 +272,12 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
                 path = (a, b)
             elif v > 1.0:
                 path = (yaw_rate / v / 2.0, 0.0)
-            views = [path_relative(view_of(tr, t, yaw_rate), path) for tr in mot.confirmed()]
+            trs = mot.confirmed()
+            views = [path_relative(view_of(tr, t, yaw_rate), path) for tr in trs]
+            near = [i for i, vw in enumerate(views) if vw.range_m is not None and vw.lateral_m is not None
+                    and abs(vw.lateral_m) <= PRIMARY_LAT_M]  # fmt: skip
+            prim = min(near, key=lambda i: views[i].range_m) if near else None
+            pv = views[prim] if prim is not None else None
             scene = SceneState(t, v, yaw, yaw_rate, lane_est, lane_cap, yaw_hist.get(lane_fid), views)
             scene.detection.age_s = t - last_det_cap
             scene.detection.backend = res.backend if res is not None else scene.detection.backend
@@ -263,6 +287,7 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
             lk = lka.step(t, lane_est, lane_cap, v, yaw, cap_yaw if cap_yaw is not None else yaw)
             throttle = float(np.clip(0.35 + 0.6 * (ego_mps - v), 0.0, 0.8))
             cmd = arb.combine(t, out_aeb.brake, lk, throttle)
+            lat["ctrl"].append(time.perf_counter() - tc0)
             ego.apply_control(carla.VehicleControl(throttle=cmd.throttle, steer=cmd.steer, brake=cmd.brake))
             # ground truth (evaluation only)
             off, he, lw = lane_gt(cmap, ego)
@@ -288,6 +313,10 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
                 "ttc": out_aeb.ttc_s, "det_age": scene.detection.age_s, "det_backend": scene.detection.backend,
                 "gt_gap": ts.gap_m if ts else None, "gt_closing": ts.closing_mps if ts else None,
                 "collisions": len(collisions), "cam": step % 3 == 0, "gate": why, "lane_gate": lwhy,
+                "lka_steer": lk.steer, "aeb_reason": out_aeb.reason,
+                "est_range": pv.range_m if pv else None,
+                "est_closing": -pv.rate_mps if pv and pv.rate_valid and pv.rate_mps is not None else None,
+                "est_tid": pv.track_id if pv else None, "radar_hits": getattr(trs[prim], "radar_hits", 0) if pv else 0,
             })  # fmt: skip
             if collisions and t - next(r["t"] for r in rows if r["collisions"]) > 0.5:
                 break
@@ -306,8 +335,16 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
                 {k: (str(v) if k == "reason" else v) for k, v in e.items()} for e in events],
             "lane_geometry_stats": geom.stats, "det_gate": {k: v for k, v in vars(gate.stats).items() if k != "ages_s"},
             "lane_gate": {k: v for k, v in vars(lane_gate.stats).items() if k != "ages_s"},
-            "det_age_ms": _stats(gate.stats.ages_s), "lane_age_ms": _stats(lane_gate.stats.ages_s)}  # fmt: skip
-    return meta | summarize(rows, sc, collisions)
+            "det_age_ms": _stats(gate.stats.ages_s), "lane_age_ms": _stats(lane_gate.stats.ages_s),
+            "det_latency_ms": _stats(lat["det"]), "lane_latency_ms": _stats(lat["lane"]),
+            # queue delay = request start - frame offered (latest-frame queue), from the pipeline records
+            "det_queue_ms": _stats([q["queue_delay_s"] for q in (both if mode == "D" else det_pipe).records]),
+            "lane_queue_ms": _stats([q["queue_delay_s"] for q in (both if mode == "D" else lane_pipe).records]),
+            "mode_d_ops": disp.ops if mode == "D" else None,
+            "control_stack_ms": _stats(lat["ctrl"]), "lane_device": SCHEDS[sched_mode][2] if mode == "D" else None,
+            "dropped_frames": ({"both": both.n_dropped_frames} if mode == "D" else
+                               {"det": det_pipe.n_dropped_frames, "lane": lane_pipe.n_dropped_frames})}  # fmt: skip
+    return meta | summarize(rows, sc, collisions) | estimation(rows)
 
 
 def split_result(r):
@@ -330,6 +367,27 @@ def _stats(v):
         "mean": float(a.mean()),
         "p50": float(np.percentile(a, 50)),
         "p95": float(np.percentile(a, 95)),
+        "p99": float(np.percentile(a, 99)),
+        "max": float(a.max()),
+    }
+
+
+def estimation(rows) -> dict:
+    """Primary-track range / closing speed / TTC vs ground truth (before contact)."""
+    pr = [r for r in rows if r["est_range"] is not None and r["gt_gap"] is not None and 0 < r["gt_gap"] < 60
+          and not r["collisions"]]  # fmt: skip
+    rng = [abs(r["est_range"] - r["gt_gap"]) for r in pr]
+    cl = [abs(r["est_closing"] - r["gt_closing"]) for r in pr if r["est_closing"] is not None]
+    ttc = [abs(r["est_range"] / r["est_closing"] - r["gt_gap"] / r["gt_closing"]) for r in pr
+           if r["est_closing"] is not None and r["est_closing"] > 0.5 and r["gt_closing"] > 0.5
+           and r["gt_gap"] / r["gt_closing"] <= 5]  # fmt: skip
+    return {
+        "est_samples": len(pr),
+        "range_mae_m": float(np.mean(rng)) if rng else None,
+        "closing_mae_mps": float(np.mean(cl)) if cl else None,
+        "ttc_mae_s": float(np.mean(ttc)) if ttc else None,
+        "ttc_median_err_s": float(np.median(ttc)) if ttc else None,
+        "radar_fused_frac": float(np.mean([r["radar_hits"] > 0 for r in pr])) if pr else None,
     }
 
 
@@ -379,18 +437,18 @@ def main() -> int:
     ap.add_argument("--modes", nargs="*", default=["A", "D"])
     ap.add_argument("--speeds-kmh", nargs="*", type=float, default=[30.0])
     ap.add_argument("--radar", nargs="*", default=["off"])
-    ap.add_argument("--sched", nargs="*", default=["fixed"])
+    ap.add_argument("--sched", nargs="*", default=["fixed"], choices=list(SCHEDS))
     ap.add_argument("--faults", nargs="*", default=[""])
     ap.add_argument("--lane-weights", default="models/lane_unet_s3c32.pt")
-    ap.add_argument("--out", default="reports/evidence/v3_scenarios.json")
+    ap.add_argument("--out", default="reports/evidence/v3_closed_loop.json")
     a = ap.parse_args()
     setup_logging("v3_run_scenarios")
     cfg = load_config()
     m = cfg["model"]
     det = GpuDetector(str(resolve(m["weights"])), m["imgsz"], m["conf"], m["iou"], m["max_det"])
     lane_model = load_lane_model(str(resolve(a.lane_weights)), "cuda:0")
-    need_npu = any(md in ("B", "C", "D") for md in a.modes) or "npu_failure" in a.faults
-    client = None
+    need_npu = any(md in ("B", "C", "D") for md in a.modes) or any(f in FAILOVER_FAULTS for f in a.faults)
+    client, client_dev = None, None
     git = ["git", "-C", str(resolve(".")), "rev-parse", "--short", "HEAD"]
     commit = subprocess.run(git, capture_output=True, text=True).stdout.strip()
     dirty = subprocess.run(["git", "-C", str(resolve(".")), "status", "--porcelain", "src", "scripts", "remote"],
@@ -407,19 +465,23 @@ def main() -> int:
                     for radar in a.radar:
                         for sched in a.sched:
                             for fault in a.faults:
-                                key = (name, mode if fault != "npu_failure" else "B+C failover", float(kmh), radar == "on",
+                                key = (name, mode if fault not in FAILOVER_FAULTS else "B+C failover", float(kmh), radar == "on",
                                        sched, fault)  # fmt: skip
                                 if key in done:
                                     continue
-                                if (mode in ("B", "C", "D") or fault == "npu_failure") and client is None and need_npu:
-                                    client = RngdMultiModelClient(timeout_s=1.0, startup_timeout_s=900,
+                                want_dev = SCHEDS[sched][2]
+                                uses_npu = mode in ("B", "C", "D") or fault in FAILOVER_FAULTS
+                                if client is not None and (client.proc.poll() is not None or client_dev != want_dev):
+                                    client.close()
+                                    client = None
+                                if uses_npu and client is None and need_npu:
+                                    client = RngdMultiModelClient(timeout_s=1.0, startup_timeout_s=900, lane_device=want_dev,
                                                                   log_path=resolve("outputs/v3/npu_server_v3.log"))  # fmt: skip
-                                if fault == "npu_failure" and client is not None and client.proc.poll() is not None:
-                                    client = RngdMultiModelClient(timeout_s=1.0, startup_timeout_s=900)
+                                    client_dev = want_dev
                                 t0 = time.perf_counter()
                                 r = run(cfg, name, SCENARIOS[name], mode, kmh, det, lane_model, client, radar == "on",
                                         sched, fault, resolve("outputs/v3/scenario_logs"))  # fmt: skip
-                                if fault == "npu_failure":
+                                if fault in FAILOVER_FAULTS:
                                     client.close()
                                     client = None
                                 r |= {"fault_arg": fault, "wall_s": time.perf_counter() - t0, "code_commit": commit,

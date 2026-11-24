@@ -93,9 +93,10 @@ class RngdMultiModelClient(FuriosaRemoteBackend):
         remote_dir = kw.pop("remote_dir", "npu_auto_driving_p2")
         env = kw.pop("env", "furiosa-npu")
         threads = kw.pop("threads", 2)
+        lane_device = kw.pop("lane_device", "furiosa:1")  # "furiosa:0" = both models on one PE
         cmd = (f"cd {remote_dir} && source ~/miniconda3/etc/profile.d/conda.sh && conda activate {env} && "
                f"exec nice -n 10 python -u npu_server_v3.py --models {models} --lane-weights {lane_weights} "
-               f"--threads {threads}")  # fmt: skip
+               f"--threads {threads} --lane-device {lane_device}")  # fmt: skip
         host = kw.pop("host", "furiosa-npu")
         opts = kw.pop("ssh_opts", ("-o", "BatchMode=yes", "-o", "ConnectTimeout=20", "-C"))
         kw.setdefault("command", ["ssh", *opts, host, f"bash -lc '{cmd}'"])
@@ -180,6 +181,42 @@ class _View:
 
     def health(self) -> dict:
         return self.client.health()
+
+    def close(self) -> None:
+        pass
+
+
+class CoalescingDispatcher:
+    """Mode D backend for one latest-frame pipeline that carries both models.
+
+    The scheduler's per-frame decision (detection and/or lane) accumulates in ``want`` until a request
+    actually starts; that request serves everything asked for since the previous one, on the newest
+    frame. Choosing the operation at capture time instead aliases with the pipeline: at ~53 ms per
+    request and 30 ms frames the frames that start keep the same parity, so "lane every 2nd frame" can
+    starve the lane model (V3 pilot: half the lane results and repeated 0.5 s lane timeouts).
+    """
+
+    def __init__(self, view: _View):
+        self.view, self.name, self.precision = view, view.name, view.precision
+        self.want = {"det": False, "lane": False}
+        self.ops: dict[str, int] = {"infer_both": 0, "infer_det": 0, "infer_lane": 0}
+
+    def request(self, det: bool, lane: bool) -> bool:
+        """Record what this frame needs; True if anything is pending (then offer the frame)."""
+        self.want["det"] |= det
+        self.want["lane"] |= lane
+        return self.want["det"] or self.want["lane"]
+
+    def infer(self, frame_id, capture_t, bgr):
+        d, ln = self.want["det"], self.want["lane"]
+        self.want = {"det": False, "lane": False}
+        op = "infer_both" if (d and ln) or not (d or ln) else ("infer_det" if d else "infer_lane")
+        self.ops[op] += 1
+        self.view.method = op
+        return self.view.infer(frame_id, capture_t, bgr)
+
+    def health(self) -> dict:
+        return self.view.health()
 
     def close(self) -> None:
         pass
