@@ -81,6 +81,9 @@ FAULTS = {  # applied to the detection path unless stated
     "seg_failure": ("lane_fail", 1.5, 3.5),
     "npu_failure": ("npu_crash", 1.5),
     "npu_stall": ("npu_stall", 1.5, 1.5),  # server sleeps 1.5 s from t = 1.5 s
+    # lane frame-age experiment: extra latency on every lane result for the whole run (single in-flight
+    # request, so a slower lane backend also lowers the lane update rate, as a remote backend does)
+    **{f"lane_delay{ms}": ("lane_delay", 0.0, 1e9, ms / 1000) for ms in (20, 50, 100, 150, 250)},
 }
 FAILOVER_FAULTS = ("npu_failure", "npu_stall")
 # scheduler name -> (RateScheduler mode, lane_every, lane device on the server)
@@ -128,7 +131,8 @@ def lane_gt(cmap, ego):
     return off, he, wp.lane_width
 
 
-def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode, fault, out_logs: Path) -> dict:
+def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode, fault, out_logs: Path,
+        on_tick=None) -> dict:  # fmt: skip
     import carla
 
     dt = 0.01
@@ -194,6 +198,10 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
             det_b = FaultWindow(det_b, fa[1], fa[2], "delay", fa[3])
         if isinstance(fa, tuple) and fa[0] == "lane_fail":
             lane_b = FaultWindow(lane_b, fa[1], fa[2], "fail")
+        if isinstance(fa, tuple) and fa[0] == "lane_delay":
+            if mode == "D":
+                raise ValueError("lane_delay needs a separate lane pipeline (modes A-C)")
+            lane_b = FaultWindow(lane_b, fa[1], fa[2], "delay", fa[3])
         if mode == "D":
             disp = CoalescingDispatcher(client.both())
             both = SimulatedAsyncPipeline(disp, LatencyModel(use_measured=True, seed=7))
@@ -209,6 +217,7 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
         lane_est, lane_cap, lane_backend, lane_fid, yaw_hist = None, None, "n/a", None, {}
         last_det_cap, triggered, n_cam, crashed = -1e9, False, 0, False
         out_aeb = None
+        last = {"det_backend": "n/a", "det_lat": None, "lane_lat": None, "mask": None}  # for on_tick only
         for step in range(int(sc["duration_s"] / dt)):
             fid = s.tick()
             t = step * dt
@@ -250,6 +259,7 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
             res, why = gate.accept(dres, t)
             if res is not None:
                 lat["det"].append(res.latency_s)
+                last["det_backend"], last["det_lat"] = res.backend, res.latency_s
                 mot.update(res.capture_t, res.dets)
                 last_det_cap = res.capture_t
             if radar_on:
@@ -261,6 +271,7 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
             lr, lwhy = lane_gate.accept(lres, t) if lres is not None else (None, "none")
             if lr is not None:
                 lat["lane"].append(lr.latency_s)
+                last["lane_lat"], last["mask"] = lr.latency_s, lr.mask
             if lr is not None and lr.mask is not None:
                 est = geom.estimate(lr.mask)
                 if est.valid:
@@ -318,6 +329,26 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
                 "est_closing": -pv.rate_mps if pv and pv.rate_valid and pv.rate_mps is not None else None,
                 "est_tid": pv.track_id if pv else None, "radar_hits": getattr(trs[prim], "radar_hits", 0) if pv else 0,
             })  # fmt: skip
+            if on_tick is not None and step % 3 == 0:  # read-only observer (demo overlay)
+                fresh = lane_cap is not None and t - lane_cap <= 0.5
+                fo = isinstance(det_b, FailoverBackend)
+                hits = getattr(trs[prim], "radar_hits", 0) if pv else 0
+                on_tick(bgr, {
+                    "t": t, "mode": mode, "sched": sched_mode, "det_backend": last["det_backend"],
+                    "lane_backend": lane_backend, "fallback": f"det {det_b.state} / lane {lane_b.state}" if fo else "n/a",
+                    "det_lat_ms": last["det_lat"] * 1e3 if last["det_lat"] is not None else None,
+                    "det_age_ms": scene.detection.age_s * 1e3 if last_det_cap > -1e8 else None,
+                    "lane_lat_ms": last["lane_lat"] * 1e3 if last["lane_lat"] is not None else None,
+                    "lane_age_ms": (t - lane_cap) * 1e3 if lane_cap is not None else None,
+                    "dropped": both.n_dropped_frames if mode == "D" else
+                    f"det {det_pipe.n_dropped_frames} / lane {lane_pipe.n_dropped_frames}",
+                    "tracks": trs, "views": views, "aeb": out_aeb, "lka": lk, "steer": cmd.steer, "arb_mode": cmd.mode,
+                    "speed_kmh": v * 3.6, "offset_m": lane_est.offset_m if lane_est and fresh else None,
+                    "lane_est": lane_est if fresh else None, "lane_mask": last["mask"], "cam": geom.cam,
+                    "radar": "off" if not radar_on else (f"on, primary track fused ({hits} radar updates)" if hits
+                                                         else "on, primary track not fused"),
+                    "row": rows[-1],  # includes ground truth, for offline evaluation only
+                })  # fmt: skip
             if collisions and t - next(r["t"] for r in rows if r["collisions"]) > 0.5:
                 break
         for _ in range(3):
@@ -348,6 +379,24 @@ def run(cfg, name, sc, mode, kmh, det, lane_model, client, radar_on, sched_mode,
             "dropped_frames": ({"both": both.n_dropped_frames} if mode == "D" else
                                {"det": det_pipe.n_dropped_frames, "lane": lane_pipe.n_dropped_frames})}  # fmt: skip
     return meta | summarize(rows, sc, collisions) | estimation(rows)
+
+
+def memory_snapshot() -> dict:
+    """Free system RAM and the resident memory of the processes that compete for it (GB)."""
+    import psutil
+
+    groups = {"carla": ("carlaue4",), "python": ("python",), "vscode": ("code",), "agent": ("claude", "node"),
+              "browser": ("chrome", "msedge")}  # fmt: skip
+    rss = dict.fromkeys(groups, 0.0)
+    for p in psutil.process_iter(["name", "memory_info"]):
+        n = (p.info["name"] or "").lower()
+        for g, pre in groups.items():
+            if p.info["memory_info"] and n.startswith(pre):
+                rss[g] += p.info["memory_info"].rss / 2**30
+    vm = psutil.virtual_memory()
+    return {"free_gb": round(vm.available / 2**30, 2), "total_gb": round(vm.total / 2**30, 2)} | {
+        f"{g}_rss_gb": round(v, 2) for g, v in rss.items()
+    }
 
 
 def split_result(r):
@@ -444,6 +493,7 @@ def main() -> int:
     ap.add_argument("--faults", nargs="*", default=[""])
     ap.add_argument("--lane-weights", default="models/lane_unet_s3c32.pt")
     ap.add_argument("--out", default="reports/evidence/v3_closed_loop.json")
+    ap.add_argument("--min-free-gb", type=float, default=1.0, help="stop gracefully below this free RAM")
     a = ap.parse_args()
     setup_logging("v3_run_scenarios")
     cfg = load_config()
@@ -481,9 +531,15 @@ def main() -> int:
                                     client = RngdMultiModelClient(timeout_s=1.0, startup_timeout_s=900, lane_device=want_dev,
                                                                   log_path=resolve("outputs/v3/npu_server_v3.log"))  # fmt: skip
                                     client_dev = want_dev
+                                mem = memory_snapshot()
+                                if mem["free_gb"] < a.min_free_gb:  # graceful stop; finished runs are saved
+                                    print(f"BLOCKED: free RAM {mem['free_gb']:.2f} GB < {a.min_free_gb} GB before {key}",
+                                          flush=True)  # fmt: skip
+                                    return 3
                                 t0 = time.perf_counter()
                                 r = run(cfg, name, SCENARIOS[name], mode, kmh, det, lane_model, client, radar == "on",
                                         sched, fault, resolve("outputs/v3/scenario_logs"))  # fmt: skip
+                                r["memory_before"], r["memory_after"] = mem, memory_snapshot()
                                 if fault in FAILOVER_FAULTS:
                                     client.close()
                                     client = None
