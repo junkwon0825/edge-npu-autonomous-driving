@@ -383,7 +383,7 @@ and local outputs.
 ```powershell
 python -m venv .venv; .\.venv\Scripts\pip install -r requirements-lock-windows.txt
 $env:PYTHONPATH = "src;scripts"
-.\.venv\Scripts\python.exe -m pytest -q        # 80 passed, 1 skipped (the live CARLA test is opt-in)
+.\.venv\Scripts\python.exe -m pytest -q        # 80 passed, 1 skipped with models/yolo26n.pt present (79 + 2 skipped without it)
 
 <CARLA_ROOT>\CarlaUE4.exe -RenderOffScreen -carla-rpc-port=2000      # separately; one client at a time
 $env:NPU_AD_LIVE_CARLA = "1"; .\.venv\Scripts\python.exe -m pytest -q  # with the server running
