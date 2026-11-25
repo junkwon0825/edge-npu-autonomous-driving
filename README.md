@@ -1,403 +1,434 @@
-# Edge-NPU Autonomous Driving Perception & Control System
+# Edge-NPU 기반 자율주행 인지·제어 시스템
 
-> CARLA closed-loop autonomous-driving research prototype using GPU and Furiosa RNGD NPU perception.
+> **GPU와 Furiosa RNGD NPU를 실제 CARLA 주행 루프에 연결하고, 모델 포팅부터 비동기 런타임·AEB·LKA·장애 분석까지 검증한 Mobility AI 프로젝트입니다.**
 
-## Overview
-I ported several perception models to a real NPU (Furiosa RNGD), built an asynchronous, multi-model
-runtime for them, and closed the loop in CARLA. A camera feeds object detection and lane segmentation,
-which in turn feed tracking, emergency braking (AEB) and lane keeping (LKA). The evaluation then measures
-how system-level latency, rather than model latency alone, changes braking margins and lane keeping.
+[English keywords: Edge AI · NPU Systems · Autonomous Driving · Computer Vision · Closed-loop Evaluation]
 
-> **Simulation-based research prototype.** This is not production autonomous driving. It has no real-time
-> guarantee and no functional-safety process. Zero collisions in the tested scenarios do **not** show
-> general safety. Every number below comes from a recorded run in `reports/evidence/`; SHA-256 manifests
-> are in `reports/v1/`, `reports/v2/` and `reports/v3/`.
+## 프로젝트 소개 (Overview)
 
-| Version | Focus | Report |
+이 프로젝트는 단순히 NPU에서 모델을 실행하는 데서 끝나지 않습니다. 객체 탐지와 차선 분할 모델을
+실제 Furiosa RNGD NPU에 포팅하고, 그 결과를 CARLA 차량 제어에 연결해 **인지 → 판단 → 제어가
+이어지는 폐루프(closed loop)**를 구현했습니다.
+
+카메라 영상은 객체 탐지(Object Detection)와 차선 분할(Lane Segmentation)에 사용됩니다. 인지 결과는
+추적(Tracking), 자동 긴급 제동(AEB), 차선 유지 보조(LKA)로 전달됩니다. 평가에서는 모델 추론 시간만
+비교하지 않고, 네트워크 전송과 큐 대기를 포함한 **전체 시스템 지연이 실제 제동 거리와 차선 유지에
+어떤 영향을 주는지** 측정했습니다.
+
+| 구분 | 내용 |
+|---|---|
+| **담당 범위** | NPU 모델 포팅, 비동기 추론 런타임, CARLA 인지·제어 통합, 실험 설계, 장애 원인 분석 |
+| **핵심 기술** | Python, PyTorch, CARLA, Furiosa RNGD, CUDA, Computer Vision, AEB, LKA |
+| **개발 환경** | Windows 11, RTX 3060 12 GB, CARLA 0.9.16, 원격 Linux NPU 호스트 |
+| **검증 방식** | 80회 폐루프 주행, GPU/NPU 동일 프레임 비교, fault injection, SHA-256 evidence manifest |
+
+> **주의:** 이 저장소는 시뮬레이션 기반 연구 프로토타입입니다. 실제 차량용 제품이 아니며 실시간성이나
+> 기능 안전(Functional Safety)을 보장하지 않습니다. 시험 시나리오에서 충돌이 없었다는 결과가 일반적인
+> 안전성을 의미하지 않습니다. 모든 수치는 `reports/evidence/`의 실행 기록을 기반으로 하며 SHA-256
+> manifest는 `reports/v1/`, `reports/v2/`, `reports/v3/`에 있습니다.
+
+| 버전 | 주요 목표 | 결과 보고서 |
 |---|---|---|
-| **V1** `v1.0.0-rc1` | GPU closed-loop AEB in CARLA + real-NPU validation of YOLO26n | [`reports/v1_final_report.md`](reports/v1_final_report.md) |
-| **V2** `v2.0.0-rc1` | async frame-age-aware runtime, tracking + Kalman filter, robust AEB, remote NPU in the live loop | [`reports/v2_final_report.md`](reports/v2_final_report.md) |
-| **V3** `v3.0.0-rc1` | multi-model NPU perception, lane segmentation, LKA, AEB + LKA arbitration, radar fusion, failure engineering | [`reports/v3_final_report.md`](reports/v3_final_report.md) |
+| **V1** `v1.0.0-rc1` | CARLA GPU 폐루프 AEB + YOLO26n 실제 NPU 검증 | [`reports/v1_final_report.md`](reports/v1_final_report.md) |
+| **V2** `v2.0.0-rc1` | 프레임 나이 기반 비동기 런타임, 추적·Kalman Filter, 강건한 AEB | [`reports/v2_final_report.md`](reports/v2_final_report.md) |
+| **V3** `v3.0.0-rc1` | 다중 모델 NPU 인지, 차선 분할, LKA, AEB+LKA 중재, Radar Fusion | [`reports/v3_final_report.md`](reports/v3_final_report.md) |
 
-## Key Results
-Three latency terms are kept apart throughout this README:
-- **Model latency** is the accelerator execution of one frame.
-- **End-to-end request latency** is the client round trip, including transport.
-- **Data age** is how old the perception result is when control uses it.
+## 핵심 성과 (Key Results)
 
-| Result | Value | Kind | Evidence |
+이 프로젝트에서는 지연 시간을 다음 세 가지로 분리해 해석했습니다.
+
+- **모델 지연(Model latency):** 가속기에서 한 프레임을 계산하는 시간
+- **요청 왕복 지연(End-to-end request latency):** 전송과 원격 처리를 포함한 클라이언트 왕복 시간
+- **데이터 나이(Data age):** 제어기가 인지 결과를 사용할 때 해당 결과가 얼마나 오래되었는지 나타내는 값
+
+| 성과 | 측정 결과 | 분류 | 근거 |
 |---|---|---|---|
-| YOLO26n on RNGD, BF16 | **2.0 ms** mean (batch 1); recall 0.972 / precision 0.992 vs GPU FP32 | model latency | `npu_bench_bf16.json`, `gpu_vs_npu_bf16.json` |
-| Same model on RTX 3060, CUDA Graph | 2.60 ms mean (eager 13.54 ms); the fair baseline reduces an apparent "6×" NPU advantage to 1.2–1.4× | model latency | `gpu_benchmark_ext.json` |
-| Lane U-Net on RNGD, BF16 | **2.8 ms**; output equals GPU BF16 (IoU 0.991–0.998 vs GPU FP32 on the same input) | model latency / correctness | `v3_npu_multimodel_bench.json`, `v3_lane_correctness_*.json` |
-| Multi-PE scaling, YOLO26n | 537 → 1,052 → **1,762 inferences/s** on 1 / 2 / 4 PEs (3.3×); 8 PEs are host-bound | throughput | `v2_npu_multistream2.json` |
-| Multi-model NPU server | detection on `furiosa:0` + lane on `furiosa:1` from one upload: 61 ms vs 55 ms for detection alone | end-to-end (remote) | `v3_npu_multimodel_bench.json` |
-| Remote transport optimisation | **203 → 60 ms** mean round trip, lossless (same detections), found by stage profiling | end-to-end | `v2_transport_profile*.json` |
-| Remote NPU in the CARLA loop | 2–3 ms of compute becomes 63–65 ms per request (mean) and **121–126 ms detection age** (p95), vs 30 ms with the local GPU | end-to-end / data age | `v3_closed_loop.json` |
-| Operator compatibility database | 74 recorded compile/run results, each with the compiler's own message | porting | `docs/npu_operator_compatibility.md` |
-| V3 closed loop | **80 runs** (74 + 6 reruns); **36 hazard runs, 0 collisions**; 0 lane departures in healthy sessions | simulation | `v3_closed_loop*.json` |
-| Lane-age tolerance | LKA holds up to +150 ms injected lane latency; at +250 ms it is unavailable 57–65 % of the time; limit about 0.25 s | data age | `v3_closed_loop.json` |
-| GPU failover | NPU stall → GPU 0.54 s, crash → GPU 0.11 s, 0 frames lost (offline); handled and logged in CARLA | robustness | `v3_failure_engineering.json` |
+| RNGD YOLO26n, BF16 | 배치 1 평균 **2.0 ms**, GPU FP32 대비 recall 0.972 / precision 0.992 | 모델 지연 | `npu_bench_bf16.json`, `gpu_vs_npu_bf16.json` |
+| RTX 3060 공정 비교 | CUDA Graph 2.60 ms, eager 13.54 ms. 겉보기 6배 차이가 공정 비교에서는 1.2–1.4배로 감소 | 모델 지연 | `gpu_benchmark_ext.json` |
+| RNGD Lane U-Net, BF16 | **2.8 ms**, 동일 입력에서 GPU FP32 대비 IoU 0.991–0.998 | 지연·정확성 | `v3_npu_multimodel_bench.json`, `v3_lane_correctness_*.json` |
+| YOLO26n Multi-PE 확장 | 1 / 2 / 4 PE에서 537 → 1,052 → **1,762 inference/s**(3.3배), 8 PE부터 호스트 병목 | 처리량 | `v2_npu_multistream2.json` |
+| 다중 모델 NPU 서버 | 한 번의 업로드로 탐지 `furiosa:0` + 차선 `furiosa:1` 실행: 탐지만 55 ms, 두 모델 61 ms | 원격 E2E | `v3_npu_multimodel_bench.json` |
+| 원격 전송 최적화 | 단계별 프로파일링으로 평균 왕복 지연 **203 → 60 ms**, 탐지 결과 손실 없음 | 원격 E2E | `v2_transport_profile*.json` |
+| CARLA 원격 NPU 폐루프 | 2–3 ms 연산이 요청당 63–65 ms, 탐지 데이터 나이 p95 **121–126 ms**로 증가. 로컬 GPU는 30 ms | E2E·Data age | `v3_closed_loop.json` |
+| 연산자 호환성 DB | 컴파일러 실제 메시지를 포함한 74개 compile/run 결과 기록 | 모델 포팅 | `docs/npu_operator_compatibility.md` |
+| V3 폐루프 평가 | **80회 주행**, 위험 시나리오 **36회·충돌 0회**, 정상 세션 차선 이탈 0회 | 시뮬레이션 | `v3_closed_loop*.json` |
+| 차선 데이터 지연 한계 | +150 ms까지 LKA 유지, +250 ms에서는 57–65% 구간 사용 불가. 한계 약 0.25초 | Data age | `v3_closed_loop.json` |
+| GPU Failover | NPU stall → GPU 0.54초, crash → GPU 0.11초, 오프라인 프레임 손실 0 | 강건성 | `v3_failure_engineering.json` |
 
-**Unsafe or negative results** (kept visible; see [Failure Analysis](#failure-analysis)):
-- **Curve + braking lead car at 50 km/h:** remote NPU staleness cuts the braking margin from 13.7 m
-  (GPU) to 2.1 m.
-- **Stale detections:** 20 % stale results with RNGD latency stopped the car 0.33 m from a pedestrian.
-- **Radar fusion** made closing speed worse in two of three scenario types.
-- **39 m-radius curve:** unneeded braking in 4 of 10 runs.
-- **INT8:** no compute speed-up.
+**실패하거나 안전하지 않았던 결과도 숨기지 않고 기록했습니다.**
 
-## Demo
-Mode D: both models run on the RNGD, and steering comes only from camera lane perception.
+- **50 km/h 곡선 + 선행차 제동:** 원격 NPU 데이터 노후화로 최소 제동 여유가 GPU 13.7 m에서 2.1 m로 감소
+- **Stale detection:** RNGD 지연에 20% stale 결과를 주입했을 때 보행자 앞 0.33 m에서 정지
+- **Radar fusion:** 세 종류 시나리오 중 두 종류에서 접근 속도 추정이 오히려 악화
+- **반경 39 m 급곡선:** 위험물이 없는데도 10회 중 4회 불필요한 제동 발생
+- **INT8:** 연산 속도 향상 없음
 
-| Lane mask + estimated centre, AEB braking on a curve | Pedestrian while cornering (AEB warning) | RNGD server crash → GPU failover (logged) |
+자세한 내용은 [실패 분석](#failure-analysis)에 정리했습니다.
+
+## 주행 데모 (Demo)
+
+Mode D에서는 객체 탐지와 차선 분할을 모두 RNGD에서 실행하며, 조향은 카메라 기반 차선 인지만 사용합니다.
+
+| 곡선 AEB 제동 + 차선 중심 추정 | 코너링 중 보행자 AEB 경고 | RNGD 서버 crash → GPU failover |
 |---|---|---|
-| ![AEB braking on a curve](assets/demo/v3/curve_lead_brake_brake.png) | ![pedestrian while cornering](assets/demo/v3/ped_cornering_warning.png) | ![GPU failover](assets/demo/v3/npu_failover_fallback.png) |
+| ![곡선에서 AEB 제동](assets/demo/v3/curve_lead_brake_brake.png) | ![코너링 중 보행자 경고](assets/demo/v3/ped_cornering_warning.png) | ![GPU failover](assets/demo/v3/npu_failover_fallback.png) |
 
-**Video:** [`assets/demo/v3/demo_v3.mp4`](assets/demo/v3/demo_v3.mp4), 640×360, 5.5 MB. It has three clips
-(curve + pedestrian, curve + lead braking, NPU crash failover).
+**V3 영상:** [`assets/demo/v3/demo_v3.mp4`](assets/demo/v3/demo_v3.mp4)
+640×360, 5.5 MB이며 곡선+보행자, 곡선+선행차 제동, NPU crash failover 세 장면으로 구성됩니다.
 
-**The overlay shows:**
-- detection boxes and the lane mask
-- the backend of each model
-- per-model latency and frame age
-- track range, closing speed and TTC
-- AEB, LKA and arbiter states
-- steering and vehicle speed
+영상 오버레이에는 다음 정보가 표시됩니다.
 
-**Clip choice:** the clips are representative day scenarios. The night/rain incident is analysed below
-instead of being staged.
+- 객체 탐지 box와 차선 mask
+- 모델별 실행 backend
+- 모델 지연과 frame age
+- 추적 거리, 접근 속도, TTC
+- AEB·LKA·중재기(arbiter) 상태
+- 조향값과 차량 속도
 
-**Earlier demos:**
+야간·우천 문제는 재현 장면을 연출하지 않고 실제 실패 기록을 [실패 분석](#failure-analysis)에 남겼습니다.
+
+**이전 버전 영상**
+
 - V1: [GPU AEB](assets/demo/v1_demo.mp4)
-- V2: [NPU live loop](assets/demo/v2_demo_npu_live.mp4), [failover](assets/demo/v2_demo_npu_failover.mp4)
+- V2: [NPU 실시간 루프](assets/demo/v2_demo_npu_live.mp4), [Failover](assets/demo/v2_demo_npu_failover.mp4)
 
-## Architecture
-![V3 architecture](assets/diagrams/v3_architecture.png)
+## 시스템 구조 (Architecture)
 
-| Mode | Detection | Lane |
+![V3 시스템 구조](assets/diagrams/v3_architecture.png)
+
+| 모드 | 객체 탐지 | 차선 분할 |
 |---|---|---|
 | A | GPU | GPU |
 | B | RNGD | GPU |
 | C | GPU | RNGD |
-| D | RNGD | RNGD (one request carries both models, on separate PEs) |
+| D | RNGD | RNGD — 한 요청에서 서로 다른 PE로 두 모델 실행 |
 
-**Runtime components:**
-- latest-frame queues
-- stale-result gates (0.3 s)
-- explicit, logged GPU failover
-- a `SceneState` that is the only input to AEB and LKA
+**런타임 핵심 구성**
 
-**Time-dilated hardware-in-the-loop evaluation:** every frame really runs on its backend, and the
-measured latency is applied in simulation time.
+- 최신 프레임만 유지하는 queue
+- 0.3초가 지난 결과를 차단하는 stale-result gate
+- 전환 원인을 명시적으로 기록하는 GPU failover
+- AEB와 LKA의 유일한 입력으로 사용하는 `SceneState`
 
-**Earlier architectures:** [V1](assets/diagrams/v1_architecture.png), [V2](assets/diagrams/v2_architecture.png).
+모든 프레임은 지정된 backend에서 실제로 실행됩니다. 측정된 지연을 시뮬레이션 시간에 반영하는
+**시간 확장 Hardware-in-the-loop 평가**를 사용했습니다.
 
-## Project Evolution
-### V1 — GPU Closed Loop + NPU Validation
-- **Closed loop:** CARLA camera → YOLO26n on GPU → monocular range / TTC → AEB. Camera-only AEB had
-  0 collisions in 30 hazard runs at 30 km/h.
-- **NPU deployment:** YOLO26n was deployed on RNGD (FP32 / BF16 / W8) and validated frame by frame
-  against the GPU. In the AEB replays, the NPU made the same first-brake decision as the GPU (7 of 7).
-- **Fair baseline:** a CUDA Graph GPU baseline turned an apparent 6× NPU advantage into 1.2–1.4×.
-- **What V1 exposed:**
-  - noisy monocular closing speed
-  - pedestrian collisions at 40–50 km/h
-  - about 120 ms of SSH frame transport
+이전 구조: [V1](assets/diagrams/v1_architecture.png), [V2](assets/diagrams/v2_architecture.png)
 
-### V2 — Async NPU Runtime + Robust AEB
-- **Transport:** stage profiling cut the remote RNGD path from 203 to 60 ms, losslessly.
-- **Runtime:**
-  - `InferenceBackend` abstraction (GPU / RNGD / replay)
-  - latest-frame queue
-  - frame-age gate
-  - explicit failover
-- **Perception:** a SORT-style tracker with a range Kalman filter, and a path-prediction AEB state
-  machine.
-- **Braking:**
-  - hazard collisions 0 / 18 (V1: 2 / 18, AEB off: 14 / 18)
-  - collision-free from 0 to 200 ms of injected perception latency
-- **Remote RNGD in the live CARLA loop:** works, but only near-real-time (frame age p95 165–212 ms).
+## 프로젝트 발전 과정 (Project Evolution)
 
-### V3 — Multi-Model NPU Perception + LKA + Sensor Fusion
-- **Perception:**
-  - a lane-segmentation network designed around measured compiler limits
-  - a two-PE multi-model NPU server, with request coalescing for Mode D
-- **Control:** camera-only LKA (pure pursuit with latency compensation), and AEB + LKA arbitration.
-- **Sensor fusion stage 1:** camera + radar.
-- **Failure engineering:** fault injection, failover in the closed loop, and memory-guarded evaluation.
-- **Validation:** 80 closed-loop runs (74 in the main matrix, plus 6 reruns); results in
-  [Evaluation](#evaluation).
+### V1 — GPU 폐루프와 NPU 검증
 
-## NPU Engineering
-### Model Porting
-| Model | Workload | NPU status | Precision | Main issue | Resolution |
+- **폐루프 구현:** CARLA camera → GPU YOLO26n → 단안 거리·TTC → AEB
+- **결과:** 30 km/h 위험 시나리오 30회에서 camera-only AEB 충돌 0회
+- **NPU 배포:** YOLO26n을 RNGD FP32/BF16/W8로 실행하고 GPU와 프레임 단위 비교
+- **의사결정 일치:** AEB replay 7회 모두 GPU와 NPU의 최초 제동 시점 일치
+- **공정한 기준선:** CUDA Graph 적용 후 겉보기 6배 NPU 우위가 1.2–1.4배로 감소
+- **발견한 문제:** 단안 접근 속도 노이즈, 40–50 km/h 보행자 충돌, 약 120 ms SSH 전송 지연
+
+### V2 — 비동기 NPU 런타임과 강건한 AEB
+
+- 단계별 프로파일링으로 원격 RNGD 경로를 **203 → 60 ms**로 단축
+- `InferenceBackend` 추상화(GPU/RNGD/replay), latest-frame queue, frame-age gate, 명시적 failover 구현
+- SORT 계열 tracker, 거리 Kalman Filter, 경로 예측 기반 AEB 상태 머신 구현
+- 위험 시나리오 충돌 0/18회(V1 2/18회, AEB off 14/18회)
+- 0–200 ms 인지 지연 주입 범위에서 충돌 없음
+- 원격 RNGD의 실제 CARLA 루프 동작을 확인했지만 frame age p95 165–212 ms로 준실시간 수준
+
+### V3 — 다중 모델 NPU 인지, LKA, Sensor Fusion
+
+- 측정한 컴파일러 한계에 맞춰 Lane Segmentation Network 설계
+- 2개 PE를 사용하는 다중 모델 NPU 서버와 Mode D request coalescing 구현
+- 카메라 기반 LKA(pure pursuit + 지연 보상), AEB+LKA 중재 구현
+- 1단계 sensor fusion으로 camera+radar 결합
+- Fault injection, 폐루프 failover, memory guard 기반 평가 수행
+- 총 80회 폐루프 평가 결과를 [평가](#evaluation)에 정리
+
+## NPU 엔지니어링 (NPU Engineering)
+
+### 모델 포팅
+
+| 모델 | 용도 | NPU 결과 | 정밀도 | 주요 문제 | 해결 방법 |
 |---|---|---|---|---|---|
-| YOLO26n | object detection (driving loop) | PASS, 2.0 ms | BF16 (also FP32, W8) | unfused BatchNorm not importable; head concat lowering | fuse Conv+BN; split at the raw head, decode/NMS on the host |
-| Lane U-Net (2.12 M params) | lane-marking segmentation (driving loop) | PASS, 2.8 ms | BF16 | ConvTranspose, bilinear and dilated conv unsupported; pooling fails at 256×512 | exact rewrites (ConvT → 1×1 conv + PixelShuffle, bilinear → nearest + filter); 3×3 stride-2 downsampling |
-| YOLO26s | larger detector | FAIL → PASS, 4.67 ms | BF16 | a lowered weight slice must fit 64 KiB | exact output-channel SplitConv, validated against the original on CPU |
-| Tiny ViT (test configuration) | small Transformer classifier | PASS, 0.44–0.48 ms | BF16 | SDPA needs contiguous q/k/v | `.contiguous()` before attention |
-| MobileNetV3-Small | classification | PASS, 0.50 ms | BF16 | none | none |
-| ResNet18 | classification backbone | **FAIL** | BF16 | 64 KiB limit on 512→512 / 512→256 convs; an output split is not enough | open: needs an input-channel split with a summed result |
-| LR-ASPP MobileNetV3 | segmentation candidate | **FAIL** | BF16 | backend scheduling error (`Inconsistent tensor group offsets`) after rewrites | not pursued; replaced by the U-Net |
+| YOLO26n | 주행 객체 탐지 | PASS, 2.0 ms | BF16, FP32, W8 | 미융합 BatchNorm import 실패, head concat lowering | Conv+BN 융합, raw head에서 분할 후 host decode/NMS |
+| Lane U-Net, 2.12 M params | 차선 분할 | PASS, 2.8 ms | BF16 | ConvTranspose·bilinear·dilated conv 미지원, 256×512 pooling 실패 | ConvT → 1×1 conv+PixelShuffle, bilinear → nearest+filter, 3×3 stride-2 |
+| YOLO26s | 대형 탐지 모델 | FAIL → PASS, 4.67 ms | BF16 | lowering된 weight slice가 64 KiB를 초과 | output-channel SplitConv 후 CPU 원본과 동일성 검증 |
+| Tiny ViT | 소형 Transformer | PASS, 0.44–0.48 ms | BF16 | SDPA의 q/k/v contiguous 요구 | attention 전 `.contiguous()` 적용 |
+| MobileNetV3-Small | 분류 | PASS, 0.50 ms | BF16 | 없음 | 없음 |
+| ResNet18 | 분류 backbone | **FAIL** | BF16 | 512→512, 512→256 conv의 64 KiB 한계 | input-channel split + 결과 합산 필요 |
+| LR-ASPP MobileNetV3 | 분할 후보 | **FAIL** | BF16 | rewrite 후 backend scheduling 오류 | 추가 진행하지 않고 U-Net으로 대체 |
 
-Evidence per row: [`docs/npu_model_portfolio.md`](docs/npu_model_portfolio.md).
+모델별 근거: [`docs/npu_model_portfolio.md`](docs/npu_model_portfolio.md)
 
-### Operator Compatibility
-- **Database:** 74 generated compile/run rows with the compiler's messages:
-  [`docs/npu_operator_compatibility.md`](docs/npu_operator_compatibility.md).
-- **Exact graph rewrites:** six, each validated against the original op on CPU (BN folding, bilinear ×2,
-  ConvTranspose, dilated conv, split conv, contiguous attention).
-- **Failure classes:** [`docs/npu_graph_lowering_notes.md`](docs/npu_graph_lowering_notes.md).
+### 연산자 호환성과 Graph Rewrite
 
-### Precision / Quantization
-- **BF16** is the deployed precision.
-  - On the same input, BF16 lane masks agree with FP32 at IoU 0.991–0.998.
-  - RNGD output matches GPU BF16.
-- **W8 is weight-only:** weights are stored as int8 and cast to BF16 inside the graph.
-  - Weights shrink from 4.82 MB (BF16) to 2.44 MB.
-  - It is *slower* (2.35 vs 2.00 ms).
-  - Recall drops to 0.957.
-- **True INT8 compute (W8A8):** blocked on `furiosa-torch` 2026.4.0. Compiler probes showed that int8
-  convolution wraps modulo 256 and that the int32-accumulating convolution is not supported. Details:
-  [`docs/quantization_limitations.md`](docs/quantization_limitations.md).
+- 컴파일러 메시지를 포함한 74개 compile/run 결과:
+  [`docs/npu_operator_compatibility.md`](docs/npu_operator_compatibility.md)
+- CPU 원본 연산과 동일성을 검증한 6개 rewrite:
+  BN folding, bilinear ×2, ConvTranspose, dilated conv, split conv, contiguous attention
+- 실패 유형 분석: [`docs/npu_graph_lowering_notes.md`](docs/npu_graph_lowering_notes.md)
 
-### Multi-Model Scheduling
-- **Offline, on the host:** separate PEs per model keep detection at 400 Hz under stress. Two workers on
-  one PE are worse than sequential execution, and strict priority starves the lane model.
-- **Coalescing for Mode D:** a dispatcher merges pending detection and lane requests into one upload.
-  It replaced a lane-request aliasing bug that starved the lane model.
-- **In the closed loop:** transport dominates, so every strategy gives the same driving outcome.
-  Adaptive priority cuts dropped frames from 170 to 21 and queue delay from 15 to 3 ms. Sharing one PE
-  adds about 6–8 ms (p95).
+### 정밀도와 양자화 (Precision / Quantization)
 
-### Runtime Failover
-- **States:** PRIMARY / FALLBACK / DEGRADED, and every switch is logged.
-- **Offline:** RNGD stall → GPU in 0.54 s, crash → GPU in 0.11 s, 0 frames lost.
-- **In CARLA:** after a stall the runtime switched back to RNGD. After a server crash it did not switch
-  back within the 12 s run.
-- **Latency accounting:** the fallback latency includes the failed NPU wait. Leaving it out was a bug,
-  found and fixed in V3.
+- 배포 정밀도는 **BF16**입니다.
+  - 동일 입력에서 BF16 차선 mask는 FP32와 IoU 0.991–0.998
+  - RNGD 출력은 GPU BF16과 일치
+- **W8은 weight-only 방식**입니다.
+  - weight 저장 공간 4.82 MB → 2.44 MB
+  - 속도는 오히려 2.00 ms → 2.35 ms로 감소
+  - recall 0.972 → 0.957
+- **실제 INT8 연산(W8A8)**은 `furiosa-torch 2026.4.0`에서 불가능했습니다.
+  - int8 convolution이 modulo 256으로 wrap
+  - int32 누산 convolution 미지원
+  - activation quantization 미지원
 
-### Transport Bottlenecks
-- **Compute is not the bottleneck:** NPU compute is 2–3 ms, while the SSH round trip to the shared
-  remote host is 60 ms or more.
-- **What fixed it** (stage profiling, 203 → 60 ms, lossless):
-  - send only the letterbox content
-  - pin the remote threads
-  - add an exact pre-filter
-  - use SSH compression
+세부 내용: [`docs/quantization_limitations.md`](docs/quantization_limitations.md)
 
-  JPEG would reach about 30 ms, but it is lossy: recall drops to 0.89–0.91, so it was not used.
-- **Shared-host and network variance:** this remains the main risk. In the loop, request p95 was
-  92–103 ms, and request timeouts under host memory pressure caused the night/rain incident.
+### 다중 모델 스케줄링
 
-## Autonomous Driving
-### Object Detection
-- **Model:** YOLO26n, 640×640 letterbox.
-- **Post-processing:** the same host decode/NMS on both backends, so GPU and RNGD outputs are compared
-  like for like.
-- **Range:** monocular, from flat-ground geometry of the box bottom (V1); range and range rate are then
-  filtered by the tracker (V2).
+- 모델별로 PE를 분리하면 stress 상황에서도 객체 탐지 400 Hz 유지
+- 한 PE에 worker 2개를 배치하면 순차 실행보다 느리고, strict priority는 차선 모델 starvation 발생
+- Mode D dispatcher가 탐지·차선 요청을 한 upload로 병합
+- request aliasing으로 차선 모델이 굶는 버그를 발견해 수정
+- 폐루프에서는 전송 지연이 지배적이어서 전략별 주행 결과 차이는 작음
+- adaptive priority로 dropped frame 170 → 21, queue delay 15 → 3 ms 감소
 
-### Lane Segmentation
-- **Model:** a U-Net designed for the RNGD compiler and trained on CARLA data.
-- **Accuracy:** IoU 0.727 on a held-out map (Town03, GPU FP32).
-  - On 150 upsampled held-out frames: GPU FP32 0.688 vs deployed RNGD path 0.664.
-  - Most of that gap comes from the double resize in the NPU client, not BF16.
-- **Geometry:** masks are projected to the ground and fitted with quadratic boundaries, which give
-  lateral offset, heading and curvature ([`docs/v3_perception_control.md`](docs/v3_perception_control.md)).
+### 런타임 Failover
 
-### Tracking
-- **Tracker:** SORT-style, with a range Kalman filter and a lateral filter.
-- **Ego-motion:** yaw-rate compensation of the lateral velocity.
-- **Range rate:** filtering cut the closing-speed MAE from 1.51 to 1.27 m/s offline
-  ([`docs/v2_tracking.md`](docs/v2_tracking.md), [`docs/v2_range_rate_filtering.md`](docs/v2_range_rate_filtering.md)).
+- 상태: PRIMARY / FALLBACK / DEGRADED, 모든 전환을 log로 기록
+- 오프라인: RNGD stall → GPU 0.54초, crash → GPU 0.11초, 프레임 손실 0
+- CARLA: stall 후 RNGD로 복귀했지만 server crash 후 12초 주행 안에는 복귀하지 못함
+- failed NPU wait를 fallback latency에서 누락하던 계산 버그를 V3에서 발견해 수정
+
+### 원격 전송 병목
+
+- NPU 연산은 2–3 ms지만 공유 원격 호스트까지 SSH 왕복은 60 ms 이상
+- 단계별 프로파일링으로 203 → 60 ms까지 무손실 최적화
+  - letterbox 유효 영역만 전송
+  - 원격 thread pinning
+  - 정확한 pre-filter 적용
+  - SSH compression 사용
+- JPEG은 약 30 ms까지 줄지만 recall이 0.89–0.91로 감소해 사용하지 않음
+- 공유 호스트의 memory pressure로 request timeout이 발생하며 야간·우천 실패로 이어짐
+
+## 자율주행 인지·제어 (Autonomous Driving)
+
+### 객체 탐지
+
+- YOLO26n, 640×640 letterbox 입력
+- GPU와 RNGD 모두 동일한 host decode/NMS를 사용해 동일 조건 비교
+- box 하단과 평면 도로 기하로 단안 거리 추정 후 tracker에서 거리·접근 속도 filtering
+
+### 차선 분할
+
+- RNGD 컴파일러 제약에 맞춘 U-Net을 CARLA 데이터로 학습
+- 미사용 map Town03에서 IoU 0.727(GPU FP32)
+- 150개 held-out frame: GPU FP32 0.688, 배포 RNGD 경로 0.664
+- 차이의 대부분은 BF16이 아니라 NPU client의 이중 resize에서 발생
+- mask를 지면에 투영한 뒤 2차 경계선으로 fitting해 횡방향 오차·heading·curvature 계산
+
+세부 설계: [`docs/v3_perception_control.md`](docs/v3_perception_control.md)
+
+### 추적과 거리 추정
+
+- SORT 계열 tracker + 거리 Kalman Filter + lateral filter
+- yaw rate를 이용한 ego-motion 보상
+- 접근 속도 MAE를 오프라인 기준 1.51 → 1.27 m/s로 감소
+
+근거: [`docs/v2_tracking.md`](docs/v2_tracking.md),
+[`docs/v2_range_rate_filtering.md`](docs/v2_range_rate_filtering.md)
 
 ### Radar Fusion
-- **Design:** a CARLA front radar refines tracks that the camera created, with NIS-gated scalar Kalman
-  updates. Radar never creates tracks.
-- **Result: mixed** (see [Failure Analysis](#failure-analysis)).
 
-### AEB
-- **Logic:** a path-prediction state machine (WARNING / BRAKE) working on a path-relative corridor, so
-  in-lane obstacles on curves are not ignored.
-- **Inputs:** TTC and gap come from tracked range and range rate in `SceneState`.
+- 카메라가 생성한 track만 CARLA 전방 radar로 보정
+- NIS gate를 적용한 scalar Kalman update 사용
+- radar 단독으로 track을 생성하지 않음
+- 결과는 시나리오에 따라 개선과 악화가 혼재
 
-### LKA
-- **Controller:** pure pursuit (look-ahead 0.8 s × v), compensated for lane-data age with odometry.
-- **Safety:** a 0.5 s lane timeout makes LKA unavailable rather than steering on stale geometry.
-- **Arbitration:** braking has precedence. Throttle is 0 by construction, and steering is clamped to
-  ±0.1 while braking. There is no evasive steering.
+### 자동 긴급 제동 (AEB)
 
-## Evaluation
-**V3: 80 closed-loop runs** (CARLA 0.9.16, time-dilated HIL). They comprise:
-- 24 lane-keeping runs: modes A–D × 6 routes
-- a focused matrix of 50: combined AEB + LKA on curves, radar pairs, scheduling, faults, and a lane-age
-  sweep
-- 6 reruns: night/rain in a healthy session, and stale injection after a simulator fix
+- 곡선에서도 차선 내 장애물을 놓치지 않도록 path-relative corridor 기반 WARNING/BRAKE 상태 머신 구현
+- `SceneState`의 추적 거리와 접근 속도로 TTC와 gap 계산
 
-All tables: [`reports/v3_closed_loop_tables.md`](reports/v3_closed_loop_tables.md).
+### 차선 유지 보조 (LKA)
 
-**Lane keeping at 30 km/h** (lateral RMSE against the map lane centre; 0 departures in healthy runs):
+- Pure pursuit 사용: look-ahead = 0.8초 × 차량 속도
+- odometry로 차선 데이터 age 보상
+- 차선 정보가 0.5초를 넘으면 stale geometry로 조향하지 않고 LKA를 unavailable 상태로 전환
+- 제동 우선 중재: AEB 작동 중 throttle은 0, steering은 ±0.1로 제한
+- 회피 조향은 구현하지 않음
 
-| Route | A: GPU lane | C / D: RNGD lane |
+<a id="evaluation"></a>
+
+## 평가 (Evaluation)
+
+V3에서는 CARLA 0.9.16과 시간 확장 HIL 방식으로 총 **80회 폐루프 주행**을 수행했습니다.
+
+- 차선 유지 24회: Mode A–D × 6개 route
+- 집중 평가 50회: 곡선 AEB+LKA, radar 비교, scheduling, fault, lane-age sweep
+- 재실행 6회: 정상 memory 상태의 야간·우천, simulator 수정 후 stale injection
+
+전체 표: [`reports/v3_closed_loop_tables.md`](reports/v3_closed_loop_tables.md)
+
+**30 km/h 차선 유지 결과**
+Map lane center 대비 lateral RMSE이며 정상 세션에서 차선 이탈은 0회입니다.
+
+| 주행 경로 | A: GPU lane | C/D: RNGD lane |
 |---|---|---|
-| straight / mild curve (R 147 m) | 0.8 / 1.4 cm | 0.9–1.0 / 1.9–2.3 cm |
-| sharp curve (R 39 m) / held-out Town03 | 9.7 / 5.3 cm | 11–13 / 5.3–5.5 cm |
-| night / rain | 1.6 / 1.6 cm | 2.5–2.6 / 2.0–2.3 cm (healthy rerun) |
+| 직선 / 완만한 곡선(R 147 m) | 0.8 / 1.4 cm | 0.9–1.0 / 1.9–2.3 cm |
+| 급곡선(R 39 m) / 미사용 Town03 | 9.7 / 5.3 cm | 11–13 / 5.3–5.5 cm |
+| 야간 / 우천 | 1.6 / 1.6 cm | 2.5–2.6 / 2.0–2.3 cm(정상 세션 재실행) |
 
-**Hazards and combined behaviour:**
-- **Hazard runs:** 36 across all backend modes and faults, with 0 collisions.
-- **Curve scenarios** (16 runs, all modes): 0 collisions and 0 departures; lateral error while braking
-  ≤ 12 cm.
-- **Arbitration:** in all 29,618 logged braking ticks the arbiter was in an AEB mode, and |steer| was at
-  most 0.10.
-- **Pedestrian at 50 km/h:** minimum gap 3.44 m with GPU detection (V2: 2.27 m) and 2.11 m with both
-  models on RNGD.
+**위험 시나리오와 AEB+LKA 동시 동작**
 
-| Question | Measured answer |
+- 전체 backend와 fault 조건을 포함한 위험 시나리오 36회, 충돌 0회
+- 곡선 시나리오 16회에서 충돌 0회·차선 이탈 0회
+- 제동 중 횡방향 오차 12 cm 이하
+- 29,618개 제동 tick 모두 AEB 우선 상태, `|steer| ≤ 0.10`
+- 50 km/h 보행자: GPU 탐지 최소 gap 3.44 m, 두 모델 RNGD 최소 gap 2.11 m
+
+| 검증 질문 | 측정 결과 |
 |---|---|
-| Does NPU lane segmentation work in closed loop? | Yes, in healthy sessions. With failing remote requests and no lane fallback, it did not. |
-| Does multi-model NPU scheduling raise data age? | Detection age p95 is 121–126 ms remote vs 30 ms on the GPU; the second model adds about 6 ms. |
-| Does radar improve closing speed? | Lead vehicle at 50 km/h: yes (0.40 → 0.24 m/s; gap 5.5 → 10.4 m). Pedestrian at 30 km/h and curve obstacle: worse. |
-| Is LKA stable during AEB? | Yes: lateral error while braking ≤ 12 cm, steering ≤ 0.10, no departures. |
-| Is the control budget met? | Lane: yes (limit about 0.25 s). Braking at 50 km/h: the margin drops by up to 11.6 m. |
+| NPU 차선 분할이 폐루프에서 동작하는가? | 정상 세션에서는 동작했습니다. 원격 요청이 실패하고 lane fallback이 없을 때는 동작하지 못했습니다. |
+| 다중 모델 NPU가 data age를 증가시키는가? | 탐지 age p95는 원격 121–126 ms, GPU 30 ms이며 두 번째 모델 추가 비용은 약 6 ms입니다. |
+| Radar가 접근 속도를 개선하는가? | 50 km/h 선행차는 개선(0.40 → 0.24 m/s, gap 5.5 → 10.4 m)했지만 보행자와 곡선 장애물에서는 악화됐습니다. |
+| AEB 중 LKA가 안정적인가? | 제동 중 횡방향 오차 12 cm 이하, steering 0.10 이하, 차선 이탈 0회였습니다. |
+| 제어 지연 예산을 만족하는가? | 차선은 약 0.25초까지 가능하지만 50 km/h 제동 여유는 최대 11.6 m 감소했습니다. |
 
-![lane keeping](assets/plots/v3_lane_keeping_rmse.png)
-![frame age](assets/plots/v3_frame_age_by_mode.png)
-![combined AEB + LKA](assets/plots/v3_combined_timeseries.png)
+![차선 유지 RMSE](assets/plots/v3_lane_keeping_rmse.png)
+![모드별 frame age](assets/plots/v3_frame_age_by_mode.png)
+![AEB와 LKA 동시 동작](assets/plots/v3_combined_timeseries.png)
 
-## Failure Analysis
-### INT8 compute limitation
-- **W8 is weight-only.** It halves weight storage (4.82 → 2.44 MB), but every multiply-accumulate
-  still runs in BF16.
-- **No speed-up:** W8 is slower than BF16 (2.35 vs 2.00 ms), and recall drops from 0.972 to 0.957.
-- **True INT8 compute was blocked by the tested SDK:**
-  - int8 convolution wraps modulo 256
-  - the int32-accumulating convolution is reported as not supported
-  - activation quantization is unavailable
+<a id="failure-analysis"></a>
 
-  This was shown by compiler probes, not assumed. W8 is kept as a documented negative result.
+## 실패 분석 (Failure Analysis)
 
-### Remote transport
-- **The model is fast, the system is not:** NPU inference takes 2–3 ms, but the remote round trip
-  dominates.
-- **Profiling helped:** it found an oversized payload, oversubscribed host threads and decode work, and
-  fixing them cut 203 → 60 ms losslessly.
-- **The cost remains:** in the loop, detection data age (p95) is 121–126 ms vs 30 ms on the GPU, and
-  shared-host and network variance remains. The fix is co-locating the NPU with the camera, not a faster
-  model.
+### INT8 연산 한계
 
-### Lane NPU incident (night/rain)
-1. **Symptom:** RNGD lane modes (C/D) left the lane in night and rain. This looked like a BF16 precision
-   problem on dark, low-contrast frames.
-2. **Hypothesis tested:** a same-frame GPU vs NPU validation on 440 frames (240 dataset + 200 real
-   driving frames).
-   - RNGD equals GPU BF16 (IoU 0.991–0.998 vs FP32).
-   - Night and rain were no worse than day.
+- W8은 weight-only 방식으로 저장 공간만 4.82 → 2.44 MB로 감소
+- 모든 multiply-accumulate는 여전히 BF16에서 실행
+- W8은 BF16보다 느림(2.35 vs 2.00 ms), recall 0.972 → 0.957
+- 실제 INT8 연산은 시험한 SDK에서 불가능
+  - int8 convolution modulo 256 wrap
+  - int32 누산 convolution 미지원
+  - activation quantization 미지원
 
-   **Precision was disproved.**
-3. **Root cause:** the four failing runs were the last before the host ran low on memory. Their remote
-   requests timed out at 1 s (detection requests too), and Modes C/D have no lane fallback, so LKA lost
-   its input.
-4. **Confirmation:** the same configurations rerun in a healthy session had 0 departures and 2.0–2.6 cm
-   RMSE.
-5. **Smaller real defect:** the NPU client resizes twice (letterbox 640×360, then 512×256). That costs
-   2–6 % mask IoU and about 2 cm of offset error in rain. It is documented, not yet fixed.
+추측이 아니라 compiler probe로 확인한 결과이며, 실패 결과도 근거로 보존했습니다.
 
-![night rain](assets/plots/v3_nightrain_transport.png)
+### 원격 전송 지연
 
-### Other unsafe or open results
-- **Remote staleness costs braking margin:** on a curve with a braking lead car at 50 km/h, the minimum
-  gap is 13.7 m with the GPU and 2.1 m with RNGD + RNGD.
-- **Stale detections:**
-  - With 20 % stale results and RNGD latency (Mode B), the car stopped 0.33 m from a crossing pedestrian.
-  - This appeared only after fixing a simulator bug that had silently disabled stale injection.
-- **Radar fusion stage 1 is mixed:**
-  - Closing-speed error gets worse for a pedestrian at 30 km/h (0.55 → 1.14 m/s) and for a curve obstacle
-    (0.34 → 2.85 m/s).
-  - The likely cause is association with other radar returns; this is not isolated.
-- **Unneeded braking:**
-  - On a 39 m-radius curve with no hazard, in 4 of 10 runs, plus early braking for a kerbside pedestrian.
-  - The braking target was outside ±2 m laterally. The root cause is open, because the target state was
-    not logged.
-- **Missing NPU lane fallback:** Modes C/D have no GPU lane fallback by default.
-- **Bugs found by questioning suspicious numbers** (each fixed, with a unit test):
+- 모델은 빠르지만 시스템은 빠르지 않았습니다. NPU 추론은 2–3 ms지만 원격 왕복 시간이 지배적입니다.
+- 단계별 profiling으로 과도한 payload, thread oversubscription, decode 비용을 찾아 203 → 60 ms로 단축했습니다.
+- 폐루프 탐지 data age p95는 원격 121–126 ms, GPU 30 ms입니다.
+- 근본적인 해결책은 더 빠른 모델이 아니라 NPU를 카메라 가까이에 배치하는 것입니다.
+
+### 야간·우천 NPU 차선 이탈 사고
+
+1. **증상:** RNGD lane Mode C/D가 야간·우천에서 차선을 이탈했습니다. 처음에는 어두운 저대비
+   프레임에서 BF16 정밀도가 떨어진 것으로 보였습니다.
+2. **가설 검증:** dataset 240개와 실제 주행 200개, 총 440개 동일 프레임을 GPU와 NPU에서 비교했습니다.
+   - RNGD는 GPU BF16과 일치했고 FP32 대비 IoU는 0.991–0.998이었습니다.
+   - 야간·우천 결과는 주간보다 나쁘지 않았습니다.
+
+   따라서 **BF16 정밀도 문제라는 가설은 기각했습니다.**
+3. **근본 원인:** 실패한 4개 주행은 호스트 memory가 부족해지기 직전 마지막 실행이었습니다.
+   탐지와 차선 요청이 모두 1초 timeout에 걸렸고, Mode C/D에는 lane fallback이 없어 LKA 입력이 사라졌습니다.
+4. **재검증:** memory가 정상인 상태에서 같은 설정을 다시 실행하자 차선 이탈 0회,
+   RMSE 2.0–2.6 cm를 기록했습니다.
+5. **별도 결함:** NPU client가 letterbox 640×360 후 512×256으로 다시 resize합니다.
+   이중 resize로 mask IoU가 2–6% 감소하고 우천 offset 오차가 약 2 cm 증가합니다.
+
+![야간·우천 실패 분석](assets/plots/v3_nightrain_transport.png)
+
+### 남아 있는 위험과 미해결 문제
+
+- 50 km/h 곡선 선행차 제동에서 최소 gap이 GPU 13.7 m, RNGD+RNGD 2.1 m
+- RNGD 지연 + 20% stale 탐지에서 횡단 보행자 앞 0.33 m 정지
+- Radar fusion이 30 km/h 보행자와 곡선 장애물 접근 속도 추정을 악화
+- 반경 39 m 무위험 곡선에서 10회 중 4회 불필요한 제동
+- Mode C/D는 기본 GPU lane fallback이 없음
+- 의심스러운 수치를 재검토해 발견하고 unit test와 함께 수정한 버그:
   - Mode D lane-request aliasing
-  - failover latency hiding the failed wait
-  - stale injection erased by measured-latency simulation
+  - failed wait를 누락한 failover latency
+  - measured-latency simulation이 stale injection을 지우던 문제
 
-## Known Limitations
-- **Not real-time:** the remote RNGD loop is near-real-time; SSH transport is the bottleneck.
-- **No default lane fallback** in Modes C/D.
-- **Open perception/control issues:**
-  - radar fusion is not a general improvement
-  - unneeded braking on tight curves
-  - a 0.30 m lane-geometry offset error on a 39 m-radius curve
-- **Porting gaps:** ResNet18 and LR-ASPP do not compile, and there is no INT8 compute.
-- **Evaluation scope:**
-  - one run per cell, so no confidence intervals
-  - developed and evaluated on the same scenario family
-  - no lane keeping at 50 km/h
-  - no LiDAR, no traffic lights
-  - CARLA only; no real-vehicle validation
-- **Resources:** 16 GB RAM is tight for CARLA plus the tooling. The V3 matrix runs in phases with a
-  free-memory guard.
+## 한계 (Known Limitations)
 
-## Repository Structure
+- 원격 RNGD 폐루프는 준실시간이며 SSH 전송이 병목
+- Mode C/D에 기본 lane fallback 없음
+- Radar fusion이 모든 시나리오에서 개선되지 않음
+- 급곡선 불필요 제동과 반경 39 m 차선 geometry offset 0.30 m 문제
+- ResNet18과 LR-ASPP 컴파일 실패, 실제 INT8 연산 미지원
+- 평가 범위:
+  - 조건별 1회 실행이라 confidence interval 없음
+  - 개발과 평가가 같은 scenario family에 속함
+  - 50 km/h LKA 미평가
+  - LiDAR·traffic light 미지원
+  - CARLA 시뮬레이션만 수행, 실제 차량 미검증
+- 16 GB RAM에서 CARLA와 도구를 함께 실행하기 빠듯해 memory guard와 단계별 matrix 실행 사용
+
+## 저장소 구조 (Repository Structure)
+
 ```text
 src/npu_ad/
-  perception/   YOLO raw-head wrapper, lane U-Net + geometry, tracker, filters, radar fusion
-  runtime/      inference backends (GPU / RNGD / replay), async pipeline, multi-model client, failover
-  control/      AEB (V1, V2), LKA, arbiter
-  simulation/   CARLA session and sensors, exclusive server lock, geometry, traffic actors
-  npu/          exact graph rewrites for the RNGD compiler
-  evaluation/   metrics
-  viz/          demo overlays
-  scene.py      SceneState: the only input to AEB and LKA
-remote/         scripts that run on the NPU host (compile, benchmark, multi-model server, probes)
-scripts/        experiments, matrix runners, analysis, demo, diagram and manifest generators
-tests/          pytest suite (fake NPU server; the live CARLA test is opt-in)
-configs/        scenario, latency and route configuration
-code/           original step-by-step CARLA learning scripts (01–09)
-docs/           design notes, NPU porting, interview Q&A, resume summaries
-reports/        final reports V1–V3, evidence JSON, manifests, generated tables, sanitization log
-  agent_runs/   raw development logs (task tables, failure ledger) from AI-assisted development
-assets/         demo videos and key frames, plots, architecture diagrams
+  perception/   YOLO raw head, Lane U-Net·geometry, tracker, filter, radar fusion
+  runtime/      GPU/RNGD/replay backend, async pipeline, multi-model client, failover
+  control/      AEB(V1/V2), LKA, arbiter
+  simulation/   CARLA session·sensor, server lock, geometry, traffic actor
+  npu/          RNGD compiler용 exact graph rewrite
+  evaluation/   평가 지표
+  viz/          데모 overlay
+  scene.py      AEB와 LKA의 유일한 입력인 SceneState
+remote/         NPU 호스트에서 실행하는 compile·benchmark·server·probe
+scripts/        실험, matrix 실행, 분석, 데모, diagram·manifest 생성
+tests/          pytest suite, fake NPU server, 선택적 live CARLA test
+configs/        scenario·latency·route 설정
+code/           CARLA 단계별 학습 코드 01–09
+docs/           설계 문서, NPU 포팅, 면접 질문, 이력서 요약
+reports/        V1–V3 최종 보고서, evidence JSON, manifest, 표, sanitization 기록
+assets/         데모 영상·프레임, plot, architecture diagram
 ```
 
-## Reproduction
-### Local CARLA / GPU
-**Requirements:**
-- Windows (developed on Windows 11)
-- Python 3.12
-- an NVIDIA GPU (developed on an RTX 3060 12 GB)
-- CARLA 0.9.16 and its Python wheel
-- the packages pinned in `requirements-lock-windows.txt` (its `carla` entry points to the wheel inside a
-  local CARLA install; adjust that path)
+## 실행 방법 (Reproduction)
 
-**Not in the repository:** model weights (`models/*.pt`; SHA-256 values are in the reports), datasets
-and local outputs.
+### 로컬 CARLA / GPU
+
+**필요 환경**
+
+- Windows 11
+- Python 3.12
+- NVIDIA GPU, 개발 환경은 RTX 3060 12 GB
+- CARLA 0.9.16과 Python wheel
+- `requirements-lock-windows.txt`에 고정된 package
+
+모델 weight(`models/*.pt`), dataset, local output은 저장소에 포함하지 않습니다.
 
 ```powershell
-python -m venv .venv; .\.venv\Scripts\pip install -r requirements-lock-windows.txt
-$env:PYTHONPATH = "src;scripts"
-.\.venv\Scripts\python.exe -m pytest -q        # 80 passed, 1 skipped with models/yolo26n.pt present (79 + 2 skipped without it)
+python -m venv .venv
+.\.venv\Scripts\pip install -r requirements-lock-windows.txt
 
-<CARLA_ROOT>\CarlaUE4.exe -RenderOffScreen -carla-rpc-port=2000      # separately; one client at a time
-$env:NPU_AD_LIVE_CARLA = "1"; .\.venv\Scripts\python.exe -m pytest -q  # with the server running
-.\.venv\Scripts\python.exe scripts\run_v1_demo.py                     # V1 demo (GPU)
-.\.venv\Scripts\python.exe scripts\v3_analyze.py                      # V3 tables + plots from evidence
+$env:PYTHONPATH = "src;scripts"
+.\.venv\Scripts\python.exe -m pytest -q
+# models/yolo26n.pt가 있으면 80 passed, 1 skipped
+# 없으면 79 passed, 2 skipped
+
+<CARLA_ROOT>\CarlaUE4.exe -RenderOffScreen -carla-rpc-port=2000
+$env:NPU_AD_LIVE_CARLA = "1"
+.\.venv\Scripts\python.exe -m pytest -q
+
+.\.venv\Scripts\python.exe scripts\run_v1_demo.py
+.\.venv\Scripts\python.exe scripts\v3_analyze.py
 ```
 
-### Furiosa NPU
-**Requirements:**
-- access to Furiosa RNGD hardware
-- the Furiosa SDK (`furiosa-torch` 2026.4.0 was used), on a Linux host
+### Furiosa RNGD NPU
 
-The NPU host here was a shared remote machine. It is reached through an SSH alias, and no host name, user
-or key is stored in the repository. Example `~/.ssh/config`:
+**필요 환경**
+
+- Furiosa RNGD hardware 접근 권한
+- Linux 호스트의 Furiosa SDK, 시험 버전은 `furiosa-torch 2026.4.0`
+
+NPU 호스트는 공유 원격 장비를 사용했습니다. SSH alias로 접속하며 실제 hostname, user, key는
+저장소에 포함하지 않습니다.
 
 ```text
 Host furiosa-npu
@@ -406,21 +437,25 @@ Host furiosa-npu
 ```
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\npu_remote.py sync          # copies remote/ + required src/ to ~/npu_auto_driving_p2
-.\.venv\Scripts\python.exe scripts\run_v3_demo.py              # V3 demo (Modes B/D need RNGD)
-bash scripts/v3_matrix_focused.sh lk_strong comb_a comb_b       # V3 matrix phases (see the script)
-.\.venv\Scripts\python.exe scripts\v3_lane_correctness.py      # same-frame GPU vs RNGD lane test
+.\.venv\Scripts\python.exe scripts\npu_remote.py sync
+.\.venv\Scripts\python.exe scripts\run_v3_demo.py
+bash scripts/v3_matrix_focused.sh lk_strong comb_a comb_b
+.\.venv\Scripts\python.exe scripts\v3_lane_correctness.py
 ```
 
-Earlier reproduction steps are in the V1 and V2 reports.
+V1·V2의 상세 재현 절차는 각 버전 최종 보고서에 있습니다.
 
-## Future Work
-1. **Co-located NPU runtime:** zero-copy capture, a C++ client and no SSH. Target detection age below
-   40 ms.
-2. **Lane failover by default** for RNGD lane modes, and the same preprocessing on both paths (remove
-   the double resize).
-3. **AEB target logging,** then fix tight-curve path extrapolation and radar association.
-4. **Porting:** ResNet18 through an input-channel split; activation quantization once the SDK supports
-   it.
-5. **Evaluation:** repeated runs with confidence intervals, held-out scenarios, lane keeping at 50 km/h,
-   and LiDAR as fusion stage 2.
+## 다음 개선 과제 (Future Work)
+
+1. **NPU 로컬 배치:** zero-copy capture와 C++ client를 적용해 detection age 40 ms 이하 달성
+2. **차선 failover 기본 적용:** RNGD lane mode에 GPU fallback을 넣고 이중 resize 제거
+3. **AEB target logging:** 급곡선 경로 예측과 radar association 문제의 원인 추적
+4. **추가 모델 포팅:** input-channel split 기반 ResNet18, SDK 지원 후 activation quantization
+5. **평가 확대:** 반복 실험과 confidence interval, held-out scenario, 50 km/h LKA, LiDAR fusion
+
+---
+
+이 프로젝트는 높은 성능 수치만 보여주는 대신, **실패를 재현하고 가설을 반증한 뒤 시스템 수준의
+원인을 찾는 과정**을 함께 기록했습니다. 특히 “NPU 모델 지연이 빠르면 자율주행 제어도 빨라진다”는
+단순한 가정을 실제 폐루프 실험으로 검증하고, 전송 지연·데이터 나이·fallback 설계가 안전성에 미치는
+영향을 수치로 확인했습니다.
