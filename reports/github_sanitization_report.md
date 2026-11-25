@@ -1,6 +1,6 @@
 # GitHub sanitization log
 
-Status: **history rewritten locally (option B) and verified. Nothing has been pushed.**
+Status: **history rewritten in a separate sanitized clone (option B), verified, and published from that clone.**
 Date: 2026-11-25. Tool: `git-filter-repo` 2.47.0, installed in the project virtual environment only.
 
 ## What was done

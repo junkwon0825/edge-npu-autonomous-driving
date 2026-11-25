@@ -292,8 +292,8 @@
     },
     {
       "path": "reports/github_sanitization_report.md",
-      "bytes": 5264,
-      "sha256": "ab20064f624717fd98c44a3109b7e295e61f5023a3220f14eb0afacc70d719b4"
+      "bytes": 5289,
+      "sha256": "05dddfb5d362c24f6f136a976b2aa08b35fb2e6c586d73da8a41b56c0108b121"
     },
     {
       "path": "reports/sanitization/commit_map.txt",

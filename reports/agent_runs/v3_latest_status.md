@@ -1,8 +1,9 @@
 # V3 latest status (2026-11-25)
 
-- **Branch:** `feature/v3-multimodel-npu`, from `v2.0.0-rc1`.
-- **Tag:** local tag `v3.0.0-rc1`.
-- **Remote:** nothing pushed; no history rewritten.
+- **Branch:** `main` for the sanitized portfolio release; V3 was developed on `feature/v3-multimodel-npu`
+  from `v2.0.0-rc1`.
+- **Tag:** `v3.0.0-rc1`.
+- **Remote:** sanitized `main` and the V1/V2/V3 release-candidate tags are published to the portfolio repository.
 - **Status:** COMPLETE (release candidate) with documented safety failures. Report:
   `reports/v3_final_report.md`.
 
@@ -47,7 +48,5 @@
   interview Q&A expanded; BF16 vs preprocessing wording made consistent.
 - **Checks:** tests, lint, imports, links, the manifest verifier and a full-history privacy scan.
 
-## Awaiting user approval
-- Push to GitHub: remote, main branch, tags.
-- Publishing the KB handoff to `jun-ai-knowledge`.
-- Deleting the ~3 GB of replay files on the shared RNGD host.
+The GitHub publication and remote replay cleanup were completed after this engineering status snapshot.
+The knowledge-base handoff is tracked separately from the public repository.
